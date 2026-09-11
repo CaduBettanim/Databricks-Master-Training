@@ -29,7 +29,8 @@ O domínio é uma **empresa de assinatura genérica**, então a trilha se adapta
 | **01 - Consultas SQL com Genie Code** | Explorar a base no SQL Editor e gerar SQL com o assistente (Genie Code). |
 | **02 - Geração de Alertas** | Criar alertas que disparam quando um indicador de churn cruza um limite. |
 | **03 - Metric Views** | Definir métricas governadas (churn, receita, suporte) e consultá-las com MEASURE(). |
-| *(próximos)* | AI Functions · Dashboards · Modelo de churn · Genie · Discovery · Knowledge Assistant · Supervisor · App |
+| **04 - AI Functions** | IA Generativa no SQL sobre os tickets: sentimento, classificação, PII e resumo. |
+| *(próximos)* | Dashboards · Modelo de churn · Genie · Discovery · Knowledge Assistant · Supervisor · App |
 
 ## Como começar
 
