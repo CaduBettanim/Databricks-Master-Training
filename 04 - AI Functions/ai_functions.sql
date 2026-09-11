@@ -13,6 +13,16 @@ SELECT LEFT(texto_reclamacao, 60) AS trecho, csat,
        ai_analyze_sentiment(texto_reclamacao) AS sentimento
 FROM amostra ORDER BY csat DESC;
 
+-- 1b) Distribuição de sentimento em TODOS os tickets
+-- (mais lenta: roda a IA em toda a tabela — ~1 a alguns minutos)
+SELECT sentimento, COUNT(*) AS qtd
+FROM (
+  SELECT ai_analyze_sentiment(texto_reclamacao) AS sentimento
+  FROM dbacademy.churn.fato_ticket_suporte
+)
+GROUP BY sentimento
+ORDER BY qtd DESC;
+
 -- 2) ai_classify — classificar o assunto do ticket
 WITH amostra AS (
   (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)

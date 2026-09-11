@@ -30,6 +30,19 @@ FROM amostra ORDER BY csat DESC;
 ```
 Resultado: `csat 5 → positive` · `csat 3 → neutral` · `csat 1 → negative` — o sentimento acompanha a nota.
 
+### 1b. Distribuição de sentimento (todos os tickets)
+Agora agregue o sentimento na base inteira (roda a IA em toda a tabela — leva **~1 a alguns minutos**):
+```sql
+SELECT sentimento, COUNT(*) AS qtd
+FROM (
+  SELECT ai_analyze_sentiment(texto_reclamacao) AS sentimento
+  FROM dbacademy.churn.fato_ticket_suporte
+)
+GROUP BY sentimento
+ORDER BY qtd DESC;
+```
+Resultado esperado: **neutral 457 · positive 421 · negative 375** (total 1.253). Assim você transforma texto livre em um indicador agregável.
+
 ## 2. Classificação — `ai_classify`
 ```sql
 WITH amostra AS (
