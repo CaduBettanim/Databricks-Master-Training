@@ -30,13 +30,13 @@ spark.sql(f"CREATE SCHEMA IF NOT EXISTS {fq} COMMENT 'Base compartilhada de chur
 # COMMAND ----------
 # ## 1. Carrega os CSVs (do repositório) → tabelas Delta
 import pandas as pd
-from pyspark.sql.functions import to_date, col, lower
+from pyspark.sql.functions import to_date, col, lower, when, trim
 
 def carrega(nome, dates=(), bools=()):
     pdf = pd.read_csv(f"{CSV_BASE}/{nome}.csv", keep_default_na=False)  # "" em vez de NaN
-    df = spark.createDataFrame(pdf)
-    for d in dates:
-        df = df.withColumn(d, to_date(col(d)))
+    df = spark.createDataFrame(pdf)   # numéricos inferidos; datas/bools vêm como string
+    for d in dates:  # trata vazio como NULL antes do cast (ANSI: to_date('') estoura)
+        df = df.withColumn(d, to_date(when(trim(col(d)) == "", None).otherwise(col(d))))
     for b in bools:
         df = df.withColumn(b, lower(col(b).cast("string")) == "true")
     df.write.mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{fq}.{nome}")
