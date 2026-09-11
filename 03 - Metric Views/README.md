@@ -23,15 +23,7 @@ O notebook cria três metric views no **seu** schema, lendo de `dbacademy.churn`
 > O SQL completo das views está em [`metric_views.sql`](./metric_views.sql).
 > As metric views são criadas via **notebook (Spark)**; depois de criadas, ficam disponíveis para consultas SQL, **dashboards (Ex. 5)** e **Genie (Ex. 7)**.
 
-## Passo 2 — Consultar com `MEASURE()`
-As últimas células do notebook já mostram exemplos. Troque `<seu_db>` pelo seu schema:
-```sql
-SELECT `Segmento`, ROUND(MEASURE(`Taxa de Churn`), 3) AS taxa_churn
-FROM dbacademy.<seu_db>.mvw_churn
-GROUP BY `Segmento` ORDER BY taxa_churn DESC;
-```
-
-## Por que Metric Views? (antes × depois)
+## Passo 2 — Por que Metric Views? (antes × depois)
 Agora que suas metric views existem, compare as duas formas de calcular a **mesma** métrica — **inadimplência por segmento**. Dão o mesmo número, com esforço e risco bem diferentes.
 
 **Sem metric view (SQL puro):** você precisa acertar o join, a lógica condicional e a forma de média:
