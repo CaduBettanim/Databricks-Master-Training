@@ -33,11 +33,26 @@ GROUP BY segmento ORDER BY clientes DESC;
 ```
 **2.2 Assinaturas ativas x canceladas** · **2.3 Top motivos de cancelamento** · **2.4 Taxa de churn por segmento** — ver [`consultas.sql`](./consultas.sql).
 
-## Passo 3 — Genie Code (assistente ✨)
-No SQL Editor, abra o assistente e peça em português:
-> *"Mostre a taxa de churn por segmento de cliente, da maior para a menor."*
+## Passo 3 — Genie Code: gerar SQL em linguagem natural
 
-Revise o SQL gerado, execute e peça também: *"explique esta consulta"*. Note como ele entende as tabelas e os comentários que documentamos no Setup.
+O **Genie Code** é o assistente do SQL Editor que **escreve o código SQL** para você — diferente da **Genie** (espaço conversacional, Ex. 7), que *responde perguntas*. Aqui o foco é **montar consulta**.
+
+> **Regra de ouro (para todos gerarem o mesmo resultado):** **nomeie sempre a tabela**. Não precisa listar as colunas — os comentários que documentamos no Setup fazem a IA acertar. Só acrescente um detalhe quando houver ambiguidade real: **qual data** (há mais de uma), o **limiar** de um termo vago, ou a **definição** de uma métrica aberta.
+
+Abra o assistente (✨) no SQL Editor e peça, **um de cada vez** (revise o SQL gerado e execute):
+
+1. `Escreva o SQL da taxa de churn por segmento usando a tabela dbacademy.churn.feature_churn.`
+2. `Escreva uma query com os 5 principais motivos de cancelamento usando a dbacademy.churn.fato_assinatura.`
+3. `Escreva a taxa de churn por plano usando dbacademy.churn.fato_assinatura e dbacademy.churn.dim_plano.`
+4. `Conte quantas assinaturas foram canceladas por mês usando dbacademy.churn.fato_assinatura, considerando a data de cancelamento (data_fim).`
+5. `Liste os 10 clientes com mais tickets de csat <= 2 na dbacademy.churn.fato_ticket_suporte, usando window function para o ranking.`
+
+**Editar e entender o código gerado** (isto é o diferencial do Genie Code — não é Q&A):
+- `explique esta consulta`
+- `otimize esta consulta`
+- `adicione um filtro para o segmento Corporativo`
+
+> **⚠️ Contra-exemplo — por que ser objetivo:** peça `Liste os clientes em risco.` Sem uma definição, a IA **inventa os critérios** (limiares diferentes a cada execução) e o resultado **varia por aluno**. Lição: seja específico. A definição de "risco" virá depois — das **instruções da Genie** (Ex. 7) e do **modelo de churn** (Ex. 6).
 
 ## Passo 4 (bônus) — Recursos Delta (somente leitura)
 ```sql
