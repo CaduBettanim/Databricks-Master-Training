@@ -55,7 +55,6 @@ SELECT csat, LEFT(texto_reclamacao, 60) AS trecho,
 FROM amostra ORDER BY csat DESC;
 ```
 Resultado (Llama): `csat 5 → Positive` · `csat 3 → Neutral` · `csat 1 → Negative`.
-> Nem todo modelo suporta `ai_query` em lote — ex.: `databricks-kimi-k3` retorna *"not supported for batch inference"*. Llama, GPT-OSS e Claude funcionam.
 
 ## 2. Classificação — `ai_classify`
 ```sql
