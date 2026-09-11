@@ -64,16 +64,20 @@ Ex.: *"Meu email é c00015@exemplo.com.br e ainda não recebi retorno."* →
 Ótimo para compartilhar dados de suporte sem expor informações pessoais (gancho com governança no Ex. 11).
 
 ## 4. Resumo das dores — `ai_summarize`
+Resume **100 tickets negativos** (csat ≤ 2) em até **150 palavras** — transformando dezenas de reclamações num diagnóstico:
 ```sql
-SELECT ai_summarize(array_join(collect_list(texto_reclamacao), ' | '), 40) AS resumo_dores
+SELECT ai_summarize(array_join(collect_list(texto_reclamacao), ' | '), 150) AS resumo_dores
 FROM (
   SELECT texto_reclamacao
   FROM dbacademy.churn.fato_ticket_suporte
   WHERE csat <= 2
-  LIMIT 20
+  LIMIT 100
 );
 ```
-Retorna algo como: *"Clientes insatisfeitos com serviço e atendimento, relatam problemas e ameaçam cancelar."* — um resumo em uma frase de dezenas de tickets.
+Retorna algo como:
+> *"Os clientes estão expressando insatisfação com o serviço, relatando problemas como serviço caindo frequentemente, dificuldade em atualizar dados cadastrais e falta de retorno sobre solicitações de cancelamento e alterações de plano. Muitos ameaçam cancelar e migrar para concorrentes devido ao péssimo atendimento."*
+
+Em vez de ler 100 tickets, você tem as **principais dores** em um parágrafo.
 
 ---
 

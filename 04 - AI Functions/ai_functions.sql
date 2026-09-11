@@ -41,11 +41,11 @@ FROM dbacademy.churn.fato_ticket_suporte
 WHERE texto_reclamacao LIKE '%@%' OR texto_reclamacao LIKE '%-____%'
 LIMIT 5;
 
--- 4) ai_summarize — resumir as dores dos tickets negativos (csat <= 2)
-SELECT ai_summarize(array_join(collect_list(texto_reclamacao), ' | '), 40) AS resumo_dores
+-- 4) ai_summarize — resumir as dores de 100 tickets negativos (csat <= 2), em até 150 palavras
+SELECT ai_summarize(array_join(collect_list(texto_reclamacao), ' | '), 150) AS resumo_dores
 FROM (
   SELECT texto_reclamacao
   FROM dbacademy.churn.fato_ticket_suporte
   WHERE csat <= 2
-  LIMIT 20
+  LIMIT 100
 );
