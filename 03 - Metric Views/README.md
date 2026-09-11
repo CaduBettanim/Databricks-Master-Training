@@ -35,6 +35,14 @@ GROUP BY `Segmento` ORDER BY taxa_churn DESC;
 
 **Taxa de churn por segmento (`mvw_churn`):** Consumidor **0,303** · PME **0,239** · Corporativo **0,166**
 
-**Receita por segmento (`mvw_receita`):** _(preenchido na validação)_
+**Receita por segmento (`mvw_receita`):** Consumidor **R$ 3.624.210,40** · PME **R$ 1.800.087,50** · Corporativo **R$ 680.302,60** (inadimplência ≈ **6,8%** em todos)
 
-**Suporte por categoria (`mvw_suporte`):** _(preenchido na validação)_
+**Suporte por categoria (`mvw_suporte`) — CSAT / NPS:**
+| Categoria | Tickets | CSAT Médio | NPS Médio |
+|-----------|:---:|:---:|:---:|
+| Dúvida | 647 | 4,08 | 7,76 |
+| Cobrança | 361 | 2,99 | 5,78 |
+| Cancelamento | 131 | 2,27 | 4,38 |
+| Técnico | 114 | 2,28 | 4,38 |
+
+As categorias "negativas" (Cancelamento, Técnico) têm o menor CSAT/NPS — coerente com o negócio.
