@@ -94,33 +94,6 @@ Conte quantas assinaturas foram canceladas por mês usando dbacademy.churn.fato_
 Liste os 10 clientes com mais tickets de csat <= 2 na dbacademy.churn.fato_ticket_suporte, usando window function para o ranking.
 ```
 
-**Editar e entender o código gerado** (o diferencial do Genie Code — não é Q&A):
-```text
-explique esta consulta
-```
-```text
-otimize esta consulta
-```
-```text
-adicione um filtro para o segmento Corporativo
-```
-
-> **⚠️ Contra-exemplo — por que ser objetivo.** Cole o prompt abaixo: sem uma definição, a IA **inventa os critérios** (limiares diferentes a cada execução) e o resultado **varia por aluno**.
-
-```text
-Liste os clientes em risco.
-```
-
-Lição: seja específico. A definição de "risco" virá depois — das **instruções da Genie** (Ex. 7) e do **modelo de churn** (Ex. 6).
-
-## Passo 4 (bônus) — Recursos Delta (somente leitura)
-```sql
-DESCRIBE HISTORY dbacademy.churn.fato_assinatura;
-DESCRIBE DETAIL  dbacademy.churn.dim_cliente;
-SELECT COUNT(*) FROM dbacademy.churn.fato_assinatura VERSION AS OF 0;  -- time travel
-```
-> A base compartilhada é **somente leitura** — não use `ALTER`/`UPDATE` aqui. Você vai criar e alterar objetos no **seu** schema a partir do próximo módulo.
-
 ## 🎯 Desafio
 **Qual plano tem a maior taxa de churn e quantos clientes perdeu?** Monte a consulta (dica: junte `fato_assinatura` com `dim_plano`), depois confira pedindo ao Genie Code.
 
