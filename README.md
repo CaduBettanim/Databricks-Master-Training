@@ -27,7 +27,8 @@ O domínio é uma **empresa de assinatura genérica**, então a trilha se adapta
 |--------|----------|
 | **00 - Setup** | Preparação da base compartilhada de churn (dados + documentação + base de conhecimento). Começe por aqui. |
 | **01 - Consultas SQL com Genie Code** | Explorar a base no SQL Editor e gerar SQL com o assistente (Genie Code). |
-| *(próximos)* | Alertas · Metric Views · AI Functions · Dashboards · Modelo de churn · Genie · Discovery · Knowledge Assistant · Supervisor · App |
+| **02 - Geração de Alertas** | Criar alertas que disparam quando um indicador de churn cruza um limite. |
+| *(próximos)* | Metric Views · AI Functions · Dashboards · Modelo de churn · Genie · Discovery · Knowledge Assistant · Supervisor · App |
 
 ## Como começar
 
