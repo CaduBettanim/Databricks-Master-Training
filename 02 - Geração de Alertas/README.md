@@ -25,7 +25,7 @@ FROM dbacademy.churn.fato_assinatura;
    - Valor (threshold): **25**
 4. **Nome:** `Alerta_Churn_<seu_nome>`.
 5. Em **Notifications**, informe o **e-mail** para receber o alerta.
-6. Defina a **agenda** (ex.: diária) e clique em **Create alert**.
+6. Defina a **agenda** (ex.: diária) e clique em **Run Alert**.
 
 Como a taxa atual é **27,0** e o limite é **25**, o alerta entra em estado **disparado (triggered)**.
 
