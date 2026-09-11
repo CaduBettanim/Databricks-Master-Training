@@ -66,7 +66,7 @@ Ex.: *"Meu email é c00015@exemplo.com.br e ainda não recebi retorno."* →
 ## 4. Resumo dos comentários com Genie Code — `ai_summarize`
 Novamente, **peça ao Genie Code**. Cole este prompt no assistente (✨), revise o SQL gerado e execute:
 ```text
-Usando a tabela dbacademy.churn.fato_ticket_suporte, gere uma consulta que pegue os últimos 100 comentários (coluna texto_reclamacao, pela data_abertura) e use ai_summarize para resumir o que os clientes estão dizendo.
+Usando a tabela dbacademy.churn.fato_ticket_suporte, gere uma consulta que pegue os últimos 100 comentários e use ai_summarize para resumir o que os clientes estão dizendo.
 ```
 Retorna algo como:
 > *"Os últimos 100 tickets revelam que os clientes relatam principalmente problemas com atendimento, cobranças indevidas e instabilidade do serviço, mas também há registros de elogios ao suporte e atendimento de qualidade."*
