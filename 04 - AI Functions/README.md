@@ -38,6 +38,25 @@ Usando a tabela dbacademy.churn.fato_ticket_suporte, escreva uma consulta que ap
 Resultado esperado (amostra de 100): **positive 43 · neutral 33 · negative 24**.
 > Roda em segundos por ser uma amostra. Repare: o texto livre virou um **indicador contável** — e você gerou a consulta só descrevendo o que queria.
 
+## 1c. Sentimento com um modelo específico — `ai_query`
+As funções acima usam o modelo **padrão** do Databricks. Com **`ai_query`** você escolhe **qual modelo** usar. Selecione uma destas 3 opções e altere o 1º argumento da query com seu modelo favorito:
+- `databricks-meta-llama-3-3-70b-instruct` (Llama)
+- `databricks-gpt-oss-120b` (OpenAI)
+- `databricks-claude-haiku-4-5` (Claude)
+```sql
+WITH amostra AS (
+  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+)
+SELECT csat, LEFT(texto_reclamacao, 60) AS trecho,
+       ai_query('databricks-meta-llama-3-3-70b-instruct',
+                'Classifique o sentimento como positive, neutral ou negative. Responda apenas com a palavra. Comentário: ' || texto_reclamacao) AS sentimento
+FROM amostra ORDER BY csat DESC;
+```
+Resultado (Llama): `csat 5 → Positive` · `csat 3 → Neutral` · `csat 1 → Negative`.
+> Nem todo modelo suporta `ai_query` em lote — ex.: `databricks-kimi-k3` retorna *"not supported for batch inference"*. Llama, GPT-OSS e Claude funcionam.
+
 ## 2. Classificação — `ai_classify`
 ```sql
 WITH amostra AS (
@@ -51,6 +70,21 @@ SELECT LEFT(texto_reclamacao, 60) AS trecho, csat,
 FROM amostra ORDER BY csat DESC;
 ```
 A IA lê o texto livre e escolhe uma das categorias que você definiu (ex.: elogio → **`Elogio`**, "já pedi cancelamento…" → **`Cancelamento`**).
+
+## 2b. Classificação com um modelo específico — `ai_query`
+Mesma ideia da 1c, agora classificando o assunto. Selecione um modelo (Llama, GPT-OSS ou Claude) e altere o 1º argumento:
+```sql
+WITH amostra AS (
+  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+)
+SELECT csat, LEFT(texto_reclamacao, 60) AS trecho,
+       ai_query('databricks-gpt-oss-120b',
+                'Classifique o assunto em uma destas categorias: Cobrança, Técnico, Cancelamento, Elogio, Dúvida. Responda apenas com a categoria. Comentário: ' || texto_reclamacao) AS categoria
+FROM amostra ORDER BY csat DESC;
+```
+Resultado (GPT-OSS): `csat 5 → Elogio` · `csat 3 → Dúvida` · `csat 1 → Cancelamento`.
 
 ## 3. Mascaramento de PII — `ai_mask`
 ```sql

@@ -24,6 +24,18 @@ FROM (
 GROUP BY sentimento
 ORDER BY qtd DESC;
 
+-- 1c) Sentimento com um MODELO ESPECÍFICO via ai_query
+--     Troque o endpoint: databricks-meta-llama-3-3-70b-instruct | databricks-gpt-oss-120b | databricks-claude-haiku-4-5
+WITH amostra AS (
+  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+)
+SELECT csat, LEFT(texto_reclamacao, 60) AS trecho,
+       ai_query('databricks-meta-llama-3-3-70b-instruct',
+                'Classifique o sentimento como positive, neutral ou negative. Responda apenas com a palavra. Comentário: ' || texto_reclamacao) AS sentimento
+FROM amostra ORDER BY csat DESC;
+
 -- 2) ai_classify — classificar o assunto do ticket
 WITH amostra AS (
   (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
@@ -33,6 +45,17 @@ WITH amostra AS (
 SELECT LEFT(texto_reclamacao, 60) AS trecho, csat,
        ai_classify(texto_reclamacao,
                    ARRAY('Cobrança','Técnico','Cancelamento','Elogio','Dúvida')) AS categoria_ia
+FROM amostra ORDER BY csat DESC;
+
+-- 2b) Classificação com um MODELO ESPECÍFICO via ai_query
+WITH amostra AS (
+  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+)
+SELECT csat, LEFT(texto_reclamacao, 60) AS trecho,
+       ai_query('databricks-gpt-oss-120b',
+                'Classifique o assunto em uma destas categorias: Cobrança, Técnico, Cancelamento, Elogio, Dúvida. Responda apenas com a categoria. Comentário: ' || texto_reclamacao) AS categoria
 FROM amostra ORDER BY csat DESC;
 
 -- 3) ai_mask — mascarar dados pessoais (PII) no texto
