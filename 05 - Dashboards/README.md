@@ -18,7 +18,7 @@ Construir, do zero, um dashboard **AI/BI** de retenção com:
 
 ## Passo 1 — Criar o dashboard e o 1º dataset
 1. No menu lateral, **New → Dashboard** (ou **Dashboards → Create dashboard**).
-2. Abra a aba **Data** (Dados) e clique em **Create from SQL**.
+2. Abra a aba **Data** (Dados) e clique em **Add SQL Dataset**.
 3. Cole a consulta do **Dataset 1 — assinaturas** (está no `.sql`) e **Run**. Renomeie o dataset para **`assinaturas`**.
 
 ```text
@@ -63,7 +63,7 @@ Esperado: **Insatisfação 196 · Preço 148 · Concorrência 104 · Atendimento
 > Repare: você montou 5 visualizações **sem escrever uma linha de SQL de gráfico** — só descrevendo o que queria. É o mesmo espírito do Genie Code, agora para o painel.
 
 ## Passo 3 — Receita e inadimplência (2º dataset)
-1. Volte à aba **Data → Create from SQL** e cole o **Dataset 2 — faturamento**. Renomeie para **`faturamento`**.
+1. Volte à aba **Data → Add SQL Dataset** e cole o **Dataset 2 — faturamento**. Renomeie para **`faturamento`**.
 2. No Canvas, adicione um gráfico com o Assistente usando o dataset **`faturamento`**:
 ```text
 Gráfico de linha com a receita por competencia (mês) e uma segunda linha com o pct_nao_pago.
