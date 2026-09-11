@@ -63,21 +63,15 @@ Ex.: *"Meu email é c00015@exemplo.com.br e ainda não recebi retorno."* →
 *"Meu email é **[MASKED]** e ainda não recebi retorno."*
 Ótimo para compartilhar dados de suporte sem expor informações pessoais (gancho com governança no Ex. 11).
 
-## 4. Resumo das dores — `ai_summarize`
-Resume **100 tickets negativos** (csat ≤ 2) em até **150 palavras** — transformando dezenas de reclamações num diagnóstico:
-```sql
-SELECT ai_summarize(array_join(collect_list(texto_reclamacao), ' | '), 150) AS resumo_dores
-FROM (
-  SELECT texto_reclamacao
-  FROM dbacademy.churn.fato_ticket_suporte
-  WHERE csat <= 2
-  LIMIT 100
-);
+## 4. Resumo dos comentários com Genie Code — `ai_summarize`
+Novamente, **peça ao Genie Code**. Cole este prompt no assistente (✨), revise o SQL gerado e execute:
+```text
+Usando a tabela dbacademy.churn.fato_ticket_suporte, gere uma consulta que pegue os últimos 100 comentários (coluna texto_reclamacao, pela data_abertura) e use ai_summarize para resumir o que os clientes estão dizendo.
 ```
 Retorna algo como:
-> *"Os clientes estão expressando insatisfação com o serviço, relatando problemas como serviço caindo frequentemente, dificuldade em atualizar dados cadastrais e falta de retorno sobre solicitações de cancelamento e alterações de plano. Muitos ameaçam cancelar e migrar para concorrentes devido ao péssimo atendimento."*
+> *"Os últimos 100 tickets revelam que os clientes relatam principalmente problemas com atendimento, cobranças indevidas e instabilidade do serviço, mas também há registros de elogios ao suporte e atendimento de qualidade."*
 
-Em vez de ler 100 tickets, você tem as **principais dores** em um parágrafo.
+Em vez de ler 100 tickets, você tem o **panorama em um parágrafo** — e gerou a consulta só descrevendo o que queria.
 
 ---
 
