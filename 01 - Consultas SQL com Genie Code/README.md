@@ -29,9 +29,37 @@ Rode uma a uma e observe os resultados:
 ```sql
 SELECT segmento, COUNT(*) AS clientes
 FROM dbacademy.churn.dim_cliente
-GROUP BY segmento ORDER BY clientes DESC;
+GROUP BY segmento
+ORDER BY clientes DESC;
 ```
-**2.2 Assinaturas ativas x canceladas** · **2.3 Top motivos de cancelamento** · **2.4 Taxa de churn por segmento** — ver [`consultas.sql`](./consultas.sql).
+
+**2.2 Assinaturas ativas x canceladas**
+```sql
+SELECT status, COUNT(*) AS qtd
+FROM dbacademy.churn.fato_assinatura
+GROUP BY status
+ORDER BY qtd DESC;
+```
+
+**2.3 Top motivos de cancelamento**
+```sql
+SELECT motivo_cancelamento, COUNT(*) AS qtd
+FROM dbacademy.churn.fato_assinatura
+WHERE churn_flag = 1
+GROUP BY motivo_cancelamento
+ORDER BY qtd DESC;
+```
+
+**2.4 Taxa de churn por segmento**
+```sql
+SELECT c.segmento, ROUND(AVG(a.churn_flag), 3) AS taxa_churn
+FROM dbacademy.churn.fato_assinatura a
+JOIN dbacademy.churn.dim_cliente c ON a.id_cliente = c.id_cliente
+GROUP BY c.segmento
+ORDER BY taxa_churn DESC;
+```
+
+> Todas as consultas também estão em [`consultas.sql`](./consultas.sql).
 
 ## Passo 3 — Genie Code: gerar SQL em linguagem natural
 
