@@ -39,20 +39,51 @@ O **Genie Code** é o assistente do SQL Editor que **escreve o código SQL** par
 
 > **Regra de ouro (para todos gerarem o mesmo resultado):** **nomeie sempre a tabela**. Não precisa listar as colunas — os comentários que documentamos no Setup fazem a IA acertar. Só acrescente um detalhe quando houver ambiguidade real: **qual data** (há mais de uma), o **limiar** de um termo vago, ou a **definição** de uma métrica aberta.
 
-Abra o assistente (✨) no SQL Editor e peça, **um de cada vez** (revise o SQL gerado e execute):
+Abra o assistente (✨) no SQL Editor e cole **um prompt de cada vez** (use o botão de copiar no canto de cada bloco), revise o SQL gerado e execute:
 
-1. `Escreva o SQL da taxa de churn por segmento usando a tabela dbacademy.churn.feature_churn.`
-2. `Escreva uma query com os 5 principais motivos de cancelamento usando a dbacademy.churn.fato_assinatura.`
-3. `Escreva a taxa de churn por plano usando dbacademy.churn.fato_assinatura e dbacademy.churn.dim_plano.`
-4. `Conte quantas assinaturas foram canceladas por mês usando dbacademy.churn.fato_assinatura, considerando a data de cancelamento (data_fim).`
-5. `Liste os 10 clientes com mais tickets de csat <= 2 na dbacademy.churn.fato_ticket_suporte, usando window function para o ranking.`
+**1. Taxa de churn por segmento**
+```text
+Escreva o SQL da taxa de churn por segmento usando a tabela dbacademy.churn.feature_churn.
+```
 
-**Editar e entender o código gerado** (isto é o diferencial do Genie Code — não é Q&A):
-- `explique esta consulta`
-- `otimize esta consulta`
-- `adicione um filtro para o segmento Corporativo`
+**2. Top 5 motivos de cancelamento**
+```text
+Escreva uma query com os 5 principais motivos de cancelamento usando a dbacademy.churn.fato_assinatura.
+```
 
-> **⚠️ Contra-exemplo — por que ser objetivo:** peça `Liste os clientes em risco.` Sem uma definição, a IA **inventa os critérios** (limiares diferentes a cada execução) e o resultado **varia por aluno**. Lição: seja específico. A definição de "risco" virá depois — das **instruções da Genie** (Ex. 7) e do **modelo de churn** (Ex. 6).
+**3. Taxa de churn por plano**
+```text
+Escreva a taxa de churn por plano usando dbacademy.churn.fato_assinatura e dbacademy.churn.dim_plano.
+```
+
+**4. Cancelamentos por mês**
+```text
+Conte quantas assinaturas foram canceladas por mês usando dbacademy.churn.fato_assinatura, considerando a data de cancelamento (data_fim).
+```
+
+**5. Top 10 clientes com tickets negativos**
+```text
+Liste os 10 clientes com mais tickets de csat <= 2 na dbacademy.churn.fato_ticket_suporte, usando window function para o ranking.
+```
+
+**Editar e entender o código gerado** (o diferencial do Genie Code — não é Q&A):
+```text
+explique esta consulta
+```
+```text
+otimize esta consulta
+```
+```text
+adicione um filtro para o segmento Corporativo
+```
+
+> **⚠️ Contra-exemplo — por que ser objetivo.** Cole o prompt abaixo: sem uma definição, a IA **inventa os critérios** (limiares diferentes a cada execução) e o resultado **varia por aluno**.
+
+```text
+Liste os clientes em risco.
+```
+
+Lição: seja específico. A definição de "risco" virá depois — das **instruções da Genie** (Ex. 7) e do **modelo de churn** (Ex. 6).
 
 ## Passo 4 (bônus) — Recursos Delta (somente leitura)
 ```sql
