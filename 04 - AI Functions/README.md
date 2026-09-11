@@ -109,7 +109,23 @@ Em vez de ler 100 tickets, você tem o **panorama em um parágrafo** — e gerou
 ---
 
 ## 🎯 Desafio
-Escreva uma consulta que, para cada ticket, mostre o **sentimento** e a **categoria** detectados pela IA, e conte **quantos tickets negativos existem por categoria**.
+Você está recebendo muitos comentários negativos e isso está impactando a relação com seus clientes. **Mostre como você pode selecionar 50 comentários negativos e gerar respostas para eles!**
+
+💡 **Dica:** existe uma **AI Function** do Databricks perfeita para *gerar* texto — descubra qual é (explore as AI Functions do SQL).
+
+<details>
+<summary>Ver solução</summary>
+
+A função é **`ai_gen`** (geração de texto). Selecione 50 tickets negativos (`csat <= 2`) e gere uma resposta para cada:
+```sql
+SELECT texto_reclamacao,
+       ai_gen('Escreva uma resposta curta, educada e empática, em português, para este comentário de um cliente insatisfeito, oferecendo ajuda para resolver: ' || texto_reclamacao) AS resposta
+FROM dbacademy.churn.fato_ticket_suporte
+WHERE csat <= 2
+LIMIT 50;
+```
+São 50 gerações — leva ~1 a alguns minutos. Cada resposta sai personalizada ao comentário do cliente (a IA até aproveita o contexto do texto).
+</details>
 
 ## Explore
 As AI Functions transformam texto livre em dados estruturados — sentimento e categoria viram colunas que você pode agregar, filtrar e cruzar com churn. Esse "sinal" da voz do cliente será usado adiante no modelo (Ex. 6) e nos agentes.
