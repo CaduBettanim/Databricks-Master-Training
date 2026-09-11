@@ -111,7 +111,7 @@ Em vez de ler 100 tickets, você tem o **panorama em um parágrafo** — e gerou
 ## 🎯 Desafio
 Você está recebendo muitos comentários negativos e isso está impactando a relação com seus clientes. **Mostre como você pode selecionar 50 comentários negativos e gerar respostas para eles!**
 
-**Dica:** AI Functions 😉
+**Dica:** Genie Code + AI Functions 😉
 
 ## Explore
 As AI Functions transformam texto livre em dados estruturados — sentimento e categoria viram colunas que você pode agregar, filtrar e cruzar com churn. Esse "sinal" da voz do cliente será usado adiante no modelo (Ex. 6) e nos agentes.
