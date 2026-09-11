@@ -12,18 +12,34 @@ Construir, do zero, um dashboard **AI/BI** de retenção com:
 - **inadimplência mensal**;
 - um **filtro** que deixa o painel inteiro interativo.
 
-> Os dois **datasets** (consultas SQL que alimentam o painel) estão em [`dashboard_datasets.sql`](./dashboard_datasets.sql). Os **gráficos** você cria com o Assistente, no Canvas.
+> Os **datasets** são consultas SQL que alimentam o painel (estão logo abaixo, prontas para copiar). Os **gráficos** você cria com o Assistente, no Canvas.
 
 ---
 
 ## Passo 1 — Criar o dashboard e o 1º dataset
 1. No menu lateral, **New → Dashboard** (ou **Dashboards → Create dashboard**).
 2. Abra a aba **Data** (Dados) e clique em **Add SQL Dataset**.
-3. Cole a consulta do **Dataset 1 — assinaturas** (está no `.sql`) e **Run**. Renomeie o dataset para **`assinaturas`**.
+3. Cole a consulta do **Dataset 1 — assinaturas** e **Run**. Renomeie o dataset para **`assinaturas`**.
 
-```text
-Dataset 1 — cole na aba Dados (é 1 linha por assinatura, com status Ativa/Cancelada,
-plano, segmento, canal, UF, faixa etária e motivo de cancelamento).
+```sql
+-- Dataset 1 — assinaturas (1 linha por assinatura; status = Ativa | Cancelada, churn_flag = 1 cancelou)
+SELECT
+  a.id_cliente,
+  a.status,
+  a.churn_flag,
+  a.motivo_cancelamento,
+  a.data_inicio,
+  a.data_fim,
+  p.nome_plano,
+  p.preco_mensal,
+  p.periodicidade,
+  c.segmento,
+  c.uf,
+  c.canal_aquisicao,
+  c.faixa_etaria
+FROM dbacademy.churn.fato_assinatura a
+JOIN dbacademy.churn.dim_plano    p ON a.id_plano   = p.id_plano
+JOIN dbacademy.churn.dim_cliente  c ON a.id_cliente = c.id_cliente;
 ```
 Este único dataset já alimenta a maioria dos gráficos abaixo.
 
@@ -63,7 +79,20 @@ Esperado: **Insatisfação 196 · Preço 148 · Concorrência 104 · Atendimento
 > Repare: você montou 5 visualizações **sem escrever uma linha de SQL de gráfico** — só descrevendo o que queria. É o mesmo espírito do Genie Code, agora para o painel.
 
 ## Passo 3 — Receita e inadimplência (2º dataset)
-1. Volte à aba **Data → Add SQL Dataset** e cole o **Dataset 2 — faturamento**. Renomeie para **`faturamento`**.
+1. Volte à aba **Data → Add SQL Dataset**, cole o **Dataset 2 — faturamento** e **Run**. Renomeie para **`faturamento`**.
+
+```sql
+-- Dataset 2 — faturamento (1 linha por mês)
+SELECT
+  competencia,
+  COUNT(*)                                                       AS faturas,
+  ROUND(SUM(valor), 0)                                           AS receita,
+  ROUND(AVG(CASE WHEN pago = false THEN 1.0 ELSE 0 END) * 100, 1) AS pct_nao_pago,
+  ROUND(AVG(dias_atraso), 1)                                     AS atraso_medio_dias
+FROM dbacademy.churn.fato_faturamento
+GROUP BY competencia
+ORDER BY competencia;
+```
 2. No Canvas, adicione um gráfico com o Assistente usando o dataset **`faturamento`**:
 ```text
 Gráfico de linha com a receita por competencia (mês) e uma segunda linha com o pct_nao_pago.
