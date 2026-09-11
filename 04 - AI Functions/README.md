@@ -15,8 +15,6 @@ Usar as **AI Functions** do Databricks para analisar o campo `texto_reclamacao` 
 
 ---
 
-> **Dica:** usamos uma **amostra variada** (csat 5, 3 e 1) para ver a IA distinguindo os casos — se você ordenar só pelos piores tickets, tudo volta negativo.
-
 ## 1a. Sentimento — `ai_analyze_sentiment`
 ```sql
 WITH amostra AS (
@@ -29,6 +27,8 @@ SELECT LEFT(texto_reclamacao, 60) AS trecho, csat,
 FROM amostra ORDER BY csat DESC;
 ```
 Resultado: `csat 5 → positive` · `csat 3 → neutral` · `csat 1 → negative` — o sentimento acompanha a nota.
+
+> **Dica:** usamos uma **amostra variada** (csat 5, 3 e 1) de propósito, para ver a IA distinguindo os casos. Se você ordenar só pelos piores tickets, tudo volta negativo.
 
 ## 1b. Distribuição de sentimento com Genie Code (amostra de 100)
 Agora, em vez de escrever o SQL, **peça ao Genie Code**. Cole este prompt no assistente (✨), revise o SQL gerado e execute:
