@@ -90,7 +90,7 @@ Conte quantas assinaturas foram canceladas por mês usando dbacademy.churn.fato_
 ```
 
 ## 🎯 Desafio
-**Qual plano tem a maior taxa de churn e quantos clientes perdeu?** Monte a consulta (dica: junte `fato_assinatura` com `dim_plano`), depois confira pedindo ao Genie Code.
+Qual plano tem a maior taxa de churn e quantos clientes perdeu?
 
 ---
 
