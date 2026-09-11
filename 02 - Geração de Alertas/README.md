@@ -30,7 +30,7 @@ FROM dbacademy.churn.fato_assinatura;
 Como a taxa atual é **27,0** e o limite é **25**, o alerta entra em estado **disparado (triggered)**.
 
 ## Passo 3 (variação) — Alerta de NPS baixo
-Repita o processo com esta consulta e a condição `nps_medio < 7`:
+Edite o processo com esta consulta e a condição `nps_medio < 7`:
 ```sql
 SELECT ROUND(AVG(nps), 2) AS nps_medio
 FROM dbacademy.churn.fato_ticket_suporte;
