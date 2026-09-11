@@ -15,24 +15,34 @@ Usar as **AI Functions** do Databricks para analisar o campo `texto_reclamacao` 
 
 ---
 
+> **Dica:** usamos uma **amostra variada** (csat 5, 3 e 1) para ver a IA distinguindo os casos — se você ordenar só pelos piores tickets, tudo volta negativo.
+
 ## 1. Sentimento — `ai_analyze_sentiment`
 ```sql
+WITH amostra AS (
+  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+)
 SELECT LEFT(texto_reclamacao, 60) AS trecho, csat,
        ai_analyze_sentiment(texto_reclamacao) AS sentimento
-FROM dbacademy.churn.fato_ticket_suporte
-ORDER BY csat LIMIT 5;
+FROM amostra ORDER BY csat DESC;
 ```
-Tickets com `csat = 1` retornam **`negative`** — o sentimento do texto bate com a nota.
+Resultado: `csat 5 → positive` · `csat 3 → neutral` · `csat 1 → negative` — o sentimento acompanha a nota.
 
 ## 2. Classificação — `ai_classify`
 ```sql
-SELECT LEFT(texto_reclamacao, 60) AS trecho,
+WITH amostra AS (
+  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+)
+SELECT LEFT(texto_reclamacao, 60) AS trecho, csat,
        ai_classify(texto_reclamacao,
                    ARRAY('Cobrança','Técnico','Cancelamento','Elogio','Dúvida')) AS categoria_ia
-FROM dbacademy.churn.fato_ticket_suporte
-ORDER BY csat LIMIT 5;
+FROM amostra ORDER BY csat DESC;
 ```
-Ex.: *"Já pedi cancelamento e continuam cobrando…"* → **`Cancelamento`**. A IA lê o texto livre e escolhe uma das categorias que você definiu.
+A IA lê o texto livre e escolhe uma das categorias que você definiu (ex.: elogio → **`Elogio`**, "já pedi cancelamento…" → **`Cancelamento`**).
 
 ## 3. Mascaramento de PII — `ai_mask`
 ```sql
