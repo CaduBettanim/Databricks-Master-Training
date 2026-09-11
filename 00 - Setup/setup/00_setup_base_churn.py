@@ -11,7 +11,7 @@
 # Parâmetros — ajuste se necessário
 NOME_CATALOGO = "dbacademy"     # catálogo Unity Catalog de destino
 NOME_SCHEMA   = "churn"         # schema COMPARTILHADO (somente leitura para alunos)
-CSV_BASE      = "https://raw.githubusercontent.com/CaduBettanim/Databricks-Master-Training/main/data"
+CSV_BASE      = "https://raw.githubusercontent.com/CaduBettanim/Databricks-Master-Training/main/00%20-%20Setup/data"
 fq = f"{NOME_CATALOGO}.{NOME_SCHEMA}"
 
 # Garante o catálogo. Só tenta criar se faltar; se não conseguir (contas com Default Storage

@@ -1,46 +1,33 @@
 # Databricks Master Training — Análise de Clientes & Churn
 
-Treinamento hands-on na plataforma Databricks, do **SQL self-service** aos **agentes de IA**, tudo sobre um mesmo domínio: **retenção / churn** de uma empresa de assinatura (setor genérico, aplicável a qualquer cliente).
+Treinamento hands-on na plataforma Databricks que leva o participante **do SQL self-service aos agentes de IA**, sempre sobre um mesmo desafio de negócio: **entender e reduzir o churn** (cancelamento) de clientes.
 
-O treinamento é para o **time de negócio** (low-code) e é **reproduzível em qualquer workspace** — os dados vêm de CSVs deste repositório.
+## Objetivo
 
-## Estrutura
+Capacitar times de **negócio e dados** a usar a plataforma Databricks de ponta a ponta — em modo **low-code** — para responder a uma pergunta real: *por que os clientes cancelam e como retê-los?*
 
-| Pasta | Conteúdo |
-|-------|----------|
-| `data/` | CSVs de origem (dataset fixo, 1 por tabela) — carregados no Setup |
-| `setup/` | Notebook de preparação da base compartilhada |
+Ao longo da trilha, o participante:
+- consulta e modela dados de churn (SQL, Metric Views);
+- aplica **IA Generativa** sobre texto (tickets de suporte);
+- cria dashboards e **agentes conversacionais (Genie)**;
+- treina um **modelo de churn** e o serve com governança;
+- orquestra tudo em um **agente supervisor** e entrega um **app** de retenção.
 
-## Modelo de dados
+O domínio é uma **empresa de assinatura genérica**, então a trilha se adapta a qualquer cliente/indústria. Todo o conteúdo é **reproduzível em qualquer workspace** — os dados vêm de CSVs versionados neste repositório.
 
-Base compartilhada (schema `churn` dentro do catálogo escolhido, ex.: `dbacademy`):
+## Arquitetura de dados
 
-| Tabela | Descrição |
-|--------|-----------|
-| `dim_cliente` | Clientes (segmento, cidade, canal, faixa etária) |
-| `dim_plano` | Planos (Básico, Padrão, Premium, Empresarial) |
-| `dim_data` | Calendário |
-| `fato_assinatura` | Assinaturas com status e `churn_flag` |
-| `fato_uso` | Uso mensal (logins, horas, funcionalidades) |
-| `fato_faturamento` | Faturamento mensal (valor, atraso, inadimplência) |
-| `fato_ticket_suporte` | Tickets de suporte em PT-BR com texto, CSAT e NPS |
-| `feature_churn` | Tabela analítica por cliente (features comportamentais) para o modelo de churn — derivada no Setup |
+- **Base compartilhada** (schema `churn`, somente leitura): criada uma vez no Setup e usada por toda a turma.
+- **Schema pessoal por participante** (`<catálogo>.<seu_database>`): recebe o que cada um cria nos exercícios (metric views, modelo, funções, etc.).
+- Objetos de workspace (Genie, Knowledge Assistant, Supervisor, App) são criados por participante.
 
-Os dados têm **sinal de churn verificado**: uso baixo, atraso de pagamento e baixa satisfação elevam o cancelamento (corr. uso × churn ≈ -0,50). Isso garante que o modelo de ML aprenda de verdade.
+## Trilha
 
-## Setup (instrutor — roda 1x)
+| Módulo | Conteúdo |
+|--------|----------|
+| **00 - Setup** | Preparação da base compartilhada de churn (dados + documentação + base de conhecimento). Começe por aqui. |
+| *(próximos)* | SQL + Genie Code · Alertas · Metric Views · AI Functions · Dashboards · Modelo de churn · Genie · Discovery · Knowledge Assistant · Supervisor · App |
 
-1. **Pré-requisito:** um catálogo Unity Catalog (por padrão `dbacademy`). Se ele não existir e não puder ser criado automaticamente (contas com *Default Storage*), crie-o pela UI: **Catalog Explorer → Create catalog → Default Storage**.
-2. Importe o notebook `setup/00_setup_base_churn.py` no seu workspace (**Workspace → Import → URL**) usando a URL raw deste arquivo.
-3. Ajuste, se quiser, as variáveis `NOME_CATALOGO` / `NOME_SCHEMA` na primeira célula.
-4. Anexe **Serverless** (ou um cluster) e clique em **Run all**.
-5. Confira o relatório final. Valores esperados (dataset fixo): **2.000 clientes**, **1.253 tickets**, **taxa de churn 0,270**, **corr. uso × churn -0,504**.
+## Como começar
 
-O notebook lê os CSVs deste repositório (via URL raw), cria as tabelas Delta, deriva `feature_churn`, documenta tudo (comentários + PK/FK) e monta a base de conhecimento (volume `kb_volume`).
-
-## Parametrização
-
-Nada é fixo a um ambiente específico:
-- **Catálogo/schema**: variáveis no topo do notebook.
-- **Origem dos dados**: URL raw deste repositório (`CSV_BASE`).
-- **Objetos por aluno** (metric views, modelo, funções, Genie, app): criados nos exercícios, em um schema pessoal `<catálogo>.<seu_database>`.
+Abra a pasta **[`00 - Setup`](./00%20-%20Setup)** e siga o `README.md` de lá.
