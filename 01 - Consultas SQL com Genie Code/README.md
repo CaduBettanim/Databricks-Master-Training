@@ -89,11 +89,6 @@ Escreva a taxa de churn por plano usando dbacademy.churn.fato_assinatura e dbaca
 Conte quantas assinaturas foram canceladas por mês usando dbacademy.churn.fato_assinatura, considerando a data de cancelamento (data_fim).
 ```
 
-**5. Top 10 clientes com tickets negativos**
-```text
-Liste os 10 clientes com mais tickets de csat <= 2 na dbacademy.churn.fato_ticket_suporte, usando window function para o ranking.
-```
-
 ## 🎯 Desafio
 **Qual plano tem a maior taxa de churn e quantos clientes perdeu?** Monte a consulta (dica: junte `fato_assinatura` com `dim_plano`), depois confira pedindo ao Genie Code.
 
