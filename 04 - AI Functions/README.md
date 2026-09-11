@@ -30,20 +30,13 @@ FROM amostra ORDER BY csat DESC;
 ```
 Resultado: `csat 5 → positive` · `csat 3 → neutral` · `csat 1 → negative` — o sentimento acompanha a nota.
 
-### 1b. Distribuição de sentimento (amostra de 100)
-Agora agregue o sentimento — transformando texto livre em um indicador contável. Usamos `LIMIT 100` para rodar em **segundos**:
-```sql
-SELECT sentimento, COUNT(*) AS qtd
-FROM (
-  SELECT ai_analyze_sentiment(texto_reclamacao) AS sentimento
-  FROM dbacademy.churn.fato_ticket_suporte
-  LIMIT 100
-)
-GROUP BY sentimento
-ORDER BY qtd DESC;
+### 1b. Distribuição de sentimento com Genie Code (amostra de 100)
+Agora, em vez de escrever o SQL, **peça ao Genie Code**. Cole este prompt no assistente (✨), revise o SQL gerado e execute:
+```text
+Usando a tabela dbacademy.churn.fato_ticket_suporte, escreva uma consulta que aplique ai_analyze_sentiment na coluna texto_reclamacao de uma amostra de 100 tickets e conte quantos são positivos, neutros e negativos.
 ```
 Resultado esperado (amostra de 100): **positive 43 · neutral 33 · negative 24**.
-> Para a base inteira, **remova o `LIMIT`** — roda a IA em todos os tickets (mais lento). Na base completa: neutral 457 · positive 421 · negative 375.
+> Roda em segundos por ser uma amostra. Repare: o texto livre virou um **indicador contável** — e você gerou a consulta só descrevendo o que queria.
 
 ## 2. Classificação — `ai_classify`
 ```sql
