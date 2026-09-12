@@ -37,7 +37,33 @@ Resultados esperados (confira se batem):
 
 > Repare: você montou 4 gráficos **sem escrever uma linha de SQL** — e usando a **medida que já tinha governado** no Ex. 3. É a fonte única da verdade virando painel.
 
-### Passo 2.1 — Adicionar o gráfico de motivos
+### Passo 2.1 — Veja a metric view propagar no dashboard
+Aqui está a grande vantagem de uma metric view: **mude a regra uma única vez e todos os gráficos que a usam mudam juntos.** Vamos transformar a `Taxa de Churn` de fração para percentual e ver o impacto — sem tocar em nenhum gráfico.
+
+1. No menu lateral, vá em **Catalog → `dbacademy` → `<seu_db>` → Tables → `mvw_churn`**.
+2. Logo acima, clique no botão **Edit**.
+3. Selecione a measure chamada **`Taxa de Churn`**.
+4. Altere a **Expressão** de:
+   ```
+   SUM(source.churn_flag) / COUNT(DISTINCT source.id_cliente)
+   ```
+   para:
+   ```
+   100 * SUM(source.churn_flag) / COUNT(DISTINCT source.id_cliente)
+   ```
+5. Clique em **Save**.
+6. Volte ao **Dashboard** e clique no botão de **refresh**.
+
+O KPI e os gráficos de churn saltam de fração para percentual:
+
+| | KPI | Básico | Padrão | Premium | Empresarial |
+|---|---|---|---|---|---|
+| **Antes** | 0,27 | 0,317 | 0,274 | 0,225 | 0,157 |
+| **Depois** | 27 | 31,7 | 27,4 | 22,5 | 15,7 |
+
+> O gráfico de **motivos** e o **mapa** **não** mudam — eles não vêm da metric view. Fica claro: **só o que consome a métrica governada foi impactado.** É a fonte única da verdade em ação.
+
+### Passo 2.2 — Adicionar o gráfico de motivos
 Esse corte não está na metric view (ela não tem a dimensão de motivo), então peça ao Genie a partir da tabela. Cole **este prompt**:
 
 ```text
@@ -45,7 +71,7 @@ Adicione um gráfico de barras com a contagem de assinaturas Canceladas por moti
 ```
 Esperado: Insatisfação **196** · Preço **148** · Concorrência **104** · Atendimento **80** · Mudança de necessidade **12**.
 
-### Passo 2.2 — Adicionar 3 filtros
+### Passo 2.3 — Adicionar 3 filtros
 Peça os filtros ao Genie, no mesmo assistente. Cole **este prompt**:
 
 ```text
