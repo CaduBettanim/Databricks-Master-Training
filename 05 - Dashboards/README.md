@@ -79,15 +79,7 @@ Posicione o logo no topo do dashboard, ocupando a largura da página. Com a imag
 Selecione o **Genie** de novo e peça um mapa. Cole **este prompt**:
 
 ```text
-Inclua um mapa contendo a quantidade de assinaturas Canceladas por UF (região).
+Inclua um mapa contendo a quantidade de assinaturas Canceladas por UF (região), usando as tabelas dbacademy.churn.fato_assinatura e dbacademy.churn.dim_cliente.
 ```
 
 Esperado: um mapa do Brasil com os cancelamentos distribuídos entre ~10 UFs (as maiores: **PR, RJ, BA, SP, CE**).
-
-## Passo 5 — Publicar
-Clique em **Publish** (canto superior direito). O dashboard publicado é o que você compartilha com o time de negócio — eles interagem com os filtros sem precisar do editor.
-
----
-
-## Explore
-Um dashboard AI/BI não é só um relatório: ele nasceu de uma frase, reusou a métrica governada do Ex. 3, e os filtros deixam qualquer pessoa de negócio explorar sozinha. No Ex. 07 vamos dar um passo além — deixar o time **perguntar em linguagem natural** com o Genie, sem nem abrir o painel.
