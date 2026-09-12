@@ -18,7 +18,6 @@ Criar um Genie Space sobre a base de churn, dar a ele um **contexto de negócio*
    - `dbacademy.churn.fato_faturamento`
    - `dbacademy.churn.fato_ticket_suporte`
    - `dbacademy.churn.fato_uso`
-3. Associe um **SQL Warehouse** (Serverless/Pro) quando pedido.
 
 > O Genie já **infere os relacionamentos** entre os fatos e a `dim_cliente` — não precisa configurar joins na mão.
 
