@@ -10,9 +10,9 @@ Transformar os dados de churn em um **painel executivo** — deixando o **Genie 
 Construir um dashboard **AI/BI** de retenção com:
 - um **KPI** de taxa de churn;
 - **churn por plano** e **por segmento**;
-- **cancelamentos ao longo do tempo** e **motivos de cancelamento**;
+- **cancelamentos ao longo do tempo**;
 - um **mapa** de churn por região;
-- **3 filtros** (plano, segmento, motivo) que deixam o painel interativo;
+- **2 filtros** (plano, segmento) que deixam o painel interativo;
 - o **logo** do treinamento no topo.
 
 > As 4 primeiras análises saem direto da sua **`mvw_churn`** — a mesma medida governada que você definiu no Ex. 3, agora virando gráfico.
@@ -61,21 +61,13 @@ O KPI e os gráficos de churn saltam de fração para percentual:
 | **Antes** | 0,27 | 0,317 | 0,274 | 0,225 | 0,157 |
 | **Depois** | 27 | 31,7 | 27,4 | 22,5 | 15,7 |
 
-> O gráfico de **motivos** e o **mapa** **não** mudam — eles não vêm da metric view. Fica claro: **só o que consome a métrica governada foi impactado.** É a fonte única da verdade em ação.
+> Só os gráficos que **consomem a metric view** mudam. Um gráfico baseado direto numa tabela — como o **mapa** que você adiciona no Passo 4 — não seria afetado. É a fonte única da verdade em ação.
 
-### Passo 2.2 — Adicionar o gráfico de motivos
-Esse corte não está na metric view (ela não tem a dimensão de motivo), então peça ao Genie a partir da tabela. Cole **este prompt**:
-
-```text
-Adicione um gráfico de barras com a contagem de assinaturas Canceladas por motivo_cancelamento, da maior para a menor, usando a tabela dbacademy.churn.fato_assinatura.
-```
-Esperado: Insatisfação **196** · Preço **148** · Concorrência **104** · Atendimento **80** · Mudança de necessidade **12**.
-
-### Passo 2.3 — Adicionar 3 filtros
+### Passo 2.2 — Adicionar 2 filtros
 Peça os filtros ao Genie, no mesmo assistente. Cole **este prompt**:
 
 ```text
-Adicione 3 filtros ao dashboard: um para Plano, outro para Segmento e outro para motivo_cancelamento.
+Adicione 2 filtros ao dashboard: um para Plano e outro para Segmento.
 ```
 
 Ao escolher um valor em qualquer filtro, os gráficos se ajustam juntos.
