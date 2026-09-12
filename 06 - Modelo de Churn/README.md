@@ -40,23 +40,10 @@ No fim do notebook, confira:
 
 Navegue no seu catálogo e veja o **`modelo_churn`** (em *Models*) e a tabela **`churn_scores`** (em *Tables*) criados no seu schema.
 
-## Passo 3 — Levar a previsão para o dashboard
-Agora que o score existe, leve-o para o painel que você criou no Ex. 5.
-1. Abra o dashboard **`Análise de Churn <seu_db>`**.
-2. No rodapé, crie uma **nova aba** (nova página).
-3. Selecione o **Genie** e cole **este prompt** (troque `<seu_db>`):
+## 🎯 Desafio
+Volte no seu dashboard **`Análise de Churn <seu_db>`** e gere uma **nova análise**: usando as tabelas `dbacademy.<seu_db>.churn_scores` e `dbacademy.churn.dim_cliente`, crie indicadores e visualizações relevantes sobre a **previsão de churn**.
 
-```text
-Usando as tabelas dbacademy.<seu_db>.churn_scores e dbacademy.churn.dim_cliente, crie indicadores e visualizações sobre a previsão de churn: um KPI com a quantidade de clientes em risco Alto (faixa_risco igual a 'Alto'); um KPI com o MRR em risco (soma de preco_mensal dos clientes com faixa_risco 'Alto'); um gráfico de barras com a quantidade de clientes por faixa_risco; um gráfico de barras com a quantidade de clientes por fator_principal, da maior para a menor; um gráfico de barras com a probabilidade média de churn (prob_churn) por segmento; e uma tabela com os 10 clientes de maior prob_churn, mostrando nome_cliente, segmento, nome_plano, preco_mensal, prob_churn e fator_principal.
-```
-
-Resultados esperados:
-- **Clientes em risco Alto:** ~**492**; **MRR em risco:** ~**R$ 45.971**.
-- **Por faixa:** Baixo ~1.375 · Alto ~492 · Médio ~133.
-- **Fator principal:** Insatisfação (CSAT) ~658 · Baixo uso ~557 · Inadimplência ~520 · Detrator (NPS) ~265.
-- **Prob. média por segmento:** Consumidor ~0,30 · PME ~0,23 · Corporativo ~0,17.
-
-Pronto: o mesmo dashboard agora tem uma aba de **retrospectiva** (o churn que aconteceu, do Ex. 5) e uma de **previsão** (quem está em risco agora).
+Assim o mesmo painel passa a ter uma aba de **retrospectiva** (o churn que aconteceu, do Ex. 5) e uma de **previsão** (quem está em risco agora).
 
 ## Explore
 Você acabou de criar o coração da operação de retenção: um score de risco por cliente, com o motivo por trás. Nos próximos módulos, esse ativo ganha vida — os **agentes** respondem sobre risco e os dashboards e o **app** priorizam quem atender primeiro. No **Ex. 11** o `modelo_churn` é publicado como **endpoint** (com guardrail de PII) para ser consultado em tempo real.
