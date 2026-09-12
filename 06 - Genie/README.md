@@ -2,7 +2,7 @@
 
 Até aqui **você** montou as análises. Agora abrimos isso para o time de negócio: **Genie Spaces** onde qualquer pessoa **pergunta em português** — *"qual a receita por segmento?"* — e o Genie escreve o SQL, executa e responde. Zero código.
 
-Vamos criar **dois Genies especializados** — um de **Faturamento** e um de **Suporte**. No próximo módulo, um **agente Supervisor** vai orquestrar os dois (mais um Knowledge Assistant), roteando cada pergunta para o especialista certo.
+Vamos criar **dois Genies especializados** — um de **Faturamento** e um de **Suporte**. Mais adiante, um **agente Supervisor** vai orquestrar os dois (mais um Knowledge Assistant), roteando cada pergunta para o especialista certo.
 
 **Pré-requisito:** [Setup](../00%20-%20Setup) concluído (base `dbacademy.churn`).
 
@@ -17,7 +17,7 @@ Vamos criar **dois Genies especializados** — um de **Faturamento** e um de **S
    - `dbacademy.churn.dim_plano`
    - `dbacademy.churn.fato_assinatura`
    - `dbacademy.churn.fato_faturamento`
-3. Dê o nome **`Faturamento - <seu_db>`** (troque `<seu_db>`) — vamos usá-lo no próximo lab.
+3. Dê o nome **`Faturamento - <seu_db>`** (troque `<seu_db>`) — vamos reutilizá-lo mais adiante, no Supervisor.
 
 > O Genie **infere os relacionamentos** entre as tabelas — não precisa configurar joins na mão.
 
