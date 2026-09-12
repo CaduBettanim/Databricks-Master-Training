@@ -83,3 +83,6 @@ Inclua um mapa contendo a quantidade de assinaturas Canceladas por UF (região),
 ```
 
 Esperado: um mapa do Brasil com os cancelamentos distribuídos entre ~10 UFs (as maiores: **PR, RJ, BA, SP, CE**).
+
+## Passo 5 — Publicar
+Clique em **Publish** (canto superior direito). O dashboard publicado é o que você compartilha com o time de negócio — eles interagem com os filtros sem precisar do editor.
