@@ -59,9 +59,3 @@ Qual a média de NPS do ano fiscal de 2024 no estado do Amazonas (AM)?
 Agora o Genie filtra **01/10/2024 a 30/09/2025** e responde **≈ 6,5** — número diferente, porque o período mudou. A mesma pergunta, duas respostas: a diferença foi **a regra que você deu**.
 
 > É a mesma ideia da métrica governada do Ex. 3: **sem a regra explícita, a IA chuta**. As *Instructions* são onde você transforma o conhecimento do negócio em respostas confiáveis — e valem para todo mundo que usa o Space.
-
-## 🎯 Desafio
-O Genie também pode responder sobre o **futuro**. Adicione a sua tabela `dbacademy.<seu_db>.churn_scores` (do [Ex. 6](../06%20-%20Modelo%20de%20Churn)) ao Space e pergunte, em linguagem natural, **quantos clientes estão em risco alto e qual o principal fator de risco**.
-
-## Explore
-Você entregou autoatendimento de dados **com governança**: o time pergunta em português e recebe número, SQL e gráfico — e as regras do negócio ficam registradas no Space, não na cabeça de uma pessoa. Nos próximos módulos o Genie deixa de ser só um espaço de perguntas e vira **peça de um agente** maior (Knowledge Assistant e Supervisor), que combina dados, documentos e ações.
