@@ -75,8 +75,6 @@ https://raw.githubusercontent.com/CaduBettanim/Databricks-Master-Training/main/0
 
 Posicione o logo no topo do dashboard, ocupando a largura da página. Com a imagem selecionada, no painel direito, na opção **Size** selecione **Fill**.
 
-> Prefere subir o arquivo em vez de usar a URL? Baixe o [`logo_master_training.png`](./logo_master_training.png) deste repositório e use **Upload** no widget de imagem.
-
 ## Passo 4 — Mapa de churn por região (com o Genie)
 Selecione o **Genie** de novo e peça um mapa. Cole **este prompt**:
 
