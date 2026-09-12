@@ -84,5 +84,7 @@ Inclua um mapa contendo a quantidade de assinaturas Canceladas por UF (região),
 
 Esperado: um mapa do Brasil com os cancelamentos distribuídos entre ~10 UFs (as maiores: **PR, RJ, BA, SP, CE**).
 
-## Passo 5 — Publicar
-Clique em **Publish** (canto superior direito). O dashboard publicado é o que você compartilha com o time de negócio — eles interagem com os filtros sem precisar do editor.
+## Passo 5 — Nomear e publicar
+Antes de publicar, **dê um nome ao dashboard**: no título (topo da página), renomeie para **`Análise de Churn <seu_db>`** (troque `<seu_db>` pelo seu database). Vamos voltar a esse painel no Ex. 6.
+
+Depois clique em **Publish** (canto superior direito). O dashboard publicado é o que você compartilha com o time de negócio — eles interagem com os filtros sem precisar do editor.
