@@ -33,13 +33,14 @@ Resultados esperados (confira se batem):
 
 > Você montou um dashboard inteiro **sem escrever uma linha de SQL** — só descrevendo as análises. É o mesmo espírito do Genie Code, agora para o painel.
 
-### Passo 2.1 — Adicionar 3 filtros
-No Canvas, adicione **três widgets de filtro** (**Add filter**), um para cada campo, para que os gráficos reajam juntos:
-- **`nome_plano`** (Plano)
-- **`segmento`** (Segmento)
-- **`motivo_cancelamento`** (Motivo do cancelamento)
+### Passo 2.1 — Adicionar 3 filtros (também com o Genie)
+Peça os filtros ao Genie, no mesmo assistente. Cole **este prompt**:
 
-Ao escolher um valor em qualquer filtro, **todos os gráficos** se ajustam.
+```text
+Adicione 3 filtros ao dashboard: um para nome_plano, outro para segmento e outro para motivo_cancelamento.
+```
+
+Ao escolher um valor em qualquer filtro, **todos os gráficos** se ajustam juntos.
 
 ## Passo 3 — Incluir o logo
 Dê a cara do treinamento ao painel. No Canvas, adicione um widget de **Image** e, no campo de URL, cole:
