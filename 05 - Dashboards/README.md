@@ -49,7 +49,7 @@ Dê a cara do treinamento ao painel. No Canvas, adicione um widget de **Image** 
 https://raw.githubusercontent.com/CaduBettanim/Databricks-Master-Training/main/05%20-%20Dashboards/logo_master_training.png
 ```
 
-Posicione o logo no topo do dashboard, ocupando a largura da página.
+Posicione o logo no topo do dashboard, ocupando a largura da página. Com a imagem selecionada, no painel direito, na opção **Size** selecione **Fill**.
 
 > Prefere subir o arquivo em vez de usar a URL? Baixe o [`logo_master_training.png`](./logo_master_training.png) deste repositório e use **Upload** no widget de imagem.
 
