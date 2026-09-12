@@ -43,11 +43,7 @@ Aqui está a grande vantagem de uma metric view: **mude a regra uma única vez e
 1. No menu lateral, vá em **Catalog → `dbacademy` → `<seu_db>` → Tables → `mvw_churn`**.
 2. Logo acima, clique no botão **Edit**.
 3. Selecione a measure chamada **`Taxa de Churn`**.
-4. Altere a **Expressão** de:
-   ```
-   SUM(source.churn_flag) / COUNT(DISTINCT source.id_cliente)
-   ```
-   para:
+4. Altere a **Expressão** de `SUM(source.churn_flag) / COUNT(DISTINCT source.id_cliente)` para:
    ```
    100 * SUM(source.churn_flag) / COUNT(DISTINCT source.id_cliente)
    ```
