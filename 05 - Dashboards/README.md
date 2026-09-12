@@ -57,8 +57,6 @@ O KPI e os gráficos de churn saltam de fração para percentual:
 | **Antes** | 0,27 | 0,317 | 0,274 | 0,225 | 0,157 |
 | **Depois** | 27 | 31,7 | 27,4 | 22,5 | 15,7 |
 
-> Só os gráficos que **consomem a metric view** mudam. Um gráfico baseado direto numa tabela — como o **mapa** que você adiciona no Passo 4 — não seria afetado. É a fonte única da verdade em ação.
-
 ### Passo 2.2 — Adicionar 2 filtros
 Peça os filtros ao Genie, no mesmo assistente. Cole **este prompt**:
 
