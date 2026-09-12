@@ -37,7 +37,7 @@ Quais os principais motivos de cancelamento?
 Esperado: Insatisfação **196** · Preço **148** · Concorrência **104** · Atendimento **80** · Mudança de necessidade **12**.
 
 ## Passo 3 — A pergunta que ele erra
-Agora uma pergunta que depende de uma regra **da sua empresa**: o **ano fiscal**. Pergunte:
+Faça a seguinte pergunta:
 
 ```text
 Qual a média de NPS do ano fiscal de 2024 no estado do Amazonas (AM)?
