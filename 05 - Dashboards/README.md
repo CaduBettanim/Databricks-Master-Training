@@ -9,6 +9,7 @@ Construir um dashboard **AI/BI** de retenção com:
 - um **KPI** de taxa de churn;
 - **churn por plano** e **por segmento**;
 - **cancelamentos ao longo do tempo** e **motivos de cancelamento**;
+- um **mapa** de churn por região;
 - **3 filtros** (plano, segmento, motivo) que deixam o painel interativo;
 - o **logo** do treinamento no topo.
 
@@ -53,15 +54,19 @@ Posicione o logo no topo do dashboard, ocupando a largura da página. Com a imag
 
 > Prefere subir o arquivo em vez de usar a URL? Baixe o [`logo_master_training.png`](./logo_master_training.png) deste repositório e use **Upload** no widget de imagem.
 
-## Passo 4 — Publicar
+## Passo 4 — Mapa de churn por região (com o Genie)
+Selecione o **Genie** de novo e peça um mapa. Cole **este prompt**:
+
+```text
+Inclua um mapa contendo a quantidade de assinaturas Canceladas por UF (região).
+```
+
+Esperado: um mapa do Brasil com os cancelamentos distribuídos entre ~10 UFs (as maiores: **PR, RJ, BA, SP, CE**).
+
+## Passo 5 — Publicar
 Clique em **Publish** (canto superior direito). O dashboard publicado é o que você compartilha com o time de negócio — eles interagem com os filtros sem precisar do editor.
 
 ---
-
-## 🎯 Desafio
-A diretoria quer saber **onde o churn dói mais no bolso**: não basta a taxa, importa quanto de receita está saindo. **Adicione um gráfico que mostre, por plano, a receita mensal perdida com os cancelamentos** (dica: some o `preco_mensal` das assinaturas Canceladas) e descubra qual plano lidera a perda — nem sempre é o de maior taxa de churn.
-
-**Dica:** peça ao Genie, apontando para `dbacademy.churn` 😉
 
 ## Explore
 Um dashboard AI/BI não é só um relatório: ele nasceu de uma frase, e os filtros deixam qualquer pessoa de negócio explorar sozinha. No Ex. 07 vamos dar um passo além — deixar o time **perguntar em linguagem natural** com o Genie, sem nem abrir o painel.
