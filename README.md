@@ -31,7 +31,8 @@ O domínio é uma **empresa de assinatura genérica**, então a trilha se adapta
 | **03 - Metric Views** | Definir métricas governadas (churn, receita, suporte) e consultá-las com MEASURE(). |
 | **04 - AI Functions** | IA Generativa no SQL sobre os tickets: sentimento, classificação, PII e resumo. |
 | **05 - Dashboards** | Painel executivo de churn no AI/BI, com os gráficos montados pelo Assistente (✨) a partir de prompts. |
-| *(próximos)* | Modelo de churn · Genie · Discovery · Knowledge Assistant · Supervisor · App |
+| **06 - Modelo de Churn** | Treinar e registrar um modelo de probabilidade de churn e gerar a tabela de scores que alimenta os agentes e o app. |
+| *(próximos)* | Genie · Discovery · Knowledge Assistant · Supervisor · App |
 
 ## Como começar
 
