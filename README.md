@@ -33,7 +33,8 @@ O domínio é uma **empresa de assinatura genérica**, então a trilha se adapta
 | **05 - Dashboards com IA** | Painel executivo de churn no AI/BI, com os gráficos montados pelo Assistente (✨) a partir de prompts. |
 | **06 - Análise de Dados Multi-Agent** | Criar dois Genies (Faturamento e Suporte) e um agente Supervisor que orquestra os dois, roteando cada pergunta ao especialista certo. |
 | **07 - Previsão de Churn (ML)** | Treinar e registrar um modelo de probabilidade de churn e gerar a tabela de scores que alimenta os agentes e o app. |
-| *(próximos)* | AI Gateway + Tools · App · Fechamento |
+| **08 - Retenção com ML e GenAI** | Criar funções governadas (UC Functions) que transformam o score em ação: o perfil 360 do cliente e um e-mail de retenção personalizado — com as regras de oferta em SQL e a IA só na escrita. |
+| *(próximos)* | App · Fechamento |
 
 ## Como começar
 
