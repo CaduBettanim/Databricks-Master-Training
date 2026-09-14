@@ -85,12 +85,5 @@ Leia os dois e-mails lado a lado: a mesma função, ofertas diferentes, cada uma
 
 > **A lição:** a **regra de negócio é governada** (SQL, verificável, igual para todos), a **IA cuida só da linguagem**. Você nunca fica refém de a IA "inventar" um desconto — e criou tudo isso **só descrevendo o que queria** ao Genie Code.
 
-## 🎯 Desafio
-Peça ao Genie Code para adicionar uma **quarta regra** à `gerar_email_retencao`. Ideias:
-- clientes do segmento **Corporativo** ganham um **canal de suporte exclusivo**;
-- risco **Alto** ganha um **bônus extra** (ex.: 1 mês grátis) que o risco Médio não recebe.
-
-Descreva a nova regra no prompt, deixe o Genie recriar a função (`CREATE OR REPLACE`) e confira o resultado em dois clientes.
-
 ## Explore
 Você acabou de construir o **motor de ação** da retenção: dado um cliente em risco, sai a oferta certa e o e-mail pronto — com a regra de negócio governada e a IA só na escrita. No **próximo módulo (Ex. 9 - Criação de Apps)**, o app **Central de Retenção** vai chamar exatamente essas duas funções: o atendente digita o id, vê o perfil e o risco, e clica para gerar o e-mail.
