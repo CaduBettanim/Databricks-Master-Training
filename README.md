@@ -26,14 +26,14 @@ O domínio é uma **empresa de assinatura genérica**, então a trilha se adapta
 | Módulo | Conteúdo |
 |--------|----------|
 | **00 - Setup** | Preparação da base compartilhada de churn (dados + documentação + base de conhecimento). Começe por aqui. |
-| **01 - Consultas SQL com Genie Code** | Explorar a base no SQL Editor e gerar SQL com o assistente (Genie Code). |
+| **01 - SQL com IA** | Explorar a base no SQL Editor e gerar SQL com o assistente (Genie Code). |
 | **02 - Geração de Alertas** | Criar alertas que disparam quando um indicador de churn cruza um limite. |
-| **03 - Metric Views** | Definir métricas governadas (churn, receita, suporte) e consultá-las com MEASURE(). |
-| **04 - AI Functions** | IA Generativa no SQL sobre os tickets: sentimento, classificação, PII e resumo. |
-| **05 - Dashboards** | Painel executivo de churn no AI/BI, com os gráficos montados pelo Assistente (✨) a partir de prompts. |
+| **03 - Métricas de Negócio** | Definir métricas governadas (churn, receita, suporte) e consultá-las com MEASURE(). |
+| **04 - IA Generativa no SQL** | IA Generativa no SQL sobre os tickets: sentimento, classificação, PII e resumo. |
+| **05 - Dashboards com IA** | Painel executivo de churn no AI/BI, com os gráficos montados pelo Assistente (✨) a partir de prompts. |
 | **06 - Análise de Dados Multi-Agent** | Criar dois Genies (Faturamento e Suporte) e um agente Supervisor que orquestra os dois, roteando cada pergunta ao especialista certo. |
-| **07 - Modelo de Churn** | Treinar e registrar um modelo de probabilidade de churn e gerar a tabela de scores que alimenta os agentes e o app. |
-| *(próximos)* | Discovery · Knowledge Assistant · Supervisor · App |
+| **07 - Previsão de Churn (ML)** | Treinar e registrar um modelo de probabilidade de churn e gerar a tabela de scores que alimenta os agentes e o app. |
+| *(próximos)* | AI Gateway + Tools · App · Fechamento |
 
 ## Como começar
 

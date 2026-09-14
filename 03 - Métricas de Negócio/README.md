@@ -1,8 +1,8 @@
-# 03 - Metric Views
+# 03 - Métricas de Negócio
 
 Definir **métricas de negócio uma única vez** — governadas no Unity Catalog — e reutilizá-las em SQL, dashboards e na Genie. É o primeiro exercício em que **você cria objetos no seu schema**.
 
-**Pré-requisitos:** [Setup](../00%20-%20Setup) concluído e o seu **database pessoal** criado (Passo 0 do [Ex. 1](../01%20-%20Consultas%20SQL%20com%20Genie%20Code)).
+**Pré-requisitos:** [Setup](../00%20-%20Setup) concluído e o seu **database pessoal** criado (Passo 0 do [Ex. 1](../01%20-%20SQL%20com%20IA)).
 
 ## O que é uma Metric View
 Uma view especial (`WITH METRICS`, em YAML) que separa **dimensões** (por onde cortar) de **medidas** (o que calcular). Você consulta as medidas com a função **`MEASURE()`**, e a definição fica **governada e consistente** para todos — dashboards e Genie passam a usar a mesma fonte da verdade.
@@ -10,7 +10,7 @@ Uma view especial (`WITH METRICS`, em YAML) que separa **dimensões** (por onde 
 ## Passo 1 — Criar as suas metric views
 1. Importe o notebook por URL (**Workspace → Import → URL**):
    ```
-   https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/03%20-%20Metric%20Views/notebook_metric_views.py
+   https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/03%20-%20M%C3%A9tricas%20de%20Neg%C3%B3cio/notebook_metric_views.py
    ```
 2. Na 1ª célula, troque `NOME_SCHEMA` pelo **seu** database pessoal.
 3. Anexe **Serverless** e clique em **Run all**.

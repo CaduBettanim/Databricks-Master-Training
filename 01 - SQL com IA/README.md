@@ -1,4 +1,4 @@
-# 01 - Consultas SQL com Genie Code
+# 01 - SQL com IA
 
 Primeiro contato com os dados de churn: explorar no **SQL Editor** e usar o **Genie Code** (assistente de IA ✨) para gerar consultas em linguagem natural.
 

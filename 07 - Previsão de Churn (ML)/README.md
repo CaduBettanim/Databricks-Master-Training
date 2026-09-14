@@ -1,10 +1,10 @@
-# 06 - Modelo de Churn
+# 07 - Previsão de Churn (ML)
 
 Treinar um modelo que estima a **probabilidade de cada cliente cancelar** e transformar isso em uma **tabela de scores** pronta para usar. Este é o exercício-**ponte**: o score que você gera aqui alimenta os dashboards, os agentes e o app de retenção dos próximos módulos.
 
 **Pré-requisitos:**
 - [Setup](../00%20-%20Setup) concluído (base `dbacademy.churn`).
-- Seu **database pessoal** criado (Passo 0 do [Ex. 1](../01%20-%20Consultas%20SQL%20com%20Genie%20Code)).
+- Seu **database pessoal** criado (Passo 0 do [Ex. 1](../01%20-%20SQL%20com%20IA)).
 
 ## Objetivo
 A partir da tabela de features `dbacademy.churn.feature_churn` (comportamento de uso, atraso de pagamento, satisfação), treinar um modelo de classificação, **registrá-lo no Unity Catalog** e **pontuar todos os clientes**. Ao final você terá, no seu schema:
@@ -18,7 +18,7 @@ A partir da tabela de features `dbacademy.churn.feature_churn` (comportamento de
 ## Passo 1 — Rodar o notebook
 1. Importe o notebook por URL (**Workspace → Import → URL**):
    ```
-   https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/06%20-%20Modelo%20de%20Churn/notebook_modelo_churn.py
+   https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/07%20-%20Previs%C3%A3o%20de%20Churn%20%28ML%29/notebook_modelo_churn.py
    ```
 2. Na célula do **Passo 1**, troque `<seu_db>` pelo **seu** database pessoal.
 3. Anexe **Serverless** e clique em **Run all**.

@@ -1,10 +1,10 @@
-# 05 - Dashboards (AI/BI)
+# 05 - Dashboards com IA
 
 Transformar os dados de churn em um **painel executivo** — deixando o **Genie montar os gráficos a partir de prompts** e **reaproveitando a metric view que você criou no Ex. 3**. Você descreve as análises, ele monta; você só ajusta e publica.
 
 **Pré-requisitos:**
 - [Setup](../00%20-%20Setup) concluído (base `dbacademy.churn`).
-- [Ex. 3 - Metric Views](../03%20-%20Metric%20Views) concluído — a sua metric view **`mvw_churn`** precisa existir no seu database pessoal (`dbacademy.<seu_db>`).
+- [Ex. 3 - Métricas de Negócio](../03%20-%20M%C3%A9tricas%20de%20Neg%C3%B3cio) concluído — a sua metric view **`mvw_churn`** precisa existir no seu database pessoal (`dbacademy.<seu_db>`).
 
 ## Objetivo
 Construir um dashboard **AI/BI** de retenção com:
@@ -70,7 +70,7 @@ Ao escolher um valor em qualquer filtro, os gráficos se ajustam juntos.
 Dê a cara do treinamento ao painel. No Canvas, adicione um widget de **Image** e, no campo de URL, cole:
 
 ```text
-https://raw.githubusercontent.com/CaduBettanim/Databricks-Master-Training/main/05%20-%20Dashboards/logo_master_training.png
+https://raw.githubusercontent.com/CaduBettanim/Databricks-Master-Training/main/05%20-%20Dashboards%20com%20IA/logo_master_training.png
 ```
 
 Posicione o logo no topo do dashboard, ocupando a largura da página. Com a imagem selecionada, no painel direito, na opção **Size** selecione **Fill**.

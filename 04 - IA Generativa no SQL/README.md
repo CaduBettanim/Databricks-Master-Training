@@ -1,4 +1,4 @@
-# 04 - AI Functions (GenAI no SQL)
+# 04 - IA Generativa no SQL
 
 Aplicar **IA Generativa direto no SQL** sobre o texto dos tickets de suporte — a "voz do cliente" — sem treinar modelo e sem sair do SQL Editor.
 
