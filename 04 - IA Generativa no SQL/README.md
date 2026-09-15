@@ -34,12 +34,12 @@ Resultado: `csat 5 → positive` · `csat 3 → neutral` · `csat 1 → negative
 
 > **Dica:** usamos uma **amostra variada** (csat 5, 3 e 1) de propósito, para ver a IA distinguindo os casos. Se você ordenar só pelos piores tickets, tudo volta negativo.
 
-## 1b. Distribuição de sentimento com Genie Code (amostra de 100)
+## 1b. Distribuição de sentimento com Genie Code (últimos 100)
 Agora, em vez de escrever o SQL, **peça ao Genie Code**. Cole este prompt no assistente (✨), revise o SQL gerado e execute:
 ```text
-Usando a tabela dbacademy.churn.fato_ticket_suporte, escreva uma consulta que aplique ai_analyze_sentiment na coluna texto_reclamacao de uma amostra de 100 tickets e conte quantos são positivos, neutros e negativos.
+Usando a tabela dbacademy.churn.fato_ticket_suporte, escreva uma consulta que aplique ai_analyze_sentiment na coluna texto_reclamacao dos últimos 100 tickets (por data_abertura) e conte quantos são positivos, neutros e negativos.
 ```
-Resultado esperado (amostra de 100): **positive 43 · neutral 33 · negative 24**.
+Resultado esperado (últimos 100): **aproximadamente 32 positive · 36 neutral · 32 negative** (como é IA, pode variar 1–2).
 > Roda em segundos por ser uma amostra. Repare: o texto livre virou um **indicador contável** — e você gerou a consulta só descrevendo o que queria.
 
 ## 1c. Sentimento com um modelo específico — `ai_query`

@@ -13,12 +13,14 @@ SELECT LEFT(texto_reclamacao, 60) AS trecho, csat,
        ai_analyze_sentiment(texto_reclamacao) AS sentimento
 FROM amostra ORDER BY csat DESC;
 
--- 1b) Distribuição de sentimento numa amostra de 100 tickets (rápido)
--- Para a base inteira, remova o LIMIT (roda a IA em toda a tabela — mais lento).
+-- 1b) Distribuição de sentimento nos ÚLTIMOS 100 tickets (por data_abertura)
+-- A ordenação fixa a amostra: todos os alunos rodam sobre os mesmos 100 registros.
+-- Para a base inteira, remova ORDER BY + LIMIT (roda a IA em toda a tabela — mais lento).
 SELECT sentimento, COUNT(*) AS qtd
 FROM (
   SELECT ai_analyze_sentiment(texto_reclamacao) AS sentimento
   FROM dbacademy.churn.fato_ticket_suporte
+  ORDER BY data_abertura DESC
   LIMIT 100
 )
 GROUP BY sentimento

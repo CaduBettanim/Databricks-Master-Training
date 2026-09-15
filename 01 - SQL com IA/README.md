@@ -80,7 +80,7 @@ Escreva o SQL da taxa de churn por segmento usando a tabela dbacademy.churn.feat
 
 **2. Top 5 motivos de cancelamento**
 ```text
-Escreva uma query com os 5 principais motivos de cancelamento usando a dbacademy.churn.fato_assinatura.
+Escreva uma query com os 5 principais motivos de cancelamento das assinaturas canceladas (churn_flag = 1) usando a dbacademy.churn.fato_assinatura.
 ```
 
 **3. Taxa de churn por plano**
@@ -90,7 +90,7 @@ Escreva a taxa de churn por plano usando dbacademy.churn.fato_assinatura e dbaca
 
 **4. Cancelamentos por mês**
 ```text
-Conte quantas assinaturas foram canceladas por mês usando dbacademy.churn.fato_assinatura, considerando a data de cancelamento (data_fim).
+Conte quantas assinaturas foram canceladas por mês usando dbacademy.churn.fato_assinatura, considerando apenas as canceladas (churn_flag = 1) pela data de cancelamento (data_fim).
 ```
 
 ## 🎯 Desafio
