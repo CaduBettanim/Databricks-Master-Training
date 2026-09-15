@@ -39,6 +39,24 @@ Agora, em vez de escrever o SQL, **peça ao Genie Code**. Cole este prompt no as
 ```text
 Usando a tabela dbacademy.churn.fato_ticket_suporte, escreva uma consulta que aplique ai_analyze_sentiment na coluna texto_reclamacao dos últimos 100 tickets (por data_abertura) e conte quantos são positivos, neutros e negativos.
 ```
+
+<details>
+<summary>👉 Travou no Genie Code? Clique aqui para o SQL correto (copie e rode)</summary>
+
+```sql
+SELECT sentimento, COUNT(*) AS qtd
+FROM (
+  SELECT ai_analyze_sentiment(texto_reclamacao) AS sentimento
+  FROM dbacademy.churn.fato_ticket_suporte
+  ORDER BY data_abertura DESC
+  LIMIT 100
+)
+GROUP BY sentimento
+ORDER BY qtd DESC;
+```
+
+</details>
+
 Resultado esperado (últimos 100): **aproximadamente 32 positive · 36 neutral · 32 negative** (como é IA, pode variar 1–2).
 > Roda em segundos por ser uma amostra. Repare: o texto livre virou um **indicador contável** — e você gerou a consulta só descrevendo o que queria.
 
@@ -105,6 +123,22 @@ Novamente, **peça ao Genie Code**. Cole este prompt no assistente (✨), revise
 ```text
 Usando a tabela dbacademy.churn.fato_ticket_suporte, gere uma consulta que pegue os últimos 100 comentários e use ai_summarize para resumir o que os clientes estão dizendo.
 ```
+
+<details>
+<summary>👉 Travou no Genie Code? Clique aqui para o SQL correto (copie e rode)</summary>
+
+```sql
+SELECT ai_summarize(array_join(collect_list(texto_reclamacao), ' | '), 150) AS resumo
+FROM (
+  SELECT texto_reclamacao
+  FROM dbacademy.churn.fato_ticket_suporte
+  ORDER BY data_abertura DESC
+  LIMIT 100
+);
+```
+
+</details>
+
 Retorna algo como:
 > *"Os últimos 100 tickets revelam que os clientes relatam principalmente problemas com atendimento, cobranças indevidas e instabilidade do serviço, mas também há registros de elogios ao suporte e atendimento de qualidade."*
 

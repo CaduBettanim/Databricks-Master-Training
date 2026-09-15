@@ -32,6 +32,26 @@ Abra o **SQL Editor**, ative o **Genie Code** (✨) e cole o prompt abaixo (troq
 Crie uma UC Function (função SQL de tabela) chamada get_cliente_360(p_id STRING) no schema dbacademy.<seu_db>. Ela junta as tabelas dbacademy.churn.dim_cliente e dbacademy.<seu_db>.churn_scores por id_cliente e retorna o perfil do cliente cujo id_cliente = p_id: nome_cliente, cidade, uf, segmento, canal_aquisicao, data_cadastro (de dim_cliente) e nome_plano, preco_mensal, prob_churn, faixa_risco, fator_principal (de churn_scores).
 ```
 
+<details>
+<summary>👉 Travou no Genie Code? Clique aqui para o SQL correto (copie e rode)</summary>
+
+> Troque `<seu_db>` pelo seu database antes de rodar.
+
+```sql
+CREATE OR REPLACE FUNCTION dbacademy.<seu_db>.get_cliente_360(p_id STRING)
+RETURNS TABLE (nome_cliente STRING, cidade STRING, uf STRING, segmento STRING,
+  canal_aquisicao STRING, data_cadastro DATE, nome_plano STRING, preco_mensal DOUBLE,
+  prob_churn DOUBLE, faixa_risco STRING, fator_principal STRING)
+RETURN
+  SELECT c.nome_cliente, c.cidade, c.uf, c.segmento, c.canal_aquisicao, c.data_cadastro,
+         s.nome_plano, s.preco_mensal, s.prob_churn, s.faixa_risco, s.fator_principal
+  FROM dbacademy.churn.dim_cliente c
+  JOIN dbacademy.<seu_db>.churn_scores s ON c.id_cliente = s.id_cliente
+  WHERE c.id_cliente = p_id;
+```
+
+</details>
+
 Teste:
 ```sql
 SELECT * FROM dbacademy.<seu_db>.get_cliente_360('C01575');
@@ -64,6 +84,42 @@ De volta ao **Genie Code** (✨), cole o prompt abaixo (troque `<seu_db>`). Ele 
 ```text
 Crie uma UC Function (função SQL de tabela) chamada gerar_email_retencao(p_id STRING) no schema dbacademy.<seu_db>, usando as tabelas dbacademy.churn.dim_cliente e dbacademy.<seu_db>.churn_scores unidas por id_cliente. Ela retorna uma coluna email com um e-mail de retenção personalizado em português para o cliente cujo id_cliente = p_id. Calcule em SQL com CASE três ofertas e depois use ai_query('databricks-meta-llama-3-3-70b-instruct', ...) para redigir o e-mail citando nome, cidade e anos de casa, oferecendo exatamente: (a) desconto de 15% se o cliente tem 5 anos ou mais de casa (calcule por data_cadastro com datediff), senão 10%; (b) se nome_plano = 'Básico' então 10GB de internet grátis, senão o dobro da internet + WhatsApp ilimitado; (c) conforme fator_principal: 'Insatisfação (CSAT)' -> gerente de conta dedicado, 'Inadimplência' -> renegociação da fatura sem juros, 'Baixo uso' -> sessão gratuita de treinamento, caso contrário -> ligação com um especialista.
 ```
+
+<details>
+<summary>👉 Travou no Genie Code? Clique aqui para o SQL correto (copie e rode)</summary>
+
+> Troque `<seu_db>` pelo seu database antes de rodar.
+
+```sql
+CREATE OR REPLACE FUNCTION dbacademy.<seu_db>.gerar_email_retencao(p_id STRING)
+RETURNS TABLE (email STRING)
+RETURN
+  WITH dados AS (
+    SELECT dc.nome_cliente, dc.cidade,
+      FLOOR(DATEDIFF(CURRENT_DATE(), dc.data_cadastro) / 365) AS anos_de_casa,
+      cs.nome_plano, cs.fator_principal,
+      CASE WHEN DATEDIFF(CURRENT_DATE(), dc.data_cadastro) >= 5 * 365 THEN '15%' ELSE '10%' END AS desconto,
+      CASE WHEN cs.nome_plano = 'Básico' THEN '10 GB de internet grátis'
+           ELSE 'o dobro da sua internet atual + WhatsApp ilimitado' END AS oferta_internet,
+      CASE WHEN cs.fator_principal = 'Insatisfação (CSAT)' THEN 'um gerente de conta dedicado'
+           WHEN cs.fator_principal = 'Inadimplência' THEN 'renegociação da sua fatura sem juros'
+           WHEN cs.fator_principal = 'Baixo uso' THEN 'uma sessão gratuita de treinamento'
+           ELSE 'uma ligação com um especialista' END AS oferta_fator
+    FROM dbacademy.churn.dim_cliente dc
+    JOIN dbacademy.<seu_db>.churn_scores cs ON dc.id_cliente = cs.id_cliente
+    WHERE dc.id_cliente = p_id
+  )
+  SELECT ai_query(
+    'databricks-meta-llama-3-3-70b-instruct',
+    'Você é um especialista em retenção de clientes. Redija um e-mail profissional e empático em português para convencer o cliente a permanecer. ' ||
+    'Dados: Nome: ' || nome_cliente || ', Cidade: ' || cidade || ', Anos de casa: ' || CAST(anos_de_casa AS STRING) ||
+    '. Ofertas: (a) desconto de ' || desconto || ' na mensalidade; (b) ' || oferta_internet || '; (c) ' || oferta_fator ||
+    '. Cite o nome, a cidade e os anos de casa e mencione as três ofertas de forma natural.'
+  ) AS email
+  FROM dados;
+```
+
+</details>
 
 > **Repare no que o Genie faz sozinho:** ele consulta as tabelas, descobre os valores de `fator_principal` e `nome_plano`, monta os `CASE` certos e o `ai_query` — você só descreveu as regras. Se ele assumir um setor específico (ex.: "telecom"), acrescente ao prompt *"empresa de assinatura genérica, não cite o setor"*.
 

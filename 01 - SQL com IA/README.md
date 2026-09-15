@@ -78,20 +78,72 @@ Abra o assistente (✨) no SQL Editor e cole **um prompt de cada vez** (use o bo
 Escreva o SQL da taxa de churn por segmento usando a tabela dbacademy.churn.feature_churn.
 ```
 
+<details>
+<summary>👉 Travou no Genie Code? Clique aqui para o SQL correto (copie e rode)</summary>
+
+```sql
+SELECT segmento, ROUND(AVG(churn_flag), 3) AS taxa_churn
+FROM dbacademy.churn.feature_churn
+GROUP BY segmento
+ORDER BY taxa_churn DESC;
+```
+
+</details>
+
 **2. Top 5 motivos de cancelamento**
 ```text
 Escreva uma query com os 5 principais motivos de cancelamento das assinaturas canceladas (churn_flag = 1) usando a dbacademy.churn.fato_assinatura.
 ```
+
+<details>
+<summary>👉 Travou no Genie Code? Clique aqui para o SQL correto (copie e rode)</summary>
+
+```sql
+SELECT motivo_cancelamento, COUNT(*) AS qtd
+FROM dbacademy.churn.fato_assinatura
+WHERE churn_flag = 1
+GROUP BY motivo_cancelamento
+ORDER BY qtd DESC
+LIMIT 5;
+```
+
+</details>
 
 **3. Taxa de churn por plano**
 ```text
 Escreva a taxa de churn por plano usando dbacademy.churn.fato_assinatura e dbacademy.churn.dim_plano.
 ```
 
+<details>
+<summary>👉 Travou no Genie Code? Clique aqui para o SQL correto (copie e rode)</summary>
+
+```sql
+SELECT p.nome_plano, ROUND(AVG(a.churn_flag), 3) AS taxa_churn
+FROM dbacademy.churn.fato_assinatura a
+JOIN dbacademy.churn.dim_plano p ON a.id_plano = p.id_plano
+GROUP BY p.nome_plano
+ORDER BY taxa_churn DESC;
+```
+
+</details>
+
 **4. Cancelamentos por mês**
 ```text
 Conte quantas assinaturas foram canceladas por mês usando dbacademy.churn.fato_assinatura, considerando apenas as canceladas (churn_flag = 1) pela data de cancelamento (data_fim).
 ```
+
+<details>
+<summary>👉 Travou no Genie Code? Clique aqui para o SQL correto (copie e rode)</summary>
+
+```sql
+SELECT date_trunc('month', data_fim) AS mes, COUNT(*) AS cancelamentos
+FROM dbacademy.churn.fato_assinatura
+WHERE churn_flag = 1
+GROUP BY 1
+ORDER BY 1;
+```
+
+</details>
 
 ## 🎯 Desafio
 Qual plano tem a maior taxa de churn e quantos clientes perdeu?
