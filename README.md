@@ -1,5 +1,7 @@
 # Databricks Master Training — Análise de Clientes & Churn
 
+![Arquitetura do Master Training na plataforma Databricks](arquitetura.gif)
+
 Treinamento hands-on na plataforma Databricks que leva o participante **do SQL self-service aos agentes de IA**, sempre sobre um mesmo desafio de negócio: **entender e reduzir o churn** (cancelamento) de clientes.
 
 ## Objetivo
@@ -35,7 +37,6 @@ O domínio é uma **empresa de assinatura genérica**, então a trilha se adapta
 | **07 - Previsão de Churn (ML)** | Treinar e registrar um modelo de probabilidade de churn e gerar a tabela de scores que alimenta os agentes e o app. |
 | **08 - Retenção com ML e GenAI** | Criar funções governadas (UC Functions) que transformam o score em ação: o perfil 360 do cliente e um e-mail de retenção personalizado — com as regras de oferta em SQL e a IA só na escrita. |
 | **09 - Criação de Apps** | Publicar a **Central de Retenção**: o app que amarra o treinamento inteiro — Cockpit de churn (mapa + gráficos com leitura por IA), Assistente (o Supervisor do Ex. 6) e Retenção personalizada (as funções do Ex. 8) — com um único notebook de deploy. |
-| *(próximos)* | Fechamento |
 
 ## Como começar
 
