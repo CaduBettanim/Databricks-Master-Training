@@ -1,29 +1,41 @@
-# 00 - Setup — Base compartilhada de Churn
+# 00 - Setup — Base compartilhada + Habilitação da turma
 
-Prepara a base de dados que **toda a turma** vai usar. Roda **uma vez** (papel de instrutor/admin).
+Um único notebook, rodado **uma vez** pelo **administrador de conta**, que faz tudo: prepara a turma
+(grupo, permissões, compute), carrega a base compartilhada de churn e **verifica** que cada
+participante — e o workspace — está pronto. É **idempotente** (seguro re-executar).
 
 ## Conteúdo
 
 | Pasta | O quê |
 |-------|-------|
 | `data/` | CSVs de origem (dataset fixo, 1 por tabela) |
-| `setup/` | Notebook `00_setup_base_churn.py` que carrega os CSVs e prepara tudo |
+| `setup/` | Notebook `00_setup_base_churn.py` — prepara a turma, carrega os dados e verifica tudo |
 
-## O que o Setup cria (no schema `<catálogo>.churn`)
+## O que o Setup faz
 
-- Dimensões: `dim_cliente`, `dim_plano`, `dim_data`
-- Fatos: `fato_assinatura`, `fato_uso`, `fato_faturamento`, `fato_ticket_suporte`
-- `feature_churn` — tabela analítica por cliente (para o modelo de churn), derivada no notebook
+**Prepara a turma** (idempotente):
+- Grupo de conta `dbacademy_workshop` (participantes + `workspace-access` + `databricks-sql-access`)
+- Catálogo `dbacademy` (trata metastore sem *Default Storage*)
+- SQL Warehouse `dbacademy_workshop_wh` e cluster multiuso `dbacademy_workshop_cluster`
+- Concessões ao grupo: `USE CATALOG` + `CREATE SCHEMA` (schema pessoal), warehouse `CAN_USE`, cluster `CAN_ATTACH_TO`
+
+**Carrega a base compartilhada** (no schema `<catálogo>.churn`, somente leitura para a turma):
+- Dimensões `dim_cliente`, `dim_plano`, `dim_data` e fatos `fato_assinatura`, `fato_uso`, `fato_faturamento`, `fato_ticket_suporte`
+- `feature_churn` — tabela analítica por cliente (para o modelo de churn)
 - Comentários + chaves (PK/FK) em todas as tabelas
 - Volume `kb_volume` com a base de conhecimento (FAQ, Política de Retenção, Playbook de CS)
+- Concede à turma `USE SCHEMA` + `SELECT` no schema `churn` e `READ VOLUME` no `kb_volume`
+
+**Verifica**: matriz de permissões por participante + as features de IA usadas nos Ex. 4/6/7
+(Model Serving/Foundation Model APIs e Multi-Agent Supervisor). Veredito na seção **7. Relatório final**.
 
 ## Passos
 
-1. **Pré-requisito:** um catálogo Unity Catalog (padrão `dbacademy`). Se não existir e não puder ser criado automaticamente (contas com *Default Storage*), crie pela UI: **Catalog Explorer → Create catalog → Default Storage**.
+1. **Pré-requisito:** rodar como **administrador de conta**. Se o catálogo `dbacademy` não puder ser criado automaticamente (contas com *Default Storage*), crie-o antes pela UI: **Catalog Explorer → Create catalog → Default Storage**.
 2. Importe o notebook por URL: **Workspace → Import → URL** com
    `https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/00%20-%20Setup/setup/00_setup_base_churn.py`
-3. (Opcional) ajuste `NOME_CATALOGO` / `NOME_SCHEMA` na primeira célula.
-4. Anexe **Serverless** (ou um cluster) e clique em **Run all**.
+3. Rode as **duas primeiras células** para exibir os widgets, **selecione os participantes** e ajuste os alternadores (criar catálogo/warehouse/cluster). (Opcional: ajuste `NOME_CATALOGO`/`NOME_SCHEMA` na célula de parâmetros.)
+4. Anexe **Serverless** (ou um cluster) e clique em **Run all**. Todas as células devem terminar com sucesso (`✅ CHECKS COMPLETOS`).
 
 ## Resultado esperado (dataset fixo → valores exatos)
 
