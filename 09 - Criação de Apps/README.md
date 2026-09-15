@@ -22,26 +22,32 @@ Um **Databricks App** (a plataforma hospeda o app com compute próprio) com trê
 > **Por que um app, e não mais um dashboard?** Porque aqui o usuário de negócio **age**: navega o risco, conversa com os dados e dispara a retenção — tudo num só lugar, com a governança do Unity Catalog por trás (o app acessa os dados com um *service principal* que só enxerga o que precisa).
 
 ## Como o app se adapta a você
-O código do app é **dirigido por configuração**: ele não tem nenhum id ou nome fixo. O notebook de deploy grava **as suas** informações (seu schema, seu Supervisor, seu warehouse) nas variáveis de ambiente do app. Por isso a mesma pasta serve para toda a turma — cada um publica a sua instância.
+O código do app é **dirigido por configuração**: ele não tem nenhum id ou nome fixo. O notebook de deploy grava **as suas** informações (seu schema, seu Supervisor, seu warehouse) nas variáveis de ambiente do app. Por isso o mesmo notebook serve para toda a turma — cada um publica a sua instância.
 
 ## Por que você não concede nenhuma permissão
 O app usa **autenticação on-behalf-of (em nome do usuário)**: cada consulta ao warehouse e cada chamada de IA rodam **com a identidade de quem está logado no app** — não com uma conta de serviço. Na prática, o Databricks Apps repassa o seu token ao app (habilitado pelos *escopos* `sql` e `model-serving`, que o notebook configura). Como **você** já tem tudo de que o app precisa — `SELECT` em `dbacademy.churn` (pelo grupo do treino), a posse do seu schema e das suas funções, e a posse do seu Supervisor/Genies — **nada precisa ser concedido**: o app simplesmente age como você. É isso que torna o app reproduzível para a turma inteira sem nenhum passo de administrador.
 
 ## Passo a passo
 
-### Passo 1 — Trazer este módulo para o seu workspace
-Adicione o repositório do treinamento como **Git folder** (menu **Workspace → Create → Git folder**) — assim a pasta `app/` (o código já pronto, com o front-end **já compilado**) vem junto e intacta.
+### Passo 1 — Importar o notebook (por URL)
+No menu **Workspace → Create → Import** (ou **Import → URL**), cole a URL do notebook e importe:
+
+```
+https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/09%20-%20Cria%C3%A7%C3%A3o%20de%20Apps/deploy_app.py
+```
+
+> É só **um** notebook — igual aos outros módulos. Ele é **autocontido**: baixa sozinho o código do app (a pasta `app/`, com o front-end **já compilado**) do GitHub em tempo de execução. Você não precisa clonar o repositório.
 
 ### Passo 2 — Rodar o notebook de deploy
-Abra **[`deploy_app.py`](./deploy_app.py)**, anexe **Serverless** e:
+Abra o notebook importado, anexe **Serverless** e:
 1. Preencha os dois campos no topo:
    - **database** — o seu schema pessoal (ex.: `cbettanim`).
    - **supervisor_endpoint** — o endpoint do seu Supervisor do Ex. 6 (ex.: `mas-3d713414-endpoint`).
 2. Clique em **Run all**.
 
 O notebook faz **todo o trabalho pesado**:
+- **baixa o código do app** do GitHub e o prepara com a **sua** configuração;
 - resolve o **SQL Warehouse** pelo nome (`dbacademy_workshop_wh`), com fallback;
-- prepara o código com a **sua** configuração;
 - **cria o app** (`central-retencao-<seu_db>`) com compute e *service principal* próprios;
 - habilita o **on-behalf-of** (escopos `sql` + `model-serving`) e declara o warehouse que o app usa;
 - **publica** e imprime a **URL**.

@@ -95,24 +95,29 @@ print(f"Warehouse: '{WH_NAME}' (id {WH_ID}) — resolvido por {WH_VIA}.")
 
 # MAGIC %md
 # MAGIC ## Passo 3 — Preparar o código-fonte do app (com a SUA configuração)
-# MAGIC Copiamos o `app/` (que veio junto deste notebook) para uma pasta sua no workspace e
-# MAGIC gravamos os seus valores no `app.yaml`. O app é **inteiramente dirigido por config**
+# MAGIC Este notebook é **autocontido**: ele **baixa o código do app** do repositório público no
+# MAGIC GitHub (a pasta `09 - Criação de Apps/app/`), copia para uma pasta sua no workspace e grava
+# MAGIC os seus valores no `app.yaml`. O app é **inteiramente dirigido por config**
 # MAGIC (`server/config.py` lê as variáveis `CR_*`) — nada é escrito no código.
 
 # COMMAND ----------
 
-nb_path = (
-    dbutils.notebook.entry_point.getDbutils().notebook().getContext().notebookPath().get()
-)
-def fuse(p):  # /Workspace é o mount FUSE dos Workspace Files
-    return p if p.startswith("/Workspace/") else "/Workspace" + p
+import urllib.request, zipfile, tempfile, glob
 
-mod_dir = fuse(os.path.dirname(nb_path))
-SRC_APP = os.path.join(mod_dir, "app")
-assert os.path.isdir(SRC_APP), (
-    f"Não achei a pasta 'app/' ao lado do notebook ({SRC_APP}). "
-    "Importe a PASTA inteira '09 - Criação de Apps' (via Git folder), não só o notebook."
+# Baixa o repositório do GitHub (a compute do Databricks alcança github.com) e usa o app/ de lá.
+ZIP_URL = "https://github.com/CaduBettanim/Databricks-Master-Training/archive/refs/heads/main.zip"
+_tmp = tempfile.mkdtemp()
+_zip = os.path.join(_tmp, "repo.zip")
+urllib.request.urlretrieve(ZIP_URL, _zip)
+with zipfile.ZipFile(_zip) as _zf:
+    _zf.extractall(_tmp)
+_matches = glob.glob(os.path.join(_tmp, "*", "09 - Criação de Apps", "app"))
+assert _matches, (
+    "Não consegui baixar o app/ do GitHub. Confirme que a compute alcança github.com "
+    "(ou adicione o repositório como Git folder e use a pasta app/ local)."
 )
+SRC_APP = _matches[0]
+print("app baixado do GitHub:", SRC_APP)
 
 STAGE = f"/Workspace/Users/{ME}/.central-retencao/{APP_NAME}"
 if os.path.exists(STAGE):
