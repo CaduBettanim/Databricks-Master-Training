@@ -79,7 +79,7 @@ Escreva o SQL da taxa de churn por segmento usando a tabela dbacademy.churn.feat
 ```
 
 <details>
-<summary>👉 Travou no Genie Code? Clique aqui para o SQL correto (copie e rode)</summary>
+<summary>👉 Resultado:</summary>
 
 ```sql
 SELECT segmento, ROUND(AVG(churn_flag), 3) AS taxa_churn
@@ -96,7 +96,7 @@ Escreva uma query com os 5 principais motivos de cancelamento das assinaturas ca
 ```
 
 <details>
-<summary>👉 Travou no Genie Code? Clique aqui para o SQL correto (copie e rode)</summary>
+<summary>👉 Resultado:</summary>
 
 ```sql
 SELECT motivo_cancelamento, COUNT(*) AS qtd
@@ -115,7 +115,7 @@ Escreva a taxa de churn por plano usando dbacademy.churn.fato_assinatura e dbaca
 ```
 
 <details>
-<summary>👉 Travou no Genie Code? Clique aqui para o SQL correto (copie e rode)</summary>
+<summary>👉 Resultado:</summary>
 
 ```sql
 SELECT p.nome_plano, ROUND(AVG(a.churn_flag), 3) AS taxa_churn
@@ -133,7 +133,7 @@ Conte quantas assinaturas foram canceladas por mês usando dbacademy.churn.fato_
 ```
 
 <details>
-<summary>👉 Travou no Genie Code? Clique aqui para o SQL correto (copie e rode)</summary>
+<summary>👉 Resultado:</summary>
 
 ```sql
 SELECT date_trunc('month', data_fim) AS mes, COUNT(*) AS cancelamentos

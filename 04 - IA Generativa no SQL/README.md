@@ -41,7 +41,7 @@ Usando a tabela dbacademy.churn.fato_ticket_suporte, escreva uma consulta que ap
 ```
 
 <details>
-<summary>👉 Travou no Genie Code? Clique aqui para o SQL correto (copie e rode)</summary>
+<summary>👉 Resultado:</summary>
 
 ```sql
 SELECT sentimento, COUNT(*) AS qtd
@@ -125,7 +125,7 @@ Usando a tabela dbacademy.churn.fato_ticket_suporte, gere uma consulta que pegue
 ```
 
 <details>
-<summary>👉 Travou no Genie Code? Clique aqui para o SQL correto (copie e rode)</summary>
+<summary>👉 Resultado:</summary>
 
 ```sql
 SELECT ai_summarize(array_join(collect_list(texto_reclamacao), ' | '), 150) AS resumo

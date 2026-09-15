@@ -33,7 +33,7 @@ Crie uma UC Function (função SQL de tabela) chamada get_cliente_360(p_id STRIN
 ```
 
 <details>
-<summary>👉 Travou no Genie Code? Clique aqui para o SQL correto (copie e rode)</summary>
+<summary>👉 Resultado:</summary>
 
 > Troque `<seu_db>` pelo seu database antes de rodar.
 
@@ -86,7 +86,7 @@ Crie uma UC Function (função SQL de tabela) chamada gerar_email_retencao(p_id 
 ```
 
 <details>
-<summary>👉 Travou no Genie Code? Clique aqui para o SQL correto (copie e rode)</summary>
+<summary>👉 Resultado:</summary>
 
 > Troque `<seu_db>` pelo seu database antes de rodar.
 
