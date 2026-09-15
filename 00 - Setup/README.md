@@ -1,5 +1,9 @@
 # 00 - Setup — Base compartilhada + Habilitação da turma
 
+![Trilha do Master Training com destaque no que foi construído até o Exercício 00](arquitetura.gif)
+
+> _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
+
 Um único notebook, rodado **uma vez** pelo **administrador de conta**, que faz tudo: prepara a turma
 (grupo, permissões, compute), carrega a base compartilhada de churn e **verifica** que cada
 participante — e o workspace — está pronto. É **idempotente** (seguro re-executar).

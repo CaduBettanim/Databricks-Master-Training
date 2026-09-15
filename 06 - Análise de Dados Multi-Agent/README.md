@@ -1,5 +1,9 @@
 # 06 - Análise de Dados com Solução Multi-Agent
 
+![Trilha do Master Training com destaque no que foi construído até o Exercício 06](arquitetura.gif)
+
+> _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
+
 Até aqui **você** montou as análises. Agora abrimos isso para o time de negócio: **Genie Spaces** onde qualquer pessoa **pergunta em português** — *"qual a receita por segmento?"* — e o Genie escreve o SQL, executa e responde. Zero código.
 
 E vamos além: criamos **dois Genies especializados** — **Faturamento** e **Suporte** — e, no final, um **agente Supervisor** que orquestra os dois. O usuário faz **uma pergunta só**, e o Supervisor descobre sozinho qual especialista deve responder. Isso é uma **solução multi-agent**.

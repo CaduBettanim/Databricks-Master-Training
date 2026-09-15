@@ -1,5 +1,9 @@
 # 05 - Dashboards com IA
 
+![Trilha do Master Training com destaque no que foi construído até o Exercício 05](arquitetura.gif)
+
+> _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
+
 Transformar os dados de churn em um **painel executivo** — deixando o **Genie montar os gráficos a partir de prompts** e **reaproveitando a metric view que você criou no Ex. 3**. Você descreve as análises, ele monta; você só ajusta e publica.
 
 **Pré-requisitos:**

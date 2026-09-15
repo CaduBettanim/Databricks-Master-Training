@@ -1,5 +1,9 @@
 # 01 - SQL com IA
 
+![Trilha do Master Training com destaque no que foi construído até o Exercício 01](arquitetura.gif)
+
+> _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
+
 Primeiro contato com os dados de churn: explorar no **SQL Editor** e usar o **Genie Code** (assistente de IA ✨) para gerar consultas em linguagem natural.
 
 **Pré-requisito:** [Setup](../00%20-%20Setup) concluído — a base `dbacademy.churn` deve existir.

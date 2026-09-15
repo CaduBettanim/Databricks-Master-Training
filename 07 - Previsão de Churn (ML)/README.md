@@ -1,5 +1,9 @@
 # 07 - Previsão de Churn (ML)
 
+![Trilha do Master Training com destaque no que foi construído até o Exercício 07](arquitetura.gif)
+
+> _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
+
 Treinar um modelo que estima a **probabilidade de cada cliente cancelar** e transformar isso em uma **tabela de scores** pronta para usar. Este é o exercício-**ponte**: o score que você gera aqui alimenta os dashboards, os agentes e o app de retenção dos próximos módulos.
 
 **Pré-requisitos:**

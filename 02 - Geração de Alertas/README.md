@@ -1,5 +1,9 @@
 # 02 - Geração de Alertas
 
+![Trilha do Master Training com destaque no que foi construído até o Exercício 02](arquitetura.gif)
+
+> _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
+
 Ser **avisado automaticamente** quando um indicador de churn ultrapassa um limite — sem precisar abrir relatórios todo dia.
 
 **Pré-requisito:** [Setup](../00%20-%20Setup) concluído (base `dbacademy.churn`).

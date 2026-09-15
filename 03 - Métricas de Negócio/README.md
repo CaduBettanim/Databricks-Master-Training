@@ -1,5 +1,9 @@
 # 03 - Métricas de Negócio
 
+![Trilha do Master Training com destaque no que foi construído até o Exercício 03](arquitetura.gif)
+
+> _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
+
 Definir **métricas de negócio uma única vez** — governadas no Unity Catalog — e reutilizá-las em SQL, dashboards e na Genie. É o primeiro exercício em que **você cria objetos no seu schema**.
 
 **Pré-requisitos:** [Setup](../00%20-%20Setup) concluído e o seu **database pessoal** criado (Passo 0 do [Ex. 1](../01%20-%20SQL%20com%20IA)).

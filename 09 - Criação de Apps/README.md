@@ -1,5 +1,9 @@
 # 09 - Criação de Apps
 
+![Trilha do Master Training com destaque no que foi construído até o Exercício 09](arquitetura.gif)
+
+> _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
+
 Você detectou o risco (dashboards + modelo do Ex. 7), diagnosticou o porquê (agentes do Ex. 6) e criou as funções que agem (Ex. 8). Agora vamos **entregar tudo num produto**: a **Central de Retenção**, um app que qualquer atendente abre no navegador — sem SQL, sem notebook.
 
 O app **amarra o treinamento inteiro** em três abas, e você o publica **rodando um único notebook**: preenche dois campos e clica em **Run all**. O notebook cria o app, concede automaticamente tudo que ele precisa e devolve a **URL**.

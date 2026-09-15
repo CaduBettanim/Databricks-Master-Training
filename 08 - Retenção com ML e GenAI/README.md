@@ -1,5 +1,9 @@
 # 08 - Retenção com ML e GenAI
 
+![Trilha do Master Training com destaque no que foi construído até o Exercício 08](arquitetura.gif)
+
+> _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
+
 Até aqui você **detectou** quem está em risco (dashboards + modelo do Ex. 7) e **diagnosticou** o porquê (IA + agentes). Agora vamos **agir**: criar as funções que, a partir de um `id_cliente`, montam a oferta de retenção certa e geram um **e-mail marketing personalizado** — e vamos criá-las **conversando com o Genie Code**, sem escrever SQL na mão.
 
 O pulo do gato deste módulo: as **regras de negócio ficam governadas no Unity Catalog** — reutilizáveis pelo app (Ex. 9), pelo Genie e por qualquer agente — e a **IA só escreve o texto**, sem decidir a oferta.
