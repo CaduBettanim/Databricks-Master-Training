@@ -1,4 +1,4 @@
-// Aba 2 — Assistente. Chat que chama o Supervisor (Ex.06) via /api/assistente/perguntar.
+// Aba 2 — Assistente. Chat que chama o Supervisor (Ex.07) via /api/assistente/perguntar.
 import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
 
@@ -36,7 +36,7 @@ export function Assistente() {
     <div className="panel">
       <div className="chat" style={{ marginBottom: 12 }}>
         <div className="hd">
-          <span className="dot" /> Conectado ao <b>&nbsp;Supervisor (Ex.06)</b> &nbsp;·&nbsp;
+          <span className="dot" /> Conectado ao <b>&nbsp;Supervisor (Ex.07)</b> &nbsp;·&nbsp;
           endpoint <code>mas-3d713414-endpoint</code> &nbsp;·&nbsp; roteia entre os Genies de Faturamento e Suporte
         </div>
         <div className="msgs">
@@ -66,7 +66,7 @@ export function Assistente() {
         </div>
       </div>
       <p className="muted" style={{ fontSize: 12 }}>
-        Cada mensagem chama o endpoint do Supervisor criado no Ex.06
+        Cada mensagem chama o endpoint do Supervisor criado no Ex.07
         (<code>/serving-endpoints/mas-3d713414-endpoint/invocations</code>).
       </p>
     </div>

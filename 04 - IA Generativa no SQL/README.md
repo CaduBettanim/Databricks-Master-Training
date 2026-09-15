@@ -98,7 +98,7 @@ LIMIT 5;
 ```
 Ex.: *"Meu email é c00015@exemplo.com.br e ainda não recebi retorno."* →
 *"Meu email é **[MASKED]** e ainda não recebi retorno."*
-Ótimo para compartilhar dados de suporte sem expor informações pessoais (gancho com governança no Ex. 11).
+Ótimo para compartilhar dados de suporte sem expor informações pessoais — um gancho com a governança do Unity Catalog.
 
 ## 4. Resumo dos comentários com Genie Code — `ai_summarize`
 Novamente, **peça ao Genie Code**. Cole este prompt no assistente (✨), revise o SQL gerado e execute:

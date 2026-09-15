@@ -184,7 +184,7 @@ export function Cockpit() {
         <div className="kpi" style={{ ["--accent" as any]: "var(--green)", ["--soft" as any]: "#E7F5EF" }}>
           <div className="ic">🎯</div><div className="lbl">Qualidade do modelo</div>
           <div className="val">AUC {kpi.auc}</div>
-          <div className="foot">Previsão de Churn (Ex.07) <span className="chip ok">bom</span></div>
+          <div className="foot">Previsão de Churn (Ex.06) <span className="chip ok">bom</span></div>
         </div>
       </div>
 

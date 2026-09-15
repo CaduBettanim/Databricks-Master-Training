@@ -19,7 +19,7 @@
 # MAGIC > use **Run all**. **Todas as células devem terminar com sucesso.** O veredito final está na
 # MAGIC > seção **7. Relatório final** (`✅ CHECKS COMPLETOS`). Se houver ❌/⚠️, corrija e re-execute.
 # MAGIC
-# MAGIC > Metric views (Ex.3), modelo (Ex.7) e os Genies/Supervisor (Ex.6) são criados por cada aluno
+# MAGIC > Metric views (Ex.3), modelo (Ex.6) e os Genies/Supervisor (Ex.7) são criados por cada aluno
 # MAGIC > no schema pessoal `<catálogo>.<seu_db>` — habilitado aqui via `CREATE SCHEMA`.
 
 # COMMAND ----------
@@ -345,7 +345,7 @@ if WAREHOUSE_ID:
 
 # COMMAND ----------
 
-# --- 3e. Cluster Multiuso (notebooks: Setup, Ex. 03, Ex. 07) -----------------
+# --- 3e. Cluster Multiuso (notebooks: Setup, Ex. 03, Ex. 06) -----------------
 def ensure_cluster(name):
     existing = next((c for c in w.clusters.list() if c.cluster_name == name), None)
     if existing:
@@ -608,8 +608,8 @@ else:
 # MAGIC | Endpoints do `ai_query` (Ex. 4) | `databricks-meta-llama-3-3-70b-instruct` e `databricks-gpt-oss-120b` presentes na lista | 4 (passos 1c, 2b) |
 # MAGIC | Multi-Agent Supervisor (Agent Bricks) | co-gated com Knowledge Assistant (`GET /knowledge-assistants` responde vs 404) | 6 (Supervisor) |
 # MAGIC
-# MAGIC > O registro do modelo no UC (Ex. 7) usa o Model Registry do Unity Catalog — inerente a
-# MAGIC > workspaces com UC, sem probe dedicado. Ex. 7 **não** cria endpoint de serving (isso é o Ex. 11).
+# MAGIC > O registro do modelo no UC (Ex. 6) usa o Model Registry do Unity Catalog — inerente a
+# MAGIC > workspaces com UC, sem probe dedicado. Ex. 6 **não** cria endpoint de serving.
 
 # COMMAND ----------
 
@@ -666,7 +666,7 @@ MAS_OK = KA_OK  # co-gated com KA
 feature_report = [
     ("Model Serving / Foundation Model APIs — AI Functions (Ex. 4)", SERVING_OK),
     ("Endpoints do ai_query do Ex. 4 (llama-3-3-70b + gpt-oss-120b)", EX4_OK),
-    ("Multi-Agent Supervisor / Agent Bricks (Ex. 6)", MAS_OK),
+    ("Multi-Agent Supervisor / Agent Bricks (Ex. 7)", MAS_OK),
 ]
 print(f"Features de IA. Legenda: {OK} disponível  {NO} indisponível  {ERR} indeterminado")
 display(pd.DataFrame([{"Feature": _l, "Status": _sym(_v)} for _l, _v in feature_report],

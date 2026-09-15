@@ -1,4 +1,4 @@
-"""Aba 2 — Assistente. Encaminha a pergunta ao Supervisor (Ex.06) e devolve o texto."""
+"""Aba 2 — Assistente. Encaminha a pergunta ao Supervisor (Ex.07) e devolve o texto."""
 from __future__ import annotations
 
 from fastapi import APIRouter, Request

@@ -54,7 +54,7 @@ CATALOG = os.environ.get("CR_CATALOG", "dbacademy")
 SCHEMA_CHURN = os.environ.get("CR_SCHEMA_CHURN", "churn")
 SCHEMA_PESSOAL = os.environ.get("CR_SCHEMA_PESSOAL", "cbettanim")
 
-# Supervisor (Ex.06) — roteia entre os Genies de Faturamento e Suporte.
+# Supervisor (Ex.07) — roteia entre os Genies de Faturamento e Suporte.
 SUPERVISOR_ENDPOINT = os.environ.get("CR_SUPERVISOR_ENDPOINT", "mas-3d713414-endpoint")
 # Foundation model p/ a "leitura da IA" dos gráficos (✨ Explicar).
 EXPLAIN_MODEL = os.environ.get("CR_EXPLAIN_MODEL", "databricks-claude-sonnet-4-5")

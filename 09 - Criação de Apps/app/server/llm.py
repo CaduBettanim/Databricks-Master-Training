@@ -3,7 +3,7 @@ Camada de IA do app. Dois consumidores, ambos serving endpoints do workspace, ch
 TOKEN DO USUÁRIO logado (OBO) — passado pelas rotas. Isso é o que faz o Supervisor rotear como
 o usuário (que é dono dos Genies), sem precisar de CAN_QUERY/CAN_RUN no service principal.
 
-  1. supervisor_ask(): o Supervisor do Ex.06 (mas-...-endpoint). Formato de "Responses API":
+  1. supervisor_ask(): o Supervisor do Ex.07 (mas-...-endpoint). Formato de "Responses API":
      body {"input":[{role,content}]}, e a resposta final é o ÚLTIMO item `message` do array
      `output` (os itens intermediários são tool_calls e ecos com <name>...</name> do roteamento).
 
@@ -56,7 +56,7 @@ def _texto_do_content(content) -> str:
 
 
 # -----------------------------------------------------------------------------
-# 1. Supervisor (Ex.06) — Responses API
+# 1. Supervisor (Ex.07) — Responses API
 # -----------------------------------------------------------------------------
 async def supervisor_ask(pergunta: str, token: Optional[str]) -> Optional[str]:
     """Manda a pergunta ao Supervisor (como o usuário) e devolve o texto da resposta final."""

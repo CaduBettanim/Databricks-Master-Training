@@ -4,14 +4,14 @@
 
 > _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
 
-Até aqui você **detectou** quem está em risco (dashboards + modelo do Ex. 7) e **diagnosticou** o porquê (IA + agentes). Agora vamos **agir**: criar as funções que, a partir de um `id_cliente`, montam a oferta de retenção certa e geram um **e-mail marketing personalizado** — e vamos criá-las **conversando com o Genie Code**, sem escrever SQL na mão.
+Até aqui você **detectou** quem está em risco (dashboards + modelo do Ex. 6) e **diagnosticou** o porquê (IA + agentes). Agora vamos **agir**: criar as funções que, a partir de um `id_cliente`, montam a oferta de retenção certa e geram um **e-mail marketing personalizado** — e vamos criá-las **conversando com o Genie Code**, sem escrever SQL na mão.
 
 O pulo do gato deste módulo: as **regras de negócio ficam governadas no Unity Catalog** — reutilizáveis pelo app (Ex. 9), pelo Genie e por qualquer agente — e a **IA só escreve o texto**, sem decidir a oferta.
 
 **Pré-requisitos:**
 - [Setup](../00%20-%20Setup) concluído (base `dbacademy.churn`).
 - Seu **database pessoal** criado (Passo 0 do [Ex. 1](../01%20-%20SQL%20com%20IA)).
-- **[Ex. 7 - Previsão de Churn (ML)](../07%20-%20Previs%C3%A3o%20de%20Churn%20%28ML%29)** concluído — precisamos da tabela `churn_scores` no seu schema.
+- **[Ex. 6 - Previsão de Churn (ML)](../06%20-%20Previs%C3%A3o%20de%20Churn%20%28ML%29)** concluído — precisamos da tabela `churn_scores` no seu schema.
 
 ## Objetivo
 Criar **duas UC Functions no seu schema** `dbacademy.<seu_db>`, uma de cada vez, usando o **Genie Code** (o assistente ✨ do SQL Editor):
@@ -23,7 +23,7 @@ Criar **duas UC Functions no seu schema** `dbacademy.<seu_db>`, uma de cada vez,
 ---
 
 ## Passo 0 — Seu database
-As funções são criadas **no SEU schema** `dbacademy.<seu_db>`. Use o mesmo database dos Ex. 1 e Ex. 7. Nos prompts abaixo, troque **`<seu_db>`** pelo seu database.
+As funções são criadas **no SEU schema** `dbacademy.<seu_db>`. Use o mesmo database dos Ex. 1 e Ex. 6. Nos prompts abaixo, troque **`<seu_db>`** pelo seu database.
 
 ## Passo 1 — Criar a `get_cliente_360` (do id ao perfil)
 Abra o **SQL Editor**, ative o **Genie Code** (✨) e cole o prompt abaixo (troque `<seu_db>`). **Revise** o `CREATE FUNCTION` que ele gerar e clique em **Run**:
@@ -42,10 +42,10 @@ Resultado (a cliente **Marina Ribeiro**):
 |------|-----------|---------------|-------|-------|-----------------|
 | Marina Ribeiro | Fortaleza/CE | 2021 | Básico (R$ 49,90) | **Alto** | Insatisfação (CSAT) |
 
-> Um único ponto de entrada para "tudo sobre o cliente" — juntando o cadastro (`dim_cliente`) com o **seu** score do Ex. 7 (`churn_scores`).
+> Um único ponto de entrada para "tudo sobre o cliente" — juntando o cadastro (`dim_cliente`) com o **seu** score do Ex. 6 (`churn_scores`).
 
 ## Passo 2 — As regras de retenção
-A próxima função monta a oferta a partir de **três regras de negócio**. Elas usam só dados que já temos — inclusive o `fator_principal` que o **modelo do Ex. 7** calculou:
+A próxima função monta a oferta a partir de **três regras de negócio**. Elas usam só dados que já temos — inclusive o `fator_principal` que o **modelo do Ex. 6** calculou:
 
 | Regra | Condição | Oferta |
 |-------|----------|--------|
