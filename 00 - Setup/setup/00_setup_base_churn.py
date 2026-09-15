@@ -273,7 +273,9 @@ except Exception as e:
 try:
     w.catalogs.get(NOME_CATALOGO)
     print(f"{OK} Catálogo '{NOME_CATALOGO}' existe (criação omitida).")
-except Exception:
+except Exception as _e:
+    if "404" not in str(_e) and "NotFound" not in type(_e).__name__:
+        raise  # 403, timeout etc. — não é "catálogo não existe"
     if CREATE_CATALOG:
         try:
             spark.sql(f"CREATE CATALOG IF NOT EXISTS {NOME_CATALOGO}")
@@ -293,6 +295,8 @@ except Exception:
         print(f"{NO} Catálogo '{NOME_CATALOGO}' não encontrado e 'Criar Catálogo' = false. Crie-o ou ative a opção.")
 
 # --- 3c. Permissões de catálogo para o grupo (criar schema pessoal do aluno) ---
+# Modelo: aluno tem USE CATALOG + CREATE SCHEMA; ao criar seu schema, vira dono (leitura+escrita
+# apenas no schema próprio).
 try:
     grant_with_retry(f"GRANT USE CATALOG, CREATE SCHEMA ON CATALOG {NOME_CATALOGO} TO `{GROUP}`")
     print(f"{OK} Concedidos USE CATALOG + CREATE SCHEMA em {NOME_CATALOGO} para {GROUP}.")
@@ -307,15 +311,17 @@ def ensure_warehouse(name):
     if existing:
         return existing.id, "existe"
     try:
-        w.warehouses.create(name=name, cluster_size="Small", min_num_clusters=1, max_num_clusters=3,
-                            auto_stop_mins=30, enable_serverless_compute=True,
-                            warehouse_type=CreateWarehouseRequestWarehouseType.PRO)
-    except Exception:
+        wh = w.warehouses.create(name=name, cluster_size="Small", min_num_clusters=1, max_num_clusters=3,
+                                 auto_stop_mins=30, enable_serverless_compute=True,
+                                 warehouse_type=CreateWarehouseRequestWarehouseType.PRO)
+    except Exception as e:
+        if "serverless" not in str(e).lower() and "not supported" not in str(e).lower():
+            raise  # quota, auth, naming — não é limitação de serverless
         print("  warehouse serverless falhou; tentando PRO clássico")
-        w.warehouses.create(name=name, cluster_size="Small", min_num_clusters=1, max_num_clusters=3,
-                            auto_stop_mins=30, enable_serverless_compute=False,
-                            warehouse_type=CreateWarehouseRequestWarehouseType.PRO)
-    return next((x.id for x in w.warehouses.list() if x.name == name), None), "criado"
+        wh = w.warehouses.create(name=name, cluster_size="Small", min_num_clusters=1, max_num_clusters=3,
+                                 auto_stop_mins=30, enable_serverless_compute=False,
+                                 warehouse_type=CreateWarehouseRequestWarehouseType.PRO)
+    return wh.id, "criado"
 
 WAREHOUSE_ID = None
 if CREATE_WAREHOUSE:
@@ -346,14 +352,14 @@ def ensure_cluster(name):
         return existing.cluster_id, "existe"
     # Mesmo tipo de nó p/ driver + workers: consciente da nuvem e evita incompatibilidade ARM/não-ARM.
     _node = w.clusters.select_node_type(min_memory_gb=32, local_disk=True)
-    w.clusters.create(
+    cl = w.clusters.create(
         cluster_name=name,
         spark_version=w.clusters.select_spark_version(latest=True, long_term_support=True),
         node_type_id=_node, driver_node_type_id=_node,
         autoscale=AutoScale(min_workers=2, max_workers=8),
         autotermination_minutes=240,
         data_security_mode=DataSecurityMode.USER_ISOLATION)  # Compartilhado (multi-usuário + UC)
-    return next((c.cluster_id for c in w.clusters.list() if c.cluster_name == name), None), "criado"
+    return cl.cluster_id, "criado"
 
 CLUSTER_ID = None
 if CREATE_CLUSTER:
@@ -465,10 +471,15 @@ print("KB:", os.listdir(base))
 # COMMAND ----------
 
 # --- 4.5 Liberar LEITURA da base compartilhada para a turma ------------------
-# A base `churn` é somente leitura para os alunos (Ex. 01-07 leem daqui).
+# Modelo: alunos têm apenas leitura em {fq} (sem MODIFY, CREATE TABLE, etc.).
 try:
     grant_with_retry(f"GRANT USE SCHEMA, SELECT ON SCHEMA {fq} TO `{GROUP}`")
-    print(f"{OK} Concedidos USE SCHEMA + SELECT em {fq} para {GROUP}.")
+    print(f"{OK} Concedidos USE SCHEMA + SELECT (somente leitura) em {fq} para {GROUP}.")
+    try:
+        grant_with_retry(f"GRANT READ VOLUME ON VOLUME {fq}.kb_volume TO `{GROUP}`")
+        print(f"{OK} Concedido READ VOLUME em {fq}.kb_volume para {GROUP}.")
+    except Exception as ve:
+        print(f"{ERR} Não foi possível conceder READ VOLUME (volume pode não existir ainda): {ve}")
 except Exception as e:
     print(f"{NO} Não foi possível conceder leitura da base compartilhada: {e}")
 
@@ -496,12 +507,18 @@ for g in w.groups.list(attributes="displayName,entitlements"):
 
 WAREHOUSE = next((x for x in w.warehouses.list() if x.name == WAREHOUSE_NAME), None)
 CLUSTER = next((c for c in w.clusters.list() if c.cluster_name == CLUSTER_NAME), None)
-WAREHOUSE_ACL = w.warehouses.get_permissions(warehouse_id=WAREHOUSE.id).access_control_list if WAREHOUSE else None
-CLUSTER_ACL = w.clusters.get_permissions(cluster_id=CLUSTER.cluster_id).access_control_list if CLUSTER else None
+try:
+    WAREHOUSE_ACL = w.warehouses.get_permissions(warehouse_id=WAREHOUSE.id).access_control_list if WAREHOUSE else None
+except Exception:
+    WAREHOUSE_ACL = None
+try:
+    CLUSTER_ACL = w.clusters.get_permissions(cluster_id=CLUSTER.cluster_id).access_control_list if CLUSTER else None
+except Exception:
+    CLUSTER_ACL = None
 
 # Grants recém-aplicados levam alguns segundos para chegar ao UC; pesquisa breve evita ❌ falsos.
 for _ in range(6):
-    _p = uc_effective_privileges("catalog", NOME_CATALOGO, ATTENDEES[0])
+    _p = uc_effective_privileges("catalog", NOME_CATALOGO, ATTENDEES[-1])
     if _p and ("USE_CATALOG" in _p or "ALL_PRIVILEGES" in _p):
         break
     time.sleep(3)
@@ -531,13 +548,13 @@ for email in ATTENDEES:
     note(email, "Databricks SQL", row["Databricks SQL"], "Direito 'databricks-sql-access' faltando")
 
     cat_privs = uc_effective_privileges("catalog", NOME_CATALOGO, email)
-    for col, priv in [("USE CATALOG", "USE_CATALOG"), ("CREATE SCHEMA", "CREATE_SCHEMA")]:
+    for _col, priv in [("USE CATALOG", "USE_CATALOG"), ("CREATE SCHEMA", "CREATE_SCHEMA")]:
         res = uc_has(cat_privs, priv)
-        row[col] = OK if res else (NO if res is False else ERR)
+        row[_col] = OK if res else (NO if res is False else ERR)
         if res is False:
-            note(email, col, NO, f"Nenhum {priv} no catálogo '{NOME_CATALOGO}'")
+            note(email, _col, NO, f"Nenhum {priv} no catálogo '{NOME_CATALOGO}'")
         elif res is None:
-            note(email, col, ERR, f"Não foi possível ler permissões no catálogo '{NOME_CATALOGO}'")
+            note(email, _col, ERR, f"Não foi possível ler permissões no catálogo '{NOME_CATALOGO}'")
 
     sch_privs = uc_effective_privileges("schema", fq, email)
     res = uc_has(sch_privs, "SELECT")
@@ -690,14 +707,21 @@ def _account_group_exists(group):
         return None
 
 # Relatório de validação da base (valores exatos esperados: 2000 / 1253 / 0.27 / -0.504 / 0.125)
-rep = spark.sql(f"""SELECT
- (SELECT COUNT(*) FROM {fq}.dim_cliente) clientes,
- (SELECT COUNT(*) FROM {fq}.fato_ticket_suporte) tickets,
- (SELECT ROUND(AVG(churn_flag),3) FROM {fq}.fato_assinatura) taxa_churn,
- (SELECT ROUND(corr(uso_medio, churn_flag),3) FROM {fq}.feature_churn) corr_uso_churn,
- (SELECT ROUND(corr(dias_atraso_medio, churn_flag),3) FROM {fq}.feature_churn) corr_atraso_churn""").first()
-display(spark.createDataFrame([rep]))
-_base_ok = (rep["clientes"] == 2000 and rep["tickets"] == 1253 and round(rep["taxa_churn"], 3) == 0.27)
+try:
+    rep = spark.sql(f"""SELECT
+     (SELECT COUNT(*) FROM {fq}.dim_cliente) clientes,
+     (SELECT COUNT(*) FROM {fq}.fato_ticket_suporte) tickets,
+     (SELECT ROUND(AVG(churn_flag),3) FROM {fq}.fato_assinatura) taxa_churn,
+     (SELECT ROUND(corr(uso_medio, churn_flag),3) FROM {fq}.feature_churn) corr_uso_churn,
+     (SELECT ROUND(corr(dias_atraso_medio, churn_flag),3) FROM {fq}.feature_churn) corr_atraso_churn""").first()
+    display(spark.createDataFrame([rep]))
+    _base_ok = (rep["clientes"] == 2000 and rep["tickets"] == 1253 and
+                round(rep["taxa_churn"], 3) == 0.27 and
+                round(rep["corr_uso_churn"], 3) == -0.504 and
+                round(rep["corr_atraso_churn"], 3) == 0.125)
+except Exception as _e:
+    print(f"{NO} Não foi possível validar a base (tabela ausente?): {_e}")
+    _base_ok = False
 
 try:
     w.catalogs.get(NOME_CATALOGO); _catalog_exists = True
@@ -705,7 +729,12 @@ except Exception:
     _catalog_exists = False
 
 _schema_grants = _group_has_uc("schema", fq, GROUP, {"USE_SCHEMA", "SELECT"})
-_attendees_ok = (len({d["Participante"] for d in detail_rows}) == 0) if ATTENDEES else None
+_volume_grants = _group_has_uc("volume", f"{fq}.kb_volume", GROUP, {"READ_VOLUME"})
+if ATTENDEES:
+    _det_statuses = {d["Status"] for d in detail_rows}
+    _attendees_ok = False if NO in _det_statuses else (None if ERR in _det_statuses else True)
+else:
+    _attendees_ok = None
 
 report = [
     ("Grupo do workshop existe e foi atribuído", _account_group_exists(GROUP)),
@@ -713,7 +742,8 @@ report = [
     ("Catálogo existe", _catalog_exists),
     ("Permissões do catálogo p/ grupo (USE CATALOG + CREATE SCHEMA)", _group_has_uc("catalog", NOME_CATALOGO, GROUP, {"USE_CATALOG", "CREATE_SCHEMA"})),
     ("Base churn carregada (2000 clientes / 1253 tickets / churn 0.27)", _base_ok),
-    ("Leitura da base churn p/ grupo (USE SCHEMA + SELECT)", _schema_grants),
+    ("Leitura da base churn p/ grupo (USE SCHEMA + SELECT, somente leitura)", _schema_grants),
+    ("Leitura do volume kb_volume p/ grupo (READ VOLUME)", _volume_grants),
     ("SQL Warehouse existe", WAREHOUSE is not None),
     ("CAN_USE de warehouse concedido ao grupo", _group_in_acl(WAREHOUSE_ACL, GROUP, {"CAN_USE", "CAN_MANAGE"})),
     ("Cluster Multiuso existe", CLUSTER is not None),
