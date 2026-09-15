@@ -37,6 +37,7 @@ O domínio é uma **empresa de assinatura genérica**, então a trilha se adapta
 | **07 - Análise de Dados Multi-Agent** | Criar dois Genies (Faturamento e Suporte) e um agente Supervisor que orquestra os dois, roteando cada pergunta ao especialista certo. |
 | **08 - Retenção com ML e GenAI** | Criar funções governadas (UC Functions) que transformam o score em ação: o perfil 360 do cliente e um e-mail de retenção personalizado — com as regras de oferta em SQL e a IA só na escrita. |
 | **09 - Criação de Apps** | Publicar a **Central de Retenção**: o app que amarra o treinamento inteiro — Cockpit de churn (mapa + gráficos com leitura por IA), Assistente (o Supervisor do Ex. 7) e Retenção personalizada (as funções do Ex. 8) — com um único notebook de deploy. |
+| **10 - Fechamento (Próximos Passos)** | Retrospectiva do desafio de churn concluído, resumo de tudo que foi construído e os próximos passos na Databricks Academy (Jornada Lakehouse). |
 
 ## Como começar
 
