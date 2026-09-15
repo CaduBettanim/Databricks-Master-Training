@@ -35,10 +35,17 @@
 # COMMAND ----------
 
 # Cria os campos no topo do notebook. Rode ESTA célula primeiro, preencha os campos e depois Run all.
+# O warehouse vira um dropdown com os warehouses reais do workspace, já com o do Setup selecionado.
+from databricks.sdk import WorkspaceClient as _WC
+_wh_names = [x.name for x in _WC().warehouses.list()]
+_WH_DEFAULT = "dbacademy_workshop_wh"
+_wh_choices = _wh_names or [""]
+_wh_sel = _WH_DEFAULT if _WH_DEFAULT in _wh_names else (_wh_names[0] if _wh_names else "")
+
 dbutils.widgets.text("database", "", "1. Seu database pessoal (ex.: cbettanim)")
 dbutils.widgets.text("supervisor_endpoint", "", "2. Endpoint do Supervisor (Ex.06)")
 dbutils.widgets.text("catalog", "dbacademy", "3. Catálogo (opcional)")
-dbutils.widgets.text("warehouse", "", "4. Warehouse: nome ou id (opcional)")
+dbutils.widgets.dropdown("warehouse", _wh_sel, _wh_choices, "4. Warehouse (default: do Setup)")
 
 # COMMAND ----------
 
