@@ -1,0 +1,27 @@
+# Central de Retenção — config do Databricks App.
+#
+# O App roda o FastAPI (uvicorn) na porta 8000, servindo API + build do React.
+# As credenciais do service principal (DATABRICKS_HOST/CLIENT_ID/CLIENT_SECRET) são
+# auto-injetadas. O SQL Warehouse e os dois serving endpoints são anexados como App
+# resources (dão CAN_USE / CAN_QUERY ao SP); os IDs/nomes têm default no server/config.py.
+command:
+  - "uvicorn"
+  - "app:app"
+  - "--host"
+  - "0.0.0.0"
+  - "--port"
+  - "8000"
+
+env:
+  - name: CR_WAREHOUSE_ID
+    value: "d788121d0edfbb7a"
+  - name: CR_SUPERVISOR_ENDPOINT
+    value: "mas-3d713414-endpoint"
+  - name: CR_EXPLAIN_MODEL
+    value: "databricks-claude-sonnet-4-5"
+  - name: CR_CATALOG
+    value: "dbacademy"
+  - name: CR_SCHEMA_CHURN
+    value: "churn"
+  - name: CR_SCHEMA_PESSOAL
+    value: "cbettanim"

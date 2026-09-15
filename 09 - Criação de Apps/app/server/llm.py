@@ -1,0 +1,161 @@
+"""
+Camada de IA do app. Dois consumidores, ambos serving endpoints do workspace, chamados com a
+identidade do app (service principal com CAN_QUERY):
+
+  1. supervisor_ask(): o Supervisor do Ex.06 (mas-...-endpoint). Formato de "Responses API":
+     body {"input":[{role,content}]}, e a resposta final é o ÚLTIMO item `message` do array
+     `output` (os itens intermediários são tool_calls e ecos com <name>...</name> do roteamento).
+
+  2. explicar_grafico(): um foundation model (databricks-claude-sonnet-4-5) no formato chat
+     completions padrão (/serving-endpoints/<modelo>/invocations), para a "leitura da IA" de
+     cada gráfico do cockpit. Resposta curta (1-2 frases PT-BR).
+
+Degrade gracioso: qualquer falha devolve None / texto de fallback.
+"""
+from __future__ import annotations
+
+import json
+import os
+import ssl
+from functools import lru_cache
+from typing import Optional
+
+import aiohttp
+
+from . import config
+
+
+@lru_cache(maxsize=1)
+def _ssl_context() -> Optional[ssl.SSLContext]:
+    for caminho in (os.environ.get("SSL_CERT_FILE"), "/etc/ssl/cert.pem"):
+        if caminho and os.path.exists(caminho):
+            try:
+                return ssl.create_default_context(cafile=caminho)
+            except Exception:
+                pass
+    return None
+
+
+def _connector():
+    ctx = _ssl_context()
+    return aiohttp.TCPConnector(ssl=ctx) if ctx else None
+
+
+def _texto_do_content(content) -> str:
+    """Extrai texto de um content que pode ser string ou lista de blocos."""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        partes = []
+        for bloco in content:
+            if isinstance(bloco, dict):
+                partes.append(bloco.get("text") or bloco.get("content") or "")
+        return "".join(partes)
+    return str(content or "")
+
+
+# -----------------------------------------------------------------------------
+# 1. Supervisor (Ex.06) — Responses API
+# -----------------------------------------------------------------------------
+async def supervisor_ask(pergunta: str) -> Optional[str]:
+    """Manda a pergunta ao Supervisor e devolve o texto da resposta final."""
+    host = config.get_workspace_host()
+    token = config.get_workspace_token()
+    url = f"{host}/serving-endpoints/{config.SUPERVISOR_ENDPOINT}/invocations"
+    payload = {"input": [{"role": "user", "content": pergunta}]}
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    try:
+        timeout = aiohttp.ClientTimeout(total=240)
+        async with aiohttp.ClientSession(timeout=timeout, connector=_connector()) as sess:
+            async with sess.post(url, json=payload, headers=headers) as rr:
+                txt = await rr.text()
+                if rr.status != 200:
+                    print(f"[supervisor] HTTP {rr.status}: {txt[:300]}")
+                    return None
+                data = json.loads(txt)
+                return _extrair_resposta_final(data)
+    except Exception as exc:
+        print(f"[supervisor] indisponível: {exc}")
+        return None
+
+
+def _extrair_resposta_final(data: dict) -> Optional[str]:
+    """A resposta final é o último item `message`/assistant cujo texto não é um eco <name>."""
+    output = data.get("output") or []
+    candidatos = []
+    for item in output:
+        if item.get("type") != "message":
+            continue
+        texto = _texto_do_content(item.get("content")).strip()
+        if not texto or texto.startswith("<name>"):
+            continue
+        candidatos.append(texto)
+    if candidatos:
+        return candidatos[-1]
+    # fallback: alguns formatos trazem texto direto
+    if isinstance(data.get("output_text"), str):
+        return data["output_text"]
+    return None
+
+
+# -----------------------------------------------------------------------------
+# 2. Foundation model — chat completions (leitura dos gráficos)
+# -----------------------------------------------------------------------------
+async def _chat(system: str, user: str, max_tokens: int = 220) -> Optional[str]:
+    host = config.get_workspace_host()
+    token = config.get_workspace_token()
+    url = f"{host}/serving-endpoints/{config.EXPLAIN_MODEL}/invocations"
+    payload = {
+        "messages": [
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ],
+        "max_tokens": max_tokens,
+        "temperature": 0.3,
+    }
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    try:
+        timeout = aiohttp.ClientTimeout(total=45)
+        async with aiohttp.ClientSession(timeout=timeout, connector=_connector()) as sess:
+            async with sess.post(url, json=payload, headers=headers) as rr:
+                txt = await rr.text()
+                if rr.status != 200:
+                    print(f"[explain] HTTP {rr.status}: {txt[:300]}")
+                    return None
+                d = json.loads(txt)
+                return _texto_do_content(d["choices"][0]["message"]["content"]).strip()
+    except Exception as exc:
+        print(f"[explain] indisponível: {exc}")
+        return None
+
+
+async def explicar_grafico(chart: str, regiao: str, dados: dict) -> str:
+    """Leitura em 1-2 frases PT-BR de um gráfico do cockpit, a partir dos dados atuais."""
+    onde = "no Brasil (todas as regiões)" if regiao == "Brasil" else f"na região {regiao}"
+    contexto = {
+        "plano": "Churn (%) por plano de assinatura",
+        "faixa": "Distribuição de clientes por faixa de risco de churn (Alto/Médio/Baixo)",
+        "meses": "Cancelamentos de assinatura por mês (set/24 a ago/25)",
+        "seg": "Churn (%) por segmento de cliente (Consumidor/PME/Corporativo)",
+    }.get(chart, chart)
+    system = (
+        "Você é um analista de retenção (Customer Success) de uma empresa de telecom. "
+        "Explique gráficos de churn para um gerente, em português do Brasil, de forma direta "
+        "e acionável. Responda em NO MÁXIMO 2 frases curtas. Não use markdown nem listas. "
+        "Cite os números mais relevantes e uma recomendação prática."
+    )
+    user = (
+        f"Gráfico: {contexto}, {onde}.\n"
+        f"Dados (JSON): {json.dumps(dados, ensure_ascii=False)}\n"
+        "Escreva a leitura do gráfico."
+    )
+    resp = await _chat(system, user)
+    return resp or "Não foi possível gerar a leitura da IA agora. Tente novamente."
+
+
+async def ping() -> dict:
+    return {
+        "ok": bool(config.get_workspace_token()),
+        "supervisor": config.SUPERVISOR_ENDPOINT,
+        "explain_model": config.EXPLAIN_MODEL,
+    }
