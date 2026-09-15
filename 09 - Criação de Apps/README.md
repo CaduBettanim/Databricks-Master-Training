@@ -19,7 +19,7 @@ Um **Databricks App** (a plataforma hospeda o app com compute próprio) com trê
 | **💬 Assistente** | Um chat que responde perguntas de negócio (*"qual o NPS médio por canal?"*, *"total de faturas em aberto?"*) roteando para o Genie certo. | seu **Supervisor** do Ex. 6 |
 | **🎯 Retenção Personalizada** | Lista os clientes mais propensos a cancelar; você cola um id, gera o **e-mail de retenção** e clica em **Enviar para CRM**. | função `gerar_email_retencao` do Ex. 8 |
 
-> **Por que um app, e não mais um dashboard?** Porque aqui o usuário de negócio **age**: navega o risco, conversa com os dados e dispara a retenção — tudo num só lugar, com a governança do Unity Catalog por trás (o app acessa os dados com um *service principal* que só enxerga o que precisa).
+> **Por que um app, e não mais um dashboard?** Porque aqui o usuário de negócio **age**: navega o risco, conversa com os dados e dispara a retenção — tudo num só lugar, com a governança do Unity Catalog por trás (o app acessa os dados **com a sua própria identidade** — veja abaixo).
 
 ## Como o app se adapta a você
 O código do app é **dirigido por configuração**: ele não tem nenhum id ou nome fixo. O notebook de deploy grava **as suas** informações (seu schema, seu Supervisor, seu warehouse) nas variáveis de ambiente do app. Por isso o mesmo notebook serve para toda a turma — cada um publica a sua instância.
@@ -40,10 +40,11 @@ https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/09%20-%20Cr
 
 ### Passo 2 — Rodar o notebook de deploy
 Abra o notebook importado, anexe **Serverless** e:
-1. Preencha os dois campos no topo:
+1. **Rode a primeira célula** (a dos campos) com **Shift+Enter** — os dois campos aparecem no topo do notebook.
+2. Preencha os campos:
    - **database** — o seu schema pessoal (ex.: `cbettanim`).
    - **supervisor_endpoint** — o endpoint do seu Supervisor do Ex. 6 (ex.: `mas-3d713414-endpoint`).
-2. Clique em **Run all**.
+3. Só então clique em **Run all**.
 
 O notebook faz **todo o trabalho pesado**:
 - **baixa o código do app** do GitHub e o prepara com a **sua** configuração;

@@ -27,15 +27,20 @@
 
 # MAGIC %md
 # MAGIC ## Passo 1 — Preencha os campos e rode tudo
-# MAGIC - **database**: o seu schema pessoal (o mesmo dos Ex. 7 e 8), ex.: `cbettanim`.
-# MAGIC - **supervisor_endpoint**: o endpoint do seu Supervisor do Ex. 6, ex.: `mas-3d713414-endpoint`.
+# MAGIC 1. **Rode só a célula abaixo** (Shift+Enter) para os campos aparecerem no topo do notebook.
+# MAGIC 2. Preencha **database** (seu schema pessoal, ex.: `cbettanim`) e **supervisor_endpoint**
+# MAGIC    (o endpoint do seu Supervisor do Ex. 6, ex.: `mas-3d713414-endpoint`).
+# MAGIC 3. Só então clique em **Run all**.
 
 # COMMAND ----------
 
+# Cria os campos no topo do notebook. Rode ESTA célula primeiro, preencha os campos e depois Run all.
 dbutils.widgets.text("database", "", "1. Seu database pessoal (ex.: cbettanim)")
 dbutils.widgets.text("supervisor_endpoint", "", "2. Endpoint do Supervisor (Ex.06)")
 dbutils.widgets.text("catalog", "dbacademy", "3. Catálogo (opcional)")
 dbutils.widgets.text("warehouse", "", "4. Warehouse: nome ou id (opcional)")
+
+# COMMAND ----------
 
 DATABASE = dbutils.widgets.get("database").strip()
 SUPERVISOR = dbutils.widgets.get("supervisor_endpoint").strip()
