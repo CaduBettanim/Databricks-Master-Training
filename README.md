@@ -21,7 +21,7 @@ O domínio é uma **empresa de assinatura genérica**, então a trilha se adapta
 
 - **Base compartilhada** (schema `churn`, somente leitura): criada uma vez no Setup e usada por toda a turma.
 - **Schema pessoal por participante** (`<catálogo>.<seu_database>`): recebe o que cada um cria nos exercícios (metric views, modelo, funções, etc.).
-- Objetos de workspace (Genie, Knowledge Assistant, Supervisor, App) são criados por participante.
+- Objetos de workspace (Genie, Supervisor, App) são criados por participante.
 
 ## Trilha
 

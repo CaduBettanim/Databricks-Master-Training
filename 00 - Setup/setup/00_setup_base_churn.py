@@ -606,7 +606,7 @@ else:
 # MAGIC |---|---|---|
 # MAGIC | Model Serving / Foundation Model APIs | `serving_endpoints.list()` funciona vs `NotFound` | 4 (AI Functions) |
 # MAGIC | Endpoints do `ai_query` (Ex. 4) | `databricks-meta-llama-3-3-70b-instruct` e `databricks-gpt-oss-120b` presentes na lista | 4 (passos 1c, 2b) |
-# MAGIC | Multi-Agent Supervisor (Agent Bricks) | co-gated com Knowledge Assistant (`GET /knowledge-assistants` responde vs 404) | 6 (Supervisor) |
+# MAGIC | Multi-Agent Supervisor (Agent Bricks) | co-gated com Knowledge Assistant (`GET /knowledge-assistants` responde vs 404) | 7 (Supervisor) |
 # MAGIC
 # MAGIC > O registro do modelo no UC (Ex. 6) usa o Model Registry do Unity Catalog — inerente a
 # MAGIC > workspaces com UC, sem probe dedicado. Ex. 6 **não** cria endpoint de serving.
