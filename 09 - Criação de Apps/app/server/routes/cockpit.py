@@ -11,11 +11,16 @@ from __future__ import annotations
 
 import asyncio
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
 from .. import config, llm, warehouse
 from ..warehouse import num
+
+
+def _user_token(request: Request):
+    """Token do usuário logado (OBO); local cai para o profile."""
+    return config.token_for_request(request.headers.get(config.USER_TOKEN_HEADER))
 
 router = APIRouter()
 
@@ -50,8 +55,9 @@ def _vazio_regiao() -> dict:
 
 
 @router.get("/cockpit/dados")
-async def cockpit_dados():
+async def cockpit_dados(request: Request):
     """Estrutura completa por região (Brasil + 5 regiões) + KPIs nacionais."""
+    token = _user_token(request)
     q_faixa = f"""
         SELECT {REG} regiao, s.faixa_risco faixa, count(*) n
         FROM {PE}.churn_scores s JOIN {CH}.dim_cliente c USING(id_cliente)
@@ -83,8 +89,9 @@ async def cockpit_dados():
     """
 
     r_faixa, r_plano, r_seg, r_meses, r_kpi = await asyncio.gather(
-        warehouse.query(q_faixa), warehouse.query(q_plano),
-        warehouse.query(q_seg), warehouse.query(q_meses), warehouse.query(q_kpi),
+        warehouse.query(q_faixa, token), warehouse.query(q_plano, token),
+        warehouse.query(q_seg, token), warehouse.query(q_meses, token),
+        warehouse.query(q_kpi, token),
     )
 
     D: dict[str, dict] = {r: _vazio_regiao() for r in REGIOES}
@@ -155,7 +162,7 @@ class ExplicarReq(BaseModel):
 
 
 @router.post("/cockpit/explicar")
-async def cockpit_explicar(req: ExplicarReq):
+async def cockpit_explicar(req: ExplicarReq, request: Request):
     """Leitura por IA (foundation model) do gráfico, a partir dos dados da região atual."""
-    texto = await llm.explicar_grafico(req.chart, req.regiao, req.dados)
+    texto = await llm.explicar_grafico(req.chart, req.regiao, req.dados, _user_token(request))
     return {"texto": texto}

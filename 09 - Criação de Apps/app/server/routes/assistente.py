@@ -1,10 +1,10 @@
 """Aba 2 — Assistente. Encaminha a pergunta ao Supervisor (Ex.06) e devolve o texto."""
 from __future__ import annotations
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
-from .. import llm
+from .. import config, llm
 
 router = APIRouter()
 
@@ -14,11 +14,12 @@ class PerguntaReq(BaseModel):
 
 
 @router.post("/assistente/perguntar")
-async def perguntar(req: PerguntaReq):
+async def perguntar(req: PerguntaReq, request: Request):
     pergunta = (req.pergunta or "").strip()
     if not pergunta:
         return {"resposta": "Digite uma pergunta.", "ok": False}
-    resposta = await llm.supervisor_ask(pergunta)
+    token = config.token_for_request(request.headers.get(config.USER_TOKEN_HEADER))
+    resposta = await llm.supervisor_ask(pergunta, token)
     if not resposta:
         return {
             "resposta": "O Supervisor não respondeu agora (pode estar em cold start). Tente de novo.",

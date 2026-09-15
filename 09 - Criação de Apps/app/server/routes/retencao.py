@@ -7,7 +7,7 @@ Aba 3 — Retenção Personalizada.
 """
 from __future__ import annotations
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
 from .. import config, warehouse
@@ -19,8 +19,12 @@ CH = f"{config.CATALOG}.{config.SCHEMA_CHURN}"
 PE = f"{config.CATALOG}.{config.SCHEMA_PESSOAL}"
 
 
+def _user_token(request: Request):
+    return config.token_for_request(request.headers.get(config.USER_TOKEN_HEADER))
+
+
 @router.get("/retencao/lista")
-async def lista():
+async def lista(request: Request):
     rows = await warehouse.query(f"""
         SELECT s.id_cliente, c.nome_cliente, c.cidade, c.uf,
                floor(datediff(current_date(), c.data_cadastro)/365) anos,
@@ -29,7 +33,7 @@ async def lista():
         WHERE s.faixa_risco='Alto'
         ORDER BY s.prob_churn DESC
         LIMIT 12
-    """)
+    """, _user_token(request))
     clientes = [
         {
             "id": r.get("id_cliente"),
@@ -56,12 +60,12 @@ def _sanitiza_id(raw: str) -> str:
 
 
 @router.post("/retencao/email")
-async def email(req: EmailReq):
+async def email(req: EmailReq, request: Request):
     cid = _sanitiza_id(req.id_cliente)
     if not cid:
         return {"ok": False, "erro": "ID inválido."}
     rows = await warehouse.query(
-        f"SELECT email FROM {PE}.gerar_email_retencao('{cid}')"
+        f"SELECT email FROM {PE}.gerar_email_retencao('{cid}')", _user_token(request)
     )
     if not rows or not rows[0].get("email"):
         return {"ok": False, "erro": "ID não encontrado na base de risco."}

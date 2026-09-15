@@ -1,9 +1,14 @@
-# Central de Retenção — config do Databricks App.
+# Central de Retenção — config do Databricks App (autenticação ON-BEHALF-OF usuário).
 #
 # O App roda o FastAPI (uvicorn) na porta 8000, servindo API + build do React.
-# As credenciais do service principal (DATABRICKS_HOST/CLIENT_ID/CLIENT_SECRET) são
-# auto-injetadas. O SQL Warehouse e os dois serving endpoints são anexados como App
-# resources (dão CAN_USE / CAN_QUERY ao SP); os IDs/nomes têm default no server/config.py.
+#
+# AUTENTICAÇÃO ON-BEHALF-OF (OBO): o app usa o token OAuth do usuário logado
+# (header X-Forwarded-Access-Token) para as chamadas de SQL e serving endpoints, de modo que
+# dados e IA rodam com a identidade do USUÁRIO — o service principal do app NÃO precisa de GRANT.
+#
+# Os escopos OBO (`sql` para o SQL Warehouse, `model-serving` para os serving endpoints) NÃO
+# ficam aqui no app.yaml (esta chave é ignorada e pode falhar o build). Eles são configurados no
+# APP (campo user_api_scopes), o que o notebook de deploy (deploy_app.py) faz via API.
 command:
   - "uvicorn"
   - "app:app"

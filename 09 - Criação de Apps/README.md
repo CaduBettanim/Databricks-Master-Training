@@ -24,6 +24,9 @@ Um **Databricks App** (a plataforma hospeda o app com compute próprio) com trê
 ## Como o app se adapta a você
 O código do app é **dirigido por configuração**: ele não tem nenhum id ou nome fixo. O notebook de deploy grava **as suas** informações (seu schema, seu Supervisor, seu warehouse) nas variáveis de ambiente do app. Por isso a mesma pasta serve para toda a turma — cada um publica a sua instância.
 
+## Por que você não concede nenhuma permissão
+O app usa **autenticação on-behalf-of (em nome do usuário)**: cada consulta ao warehouse e cada chamada de IA rodam **com a identidade de quem está logado no app** — não com uma conta de serviço. Na prática, o Databricks Apps repassa o seu token ao app (habilitado pelos *escopos* `sql` e `model-serving`, que o notebook configura). Como **você** já tem tudo de que o app precisa — `SELECT` em `dbacademy.churn` (pelo grupo do treino), a posse do seu schema e das suas funções, e a posse do seu Supervisor/Genies — **nada precisa ser concedido**: o app simplesmente age como você. É isso que torna o app reproduzível para a turma inteira sem nenhum passo de administrador.
+
 ## Passo a passo
 
 ### Passo 1 — Trazer este módulo para o seu workspace
@@ -40,11 +43,10 @@ O notebook faz **todo o trabalho pesado**:
 - resolve o **SQL Warehouse** pelo nome (`dbacademy_workshop_wh`), com fallback;
 - prepara o código com a **sua** configuração;
 - **cria o app** (`central-retencao-<seu_db>`) com compute e *service principal* próprios;
-- **concede automaticamente** ao *service principal* do app tudo que ele precisa:
-  - `USE CATALOG` + `USE SCHEMA`/`SELECT` em `dbacademy.churn` e no seu schema, `EXECUTE` nas suas funções;
-  - `CAN_USE` no warehouse e `CAN_QUERY` nos endpoints (Supervisor + os modelos de IA);
-  - `CAN_RUN` **em cada Genie que o seu Supervisor usa** — descobertos automaticamente a partir do próprio Supervisor;
+- habilita o **on-behalf-of** (escopos `sql` + `model-serving`) e declara o warehouse que o app usa;
 - **publica** e imprime a **URL**.
+
+Repare no que ele **não** faz: nenhuma concessão de permissão. Sem `GRANT`, sem `EXECUTE`, sem `CAN_QUERY`, sem `CAN_RUN` em Genie. Sob o on-behalf-of, o app age com a sua identidade — que já tem acesso a tudo.
 
 ### Passo 3 — Abrir o app
 Clique na **URL** que o notebook imprime no final. Explore as três abas:

@@ -12,11 +12,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from server import config, llm
+from server import config, llm, warehouse
 from server.routes import assistente, cockpit, retencao
 
 FRONTEND_DIST = Path(__file__).parent / "frontend" / "dist"
@@ -29,10 +29,23 @@ app.include_router(retencao.router, prefix="/api")
 
 
 @app.get("/api/health")
-async def health():
+async def health(request: Request):
+    """Saúde + diagnóstico OBO: confirma que o header do usuário chegou e mostra COMO QUEM as
+    consultas rodam (current_user()) — deve ser o usuário logado, não o service principal."""
+    hdr = request.headers.get(config.USER_TOKEN_HEADER)
+    token = config.token_for_request(hdr)
+    obo = {"user_header_present": bool(hdr)}
+    try:
+        rows = await warehouse.query("SELECT current_user() AS u", token)
+        obo["user_query_ok"] = bool(rows)
+        obo["consulta_roda_como"] = rows[0].get("u") if rows else None
+    except Exception as exc:  # pragma: no cover
+        obo["user_query_ok"] = False
+        obo["erro"] = str(exc)[:200]
     return {
         "app": "central-retencao",
         "ambiente": config.summary(),
+        "obo": obo,
         "ia": await llm.ping(),
     }
 

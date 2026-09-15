@@ -1,6 +1,7 @@
 """
-Camada de IA do app. Dois consumidores, ambos serving endpoints do workspace, chamados com a
-identidade do app (service principal com CAN_QUERY):
+Camada de IA do app. Dois consumidores, ambos serving endpoints do workspace, chamados com o
+TOKEN DO USUÁRIO logado (OBO) — passado pelas rotas. Isso é o que faz o Supervisor rotear como
+o usuário (que é dono dos Genies), sem precisar de CAN_QUERY/CAN_RUN no service principal.
 
   1. supervisor_ask(): o Supervisor do Ex.06 (mas-...-endpoint). Formato de "Responses API":
      body {"input":[{role,content}]}, e a resposta final é o ÚLTIMO item `message` do array
@@ -57,10 +58,11 @@ def _texto_do_content(content) -> str:
 # -----------------------------------------------------------------------------
 # 1. Supervisor (Ex.06) — Responses API
 # -----------------------------------------------------------------------------
-async def supervisor_ask(pergunta: str) -> Optional[str]:
-    """Manda a pergunta ao Supervisor e devolve o texto da resposta final."""
+async def supervisor_ask(pergunta: str, token: Optional[str]) -> Optional[str]:
+    """Manda a pergunta ao Supervisor (como o usuário) e devolve o texto da resposta final."""
+    if not token:
+        return None
     host = config.get_workspace_host()
-    token = config.get_workspace_token()
     url = f"{host}/serving-endpoints/{config.SUPERVISOR_ENDPOINT}/invocations"
     payload = {"input": [{"role": "user", "content": pergunta}]}
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
@@ -101,9 +103,10 @@ def _extrair_resposta_final(data: dict) -> Optional[str]:
 # -----------------------------------------------------------------------------
 # 2. Foundation model — chat completions (leitura dos gráficos)
 # -----------------------------------------------------------------------------
-async def _chat(system: str, user: str, max_tokens: int = 220) -> Optional[str]:
+async def _chat(system: str, user: str, token: Optional[str], max_tokens: int = 220) -> Optional[str]:
+    if not token:
+        return None
     host = config.get_workspace_host()
-    token = config.get_workspace_token()
     url = f"{host}/serving-endpoints/{config.EXPLAIN_MODEL}/invocations"
     payload = {
         "messages": [
@@ -129,7 +132,7 @@ async def _chat(system: str, user: str, max_tokens: int = 220) -> Optional[str]:
         return None
 
 
-async def explicar_grafico(chart: str, regiao: str, dados: dict) -> str:
+async def explicar_grafico(chart: str, regiao: str, dados: dict, token: Optional[str]) -> str:
     """Leitura em 1-2 frases PT-BR de um gráfico do cockpit, a partir dos dados atuais."""
     onde = "no Brasil (todas as regiões)" if regiao == "Brasil" else f"na região {regiao}"
     contexto = {
@@ -149,13 +152,12 @@ async def explicar_grafico(chart: str, regiao: str, dados: dict) -> str:
         f"Dados (JSON): {json.dumps(dados, ensure_ascii=False)}\n"
         "Escreva a leitura do gráfico."
     )
-    resp = await _chat(system, user)
+    resp = await _chat(system, user, token)
     return resp or "Não foi possível gerar a leitura da IA agora. Tente novamente."
 
 
 async def ping() -> dict:
     return {
-        "ok": bool(config.get_workspace_token()),
         "supervisor": config.SUPERVISOR_ENDPOINT,
         "explain_model": config.EXPLAIN_MODEL,
     }

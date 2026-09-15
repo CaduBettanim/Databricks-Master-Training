@@ -1,17 +1,21 @@
 """
-Configuração central e autenticação dual-mode da Central de Retenção.
+Configuração central e autenticação da Central de Retenção.
 
-Padrão da skill databricks-apps: o MESMO código roda localmente (via profile do CLI) e dentro
-do Databricks App (via service principal auto-injetado). A detecção é feita pela variável
-DATABRICKS_APP_NAME, que só existe no ambiente do App.
+AUTENTICAÇÃO ON-BEHALF-OF (OBO): dentro do Databricks App, TODAS as chamadas de dados e IA
+rodam com a identidade do USUÁRIO LOGADO — não do service principal do app. O Databricks Apps
+injeta o token OAuth do usuário no header `X-Forwarded-Access-Token` (habilitado pelos escopos
+`user_api_scopes` no app.yaml: `sql` para o SQL Warehouse e `model-serving` para os serving
+endpoints). As rotas leem esse header e passam o token para warehouse.py e llm.py.
 
-Diferente da demo Cargill, este app NÃO usa Lakebase. Todo o dado vem do Unity Catalog, lido
-por um SQL Warehouse via Statement Execution API (server/warehouse.py). A IA vem de dois
-serving endpoints: o Supervisor (Ex.06) e um foundation model (leitura dos gráficos).
+Consequência (o ponto do OBO): o app NÃO precisa de nenhum GRANT no seu service principal. O
+usuário já tem SELECT em `dbacademy.churn` (grupo do treino), é dono do seu schema pessoal e
+das UC functions, e é dono do Supervisor/Genies — então tudo funciona sem conceder nada ao SP.
+
+Localmente (fora do App) não há header: caímos para o token do profile do CLI (dev), via
+`get_workspace_token()`.
 
 Gotchas resolvidos aqui:
-  1. Token OAuth: `w.config.token` é None em auth U2M/OAuth. Use `w.config.authenticate()`
-     que devolve o header 'Authorization: Bearer <token>' e extraia o token de lá.
+  1. Token OAuth local: `w.config.token` é None em auth U2M/OAuth. Use `w.config.authenticate()`.
   2. DATABRICKS_HOST dentro do App vem SEM esquema (só o hostname). Prefixe com https://.
 """
 from __future__ import annotations
@@ -33,11 +37,14 @@ DATABRICKS_PROFILE = os.environ.get("DATABRICKS_CONFIG_PROFILE") or os.environ.g
 
 WORKSPACE_HOST_DEFAULT = "https://SEU_WORKSPACE_HOST"
 
+# Header que o Databricks Apps injeta com o token OAuth do usuário logado (OBO).
+USER_TOKEN_HEADER = "x-forwarded-access-token"
+
 # -----------------------------------------------------------------------------
 # Recursos (parametrizáveis por env var; defaults = valores do workspace do treino).
-# O SQL Warehouse e os dois serving endpoints são anexados como App resources — isso dá ao
-# service principal do app CAN_USE / CAN_QUERY. Os GRANTs do Unity Catalog (SELECT/EXECUTE)
-# são concedidos ao SP à parte.
+# Sob OBO, o SQL Warehouse ainda é anexado como App resource (o SP precisa de CAN_USE no
+# COMPUTE do warehouse), mas as consultas rodam com o token do usuário. Serving endpoints NÃO
+# precisam de anexo/CAN_QUERY: o token do usuário (escopo model-serving) autoriza a invocação.
 # -----------------------------------------------------------------------------
 WAREHOUSE_ID = os.environ.get("CR_WAREHOUSE_ID", "d788121d0edfbb7a")
 
@@ -102,10 +109,25 @@ def get_workspace_token() -> Optional[str]:
     return None
 
 
+def token_for_request(header_token: Optional[str]) -> Optional[str]:
+    """Token a usar nas chamadas (SQL + serving).
+
+    No App: SEMPRE o token do USUÁRIO logado (X-Forwarded-Access-Token) — OBO. Se o header
+    faltar em produção, retornamos None (não caímos para o SP, que não tem grants — isso só
+    mascararia o erro). Local (fora do App): usa o token do profile do CLI (dev).
+    """
+    if header_token:
+        return header_token
+    if IS_DATABRICKS_APP:
+        return None
+    return get_workspace_token()
+
+
 def summary() -> dict:
     """Diagnóstico legível do ambiente, exposto em /api/health."""
     return {
         "modo": "databricks_app" if IS_DATABRICKS_APP else "local",
+        "auth": "on-behalf-of-user (X-Forwarded-Access-Token)",
         "profile": None if IS_DATABRICKS_APP else DATABRICKS_PROFILE,
         "host": get_workspace_host(),
         "warehouse_id": WAREHOUSE_ID,

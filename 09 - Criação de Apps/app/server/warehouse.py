@@ -2,21 +2,26 @@
 Leitura do Unity Catalog via SQL Statement Execution API (warehouse serverless).
 
 Toda a camada de dados do app (cockpit, lista de risco, e-mail de retenção via UC function)
-passa por aqui. Degrade gracioso: erro -> lista vazia, e o front mostra estado vazio.
+passa por aqui. As consultas rodam com o TOKEN DO USUÁRIO logado (OBO) — passado pelas rotas —
+para que o Unity Catalog aplique as permissões do próprio usuário. Degrade gracioso: erro ou
+token ausente -> lista vazia, e o front mostra estado vazio.
 """
 from __future__ import annotations
 
 import json
+from typing import Optional
 
 import aiohttp
 
 from . import config
 
 
-async def query(sql: str) -> list[dict]:
-    """Roda um SELECT no warehouse e devolve lista de dicts (colunas nomeadas)."""
+async def query(sql: str, token: Optional[str]) -> list[dict]:
+    """Roda um SELECT no warehouse (como o usuário) e devolve lista de dicts."""
+    if not token:
+        print("[warehouse] sem token de usuário; retornando vazio")
+        return []
     host = config.get_workspace_host()
-    token = config.get_workspace_token()
     url = f"{host}/api/2.0/sql/statements"
     payload = {
         "warehouse_id": config.WAREHOUSE_ID,
