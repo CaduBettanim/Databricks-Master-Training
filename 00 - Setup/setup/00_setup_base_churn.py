@@ -338,7 +338,7 @@ else:
 if WAREHOUSE_ID:
     try:
         w.warehouses.update_permissions(warehouse_id=WAREHOUSE_ID, access_control_list=[
-            WarehouseAccessControlRequest(group_name=GROUP, permission_level=WarehousePermissionLevel.CAN_USE)])
+            WarehouseAccessControlRequest(group_name=GROUP, permission_level=WarehousePermissionLevel.CAN_MANAGE)])
         print(f"{OK} Concedido CAN_USE do warehouse para {GROUP}.")
     except Exception as e:
         print(f"{NO} Não foi possível conceder permissão de warehouse: {e}")
