@@ -4,9 +4,7 @@
 
 > _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
 
-Um único notebook, rodado **uma vez** pelo **administrador de conta**, que faz tudo: prepara a turma
-(grupo, permissões, compute), carrega a base compartilhada de churn e **verifica** que cada
-participante — e o workspace — está pronto. É **idempotente** (seguro re-executar).
+Um único notebook, rodado **uma vez** pelo **administrador de conta**, que faz tudo: prepara a turma (grupo, permissões, compute), carrega a base compartilhada de churn e **verifica** que cada participante — e o workspace — está pronto. É **idempotente** (seguro re-executar).
 
 ## Conteúdo
 
@@ -30,14 +28,15 @@ participante — e o workspace — está pronto. É **idempotente** (seguro re-e
 - Volume `kb_volume` com a base de conhecimento (FAQ, Política de Retenção, Playbook de CS)
 - Concede à turma `USE SCHEMA` + `SELECT` no schema `churn` e `READ VOLUME` no `kb_volume`
 
-**Verifica**: matriz de permissões por participante + as features de IA usadas nos Ex. 4/6/7
-(Model Serving/Foundation Model APIs e Multi-Agent Supervisor). Veredito na seção **7. Relatório final**.
+**Verifica**: matriz de permissões por participante + as features de IA usadas nos Ex. 4/6/7 (Model Serving/Foundation Model APIs e Multi-Agent Supervisor). Veredito na seção **7. Relatório final**.
 
 ## Passos
 
 1. **Pré-requisito:** rodar como **administrador de conta**. Se o catálogo `dbacademy` não puder ser criado automaticamente (contas com *Default Storage*), crie-o antes pela UI: **Catalog Explorer → Create catalog → Default Storage**.
 2. Importe o notebook por URL: **Workspace → Import → URL** com
-   `https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/00%20-%20Setup/setup/00_setup_base_churn.py`
+```
+https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/00%20-%20Setup/setup/00_setup_base_churn.py
+```
 3. Rode as **duas primeiras células** para exibir os widgets, **selecione os participantes** e ajuste os alternadores (criar catálogo/warehouse/cluster). (Opcional: ajuste `NOME_CATALOGO`/`NOME_SCHEMA` na célula de parâmetros.)
 4. Anexe **Serverless** (ou um cluster) e clique em **Run all**. Todas as células devem terminar com sucesso (`✅ CHECKS COMPLETOS`).
 
