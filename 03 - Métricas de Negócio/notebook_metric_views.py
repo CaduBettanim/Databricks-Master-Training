@@ -18,12 +18,12 @@ dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas o
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE SCHEMA IF NOT EXISTS dbacademy.${database}
+# MAGIC CREATE SCHEMA IF NOT EXISTS dbacademy.:database
 
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE OR REPLACE VIEW dbacademy.${database}.mvw_churn (
+# MAGIC CREATE OR REPLACE VIEW dbacademy.:database.mvw_churn (
 # MAGIC   `Segmento`      COMMENT 'Segmento do cliente',
 # MAGIC   `Plano`         COMMENT 'Nome do plano',
 # MAGIC   `Mês`           COMMENT 'Mês do cancelamento',
@@ -60,7 +60,7 @@ dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas o
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE OR REPLACE VIEW dbacademy.${database}.mvw_receita (
+# MAGIC CREATE OR REPLACE VIEW dbacademy.:database.mvw_receita (
 # MAGIC   `Segmento`      COMMENT 'Segmento do cliente',
 # MAGIC   `Mês`           COMMENT 'Competência (mês)',
 # MAGIC   `Receita`       COMMENT 'Soma faturada',
@@ -91,7 +91,7 @@ dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas o
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE OR REPLACE VIEW dbacademy.${database}.mvw_suporte (
+# MAGIC CREATE OR REPLACE VIEW dbacademy.:database.mvw_suporte (
 # MAGIC   `Segmento`   COMMENT 'Segmento do cliente',
 # MAGIC   `Canal`      COMMENT 'Canal do ticket',
 # MAGIC   `Categoria`  COMMENT 'Categoria do ticket',
@@ -132,7 +132,7 @@ dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas o
 # MAGIC %sql
 # MAGIC -- Taxa de churn por segmento
 # MAGIC SELECT `Segmento`, ROUND(MEASURE(`Taxa de Churn`), 3) AS taxa_churn
-# MAGIC FROM dbacademy.${database}.mvw_churn
+# MAGIC FROM dbacademy.:database.mvw_churn
 # MAGIC GROUP BY `Segmento`
 # MAGIC ORDER BY taxa_churn DESC
 
@@ -143,7 +143,7 @@ dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas o
 # MAGIC SELECT `Segmento`,
 # MAGIC        ROUND(MEASURE(`Receita`), 2)       AS receita,
 # MAGIC        ROUND(MEASURE(`Inadimplência`), 3) AS inadimplencia
-# MAGIC FROM dbacademy.${database}.mvw_receita
+# MAGIC FROM dbacademy.:database.mvw_receita
 # MAGIC GROUP BY `Segmento`
 # MAGIC ORDER BY receita DESC
 
@@ -155,7 +155,7 @@ dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas o
 # MAGIC        MEASURE(`Tickets`)              AS tickets,
 # MAGIC        ROUND(MEASURE(`CSAT Médio`), 2) AS csat,
 # MAGIC        ROUND(MEASURE(`NPS Médio`), 2)  AS nps
-# MAGIC FROM dbacademy.${database}.mvw_suporte
+# MAGIC FROM dbacademy.:database.mvw_suporte
 # MAGIC GROUP BY `Categoria`
 # MAGIC ORDER BY tickets DESC
 
