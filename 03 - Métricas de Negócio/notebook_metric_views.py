@@ -10,20 +10,106 @@ NOME_CATALOGO = "dbacademy"
 _schemas = [r[0] for r in spark.sql(f"SHOW SCHEMAS IN {NOME_CATALOGO}").collect() if r[0] != "churn"]
 dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas or [""], "Seu schema (dbacademy.<schema>)")
 NOME_SCHEMA = dbutils.widgets.get("database")
-SQL_URL = "https://raw.githubusercontent.com/CaduBettanim/Databricks-Master-Training/main/03%20-%20Metric%20Views/metric_views.sql"
 
 fq = f"{NOME_CATALOGO}.{NOME_SCHEMA}"
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {fq}")
 
 # COMMAND ----------
-# ## 1. Criar as metric views (lê o SQL do repositório e cria no seu schema)
-import urllib.request
-sql = urllib.request.urlopen(SQL_URL).read().decode("utf-8").replace("<seu_db>", NOME_SCHEMA)
-for stmt in sql.split(";"):
-    if "CREATE OR REPLACE VIEW" in stmt:
-        nome = stmt.split("VIEW",1)[1].split("(",1)[0].strip()
-        spark.sql(stmt)
-        print("criada:", nome)
+# ## 1. Criar as metric views
+for view, ddl in [
+    ("mvw_churn", f"""CREATE OR REPLACE VIEW {fq}.mvw_churn (
+  `Segmento`      COMMENT 'Segmento do cliente',
+  `Plano`         COMMENT 'Nome do plano',
+  `Mês`           COMMENT 'Mês do cancelamento',
+  `Cancelamentos` COMMENT 'Assinaturas canceladas',
+  `Clientes`      COMMENT 'Total de clientes',
+  `Taxa de Churn` COMMENT 'Cancelamentos / Clientes'
+) WITH METRICS LANGUAGE YAML
+COMMENT 'Métricas de churn/retenção' AS $$
+version: 0.1
+source: dbacademy.churn.fato_assinatura
+joins:
+  - name: cliente
+    source: dbacademy.churn.dim_cliente
+    'on': source.id_cliente = cliente.id_cliente
+  - name: plano
+    source: dbacademy.churn.dim_plano
+    'on': source.id_plano = plano.id_plano
+dimensions:
+  - name: Segmento
+    expr: cliente.segmento
+  - name: Plano
+    expr: plano.nome_plano
+  - name: Mês
+    expr: date_trunc('MONTH', source.data_fim)
+measures:
+  - name: Cancelamentos
+    expr: SUM(source.churn_flag)
+  - name: Clientes
+    expr: COUNT(DISTINCT source.id_cliente)
+  - name: Taxa de Churn
+    expr: SUM(source.churn_flag) / COUNT(DISTINCT source.id_cliente)
+$$"""),
+    ("mvw_receita", f"""CREATE OR REPLACE VIEW {fq}.mvw_receita (
+  `Segmento`      COMMENT 'Segmento do cliente',
+  `Mês`           COMMENT 'Competência (mês)',
+  `Receita`       COMMENT 'Soma faturada',
+  `Inadimplência` COMMENT 'Percentual de faturas não pagas',
+  `Ticket Médio`  COMMENT 'Valor médio por fatura'
+) WITH METRICS LANGUAGE YAML
+COMMENT 'Métricas de receita' AS $$
+version: 0.1
+source: dbacademy.churn.fato_faturamento
+joins:
+  - name: cliente
+    source: dbacademy.churn.dim_cliente
+    'on': source.id_cliente = cliente.id_cliente
+dimensions:
+  - name: Segmento
+    expr: cliente.segmento
+  - name: Mês
+    expr: date_trunc('MONTH', source.competencia)
+measures:
+  - name: Receita
+    expr: SUM(source.valor)
+  - name: Inadimplência
+    expr: AVG(CASE WHEN NOT source.pago THEN 1.0 ELSE 0.0 END)
+  - name: Ticket Médio
+    expr: AVG(source.valor)
+$$"""),
+    ("mvw_suporte", f"""CREATE OR REPLACE VIEW {fq}.mvw_suporte (
+  `Segmento`   COMMENT 'Segmento do cliente',
+  `Canal`      COMMENT 'Canal do ticket',
+  `Categoria`  COMMENT 'Categoria do ticket',
+  `Tickets`    COMMENT 'Quantidade de tickets',
+  `CSAT Médio` COMMENT 'CSAT médio (1-5)',
+  `NPS Médio`  COMMENT 'NPS médio (0-10)'
+) WITH METRICS LANGUAGE YAML
+COMMENT 'Métricas de atendimento' AS $$
+version: 0.1
+source: dbacademy.churn.fato_ticket_suporte
+joins:
+  - name: cliente
+    source: dbacademy.churn.dim_cliente
+    'on': source.id_cliente = cliente.id_cliente
+dimensions:
+  - name: Segmento
+    expr: cliente.segmento
+  - name: Canal
+    expr: source.canal
+  - name: Categoria
+    expr: source.categoria
+measures:
+  - name: Tickets
+    expr: COUNT(1)
+  - name: CSAT Médio
+    expr: AVG(source.csat)
+  - name: NPS Médio
+    expr: AVG(source.nps)
+$$"""),
+]:
+    spark.sql(ddl)
+    print("criada:", f"{fq}.{view}")
 
 # COMMAND ----------
 # ## 2. Consultar com MEASURE()
