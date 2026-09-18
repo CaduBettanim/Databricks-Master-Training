@@ -20,11 +20,13 @@ dbutils.library.restartPython()
 
 # MAGIC %md
 # MAGIC ## Passo 1 — Configure o seu schema
-# MAGIC Troque `<seu_db>` pelo seu database pessoal.
+# MAGIC Selecione o seu schema pessoal no widget abaixo.
 
 # COMMAND ----------
 
-SEU_DB = "<seu_db>"                       # <<< troque aqui
+_schemas = [r[0] for r in spark.sql("SHOW SCHEMAS IN dbacademy").collect() if r[0] != "churn"]
+dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas or [""], "Seu schema (dbacademy.<schema>)")
+SEU_DB = dbutils.widgets.get("database")
 SCHEMA = f"dbacademy.{SEU_DB}"
 MODEL  = f"{SCHEMA}.modelo_churn"
 SCORES = f"{SCHEMA}.churn_scores"

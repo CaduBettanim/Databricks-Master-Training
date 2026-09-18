@@ -7,7 +7,9 @@
 # COMMAND ----------
 
 NOME_CATALOGO = "dbacademy"
-NOME_SCHEMA   = "<seu_db>"   # <<< troque pelo seu database pessoal (ex.: jsilva)
+_schemas = [r[0] for r in spark.sql(f"SHOW SCHEMAS IN {NOME_CATALOGO}").collect() if r[0] != "churn"]
+dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas or [""], "Seu schema (dbacademy.<schema>)")
+NOME_SCHEMA = dbutils.widgets.get("database")
 SQL_URL = "https://raw.githubusercontent.com/CaduBettanim/Databricks-Master-Training/main/03%20-%20Metric%20Views/metric_views.sql"
 
 fq = f"{NOME_CATALOGO}.{NOME_SCHEMA}"
