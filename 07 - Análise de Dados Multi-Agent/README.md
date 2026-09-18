@@ -103,7 +103,7 @@ Você tem dois especialistas. Agora crie o **Supervisor** que recebe a pergunta 
 ## Passo 8 — Nomear, instruir e descrever
 > O **nome** só fica editável **depois** que você anexa pelo menos um agente (Passo 7) — por isso deixamos para agora.
 
-1. Dê um **nome** ao Supervisor, por exemplo **`Análise de Clientes - <seu_db>`**.
+1. Dê um **nome** ao Supervisor, por exemplo **`Analise-Clientes-<seu_db>`**.
 2. Em **Instructions**, cole as regras de coordenação:
    ```text
    Você coordena dois especialistas: um de Faturamento (receita, inadimplência, faturas, planos) e um de Suporte (tickets, CSAT, NPS, canais). Encaminhe cada pergunta ao especialista adequado, combine as respostas quando a pergunta envolver os dois temas e responda sempre em português.
