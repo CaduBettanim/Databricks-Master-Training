@@ -1,0 +1,168 @@
+direction: down
+
+vars: {
+  d: {
+    orange: "#FF3621"
+    navy: "#1B3139"
+    teal: "#00A972"
+    blue: "#1E88E5"
+    purple: "#7B1FA2"
+    grey: "#E8EAF6"
+    sql: "#0277BD"
+  }
+}
+
+classes: {
+  ex: {
+    style: {
+      fill: ${d.grey}
+      stroke: ${d.navy}
+      border-radius: 8
+      font-size: 14
+    }
+  }
+  artifact: {
+    shape: cylinder
+    style: {
+      fill: ${d.navy}
+      font-color: white
+      stroke: ${d.navy}
+    }
+  }
+  arrow: {
+    style: {
+      stroke: ${d.navy}
+      stroke-width: 2
+    }
+  }
+  dotted: {
+    style: {
+      stroke: "#999"
+      stroke-dash: 5
+      stroke-width: 1
+    }
+  }
+}
+
+# ── 00 Setup ─────────────────────────────────────────────────────────────────
+
+setup: 00 · Setup {
+  style: {
+    fill: ${d.orange}
+    font-color: white
+    stroke: ${d.orange}
+    border-radius: 8
+    font-size: 15
+    bold: true
+  }
+  icon: /Users/augusto.carneiro/.claude/skills/d2/assets/icons/databricks-workspace.svg
+}
+
+churn_schema: dbacademy.churn {
+  class: artifact
+  icon: /Users/augusto.carneiro/.claude/skills/d2/assets/icons/delta-lake.svg
+}
+
+setup -> churn_schema: "7 tabelas + feature_churn\ncomentários + PK/FK + KB" {
+  class: arrow
+}
+
+# ── Schema pessoal (criado pelo aluno no Ex.1) ────────────────────────────────
+
+schema_pessoal: dbacademy.\<seu_db\> {
+  class: artifact
+  style.fill: ${d.teal}
+  icon: /Users/augusto.carneiro/.claude/skills/d2/assets/icons/unity-catalog.svg
+}
+
+ex01: 01 · SQL com IA {
+  class: ex
+  icon: /Users/augusto.carneiro/.claude/skills/d2/assets/icons/notebook.svg
+}
+
+setup -> ex01: {class: arrow}
+ex01 -> schema_pessoal: "CREATE SCHEMA\n<seu_db>" {class: arrow}
+
+# ── Ex independentes do Setup ────────────────────────────────────────────────
+
+ex02: 02 · Geração de Alertas {
+  class: ex
+  icon: /Users/augusto.carneiro/.claude/skills/d2/assets/icons/notebook.svg
+}
+
+ex04: 04 · IA Generativa no SQL {
+  class: ex
+  icon: /Users/augusto.carneiro/.claude/skills/d2/assets/icons/notebook.svg
+}
+
+ex06: 06 · Multi-Agent Genie {
+  class: ex
+  icon: /Users/augusto.carneiro/.claude/skills/d2/assets/icons/genie.svg
+}
+
+setup -> ex02: {class: arrow}
+setup -> ex04: {class: arrow}
+setup -> ex06: {class: arrow}
+
+# ── Ex.3 depende do schema pessoal ───────────────────────────────────────────
+
+ex03: 03 · Métricas de Negócio {
+  class: ex
+  icon: /Users/augusto.carneiro/.claude/skills/d2/assets/icons/notebook.svg
+}
+
+schema_pessoal -> ex03: {class: arrow}
+churn_schema -> ex03: {class: dotted}
+
+mvws: mvw_churn · mvw_receita · mvw_suporte {
+  class: artifact
+  style.fill: ${d.blue}
+  icon: /Users/augusto.carneiro/.claude/skills/d2/assets/icons/delta-lake.svg
+}
+
+ex03 -> mvws: "Metric Views\ngoverned MEASURE()" {class: arrow}
+
+# ── Ex.5 depende de mvw_churn (Ex.3) ─────────────────────────────────────────
+
+ex05: 05 · Dashboards com IA {
+  class: ex
+  icon: /Users/augusto.carneiro/.claude/skills/d2/assets/icons/databricks-workspace.svg
+}
+
+mvws -> ex05: "mvw_churn\n→ gráficos via prompt" {class: arrow}
+churn_schema -> ex05: {class: dotted}
+
+# ── Ex.7 depende do schema pessoal ───────────────────────────────────────────
+
+ex07: 07 · Previsão de Churn (ML) {
+  class: ex
+  icon: /Users/augusto.carneiro/.claude/skills/d2/assets/icons/mlflow.svg
+}
+
+schema_pessoal -> ex07: {class: arrow}
+churn_schema -> ex07: {class: dotted}
+
+modelo_churn: modelo_churn\n+ churn_scores {
+  class: artifact
+  style.fill: ${d.purple}
+  icon: /Users/augusto.carneiro/.claude/skills/d2/assets/icons/mlflow.svg
+}
+
+ex07 -> modelo_churn: "GradientBoosting\nAUC ≈ 0.97\nfaixa_risco + fator" {class: arrow}
+
+# ── Ex.7 desafio volta ao dashboard ──────────────────────────────────────────
+
+modelo_churn -> ex05: "desafio:\naba de previsão" {class: dotted}
+
+# ── legenda ───────────────────────────────────────────────────────────────────
+
+legend: {
+  label: "──── obrigatório   - - - leitura da base"
+  style: {
+    fill: white
+    stroke: "#ccc"
+    font-color: "#666"
+    font-size: 12
+    border-radius: 4
+  }
+}
