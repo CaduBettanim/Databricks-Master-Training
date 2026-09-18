@@ -9,49 +9,156 @@
 NOME_CATALOGO = "dbacademy"
 _schemas = [r[0] for r in spark.sql(f"SHOW SCHEMAS IN {NOME_CATALOGO}").collect() if r[0] != "churn"]
 dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas or [""], "Seu schema (dbacademy.<schema>)")
-NOME_SCHEMA = dbutils.widgets.get("database")
-SQL_URL = "https://raw.githubusercontent.com/CaduBettanim/Databricks-Master-Training/main/03%20-%20Metric%20Views/metric_views.sql"
-
-fq = f"{NOME_CATALOGO}.{NOME_SCHEMA}"
-spark.sql(f"CREATE SCHEMA IF NOT EXISTS {fq}")
 
 # COMMAND ----------
-# ## 1. Criar as metric views (lê o SQL do repositório e cria no seu schema)
-import urllib.request
-sql = urllib.request.urlopen(SQL_URL).read().decode("utf-8").replace("<seu_db>", NOME_SCHEMA)
-for stmt in sql.split(";"):
-    if "CREATE OR REPLACE VIEW" in stmt:
-        nome = stmt.split("VIEW",1)[1].split("(",1)[0].strip()
-        spark.sql(stmt)
-        print("criada:", nome)
+
+# MAGIC %md
+# MAGIC ## 1. Criar as metric views
 
 # COMMAND ----------
-# ## 2. Consultar com MEASURE()
 
-# Taxa de churn por segmento
-display(spark.sql(f"""
-SELECT `Segmento`, ROUND(MEASURE(`Taxa de Churn`), 3) AS taxa_churn
-FROM {fq}.mvw_churn GROUP BY `Segmento` ORDER BY taxa_churn DESC
-"""))
+# MAGIC %sql
+# MAGIC CREATE SCHEMA IF NOT EXISTS dbacademy.${database}
 
 # COMMAND ----------
-# Receita e inadimplência por segmento
-display(spark.sql(f"""
-SELECT `Segmento`,
-       ROUND(MEASURE(`Receita`), 2)       AS receita,
-       ROUND(MEASURE(`Inadimplência`), 3) AS inadimplencia
-FROM {fq}.mvw_receita GROUP BY `Segmento` ORDER BY receita DESC
-"""))
+
+# MAGIC %sql
+# MAGIC CREATE OR REPLACE VIEW dbacademy.${database}.mvw_churn (
+# MAGIC   `Segmento`      COMMENT 'Segmento do cliente',
+# MAGIC   `Plano`         COMMENT 'Nome do plano',
+# MAGIC   `Mês`           COMMENT 'Mês do cancelamento',
+# MAGIC   `Cancelamentos` COMMENT 'Assinaturas canceladas',
+# MAGIC   `Clientes`      COMMENT 'Total de clientes',
+# MAGIC   `Taxa de Churn` COMMENT 'Cancelamentos / Clientes'
+# MAGIC ) WITH METRICS LANGUAGE YAML
+# MAGIC COMMENT 'Métricas de churn/retenção' AS $$
+# MAGIC version: 0.1
+# MAGIC source: dbacademy.churn.fato_assinatura
+# MAGIC joins:
+# MAGIC   - name: cliente
+# MAGIC     source: dbacademy.churn.dim_cliente
+# MAGIC     'on': source.id_cliente = cliente.id_cliente
+# MAGIC   - name: plano
+# MAGIC     source: dbacademy.churn.dim_plano
+# MAGIC     'on': source.id_plano = plano.id_plano
+# MAGIC dimensions:
+# MAGIC   - name: Segmento
+# MAGIC     expr: cliente.segmento
+# MAGIC   - name: Plano
+# MAGIC     expr: plano.nome_plano
+# MAGIC   - name: Mês
+# MAGIC     expr: date_trunc('MONTH', source.data_fim)
+# MAGIC measures:
+# MAGIC   - name: Cancelamentos
+# MAGIC     expr: SUM(source.churn_flag)
+# MAGIC   - name: Clientes
+# MAGIC     expr: COUNT(DISTINCT source.id_cliente)
+# MAGIC   - name: Taxa de Churn
+# MAGIC     expr: SUM(source.churn_flag) / COUNT(DISTINCT source.id_cliente)
+# MAGIC $$
 
 # COMMAND ----------
-# CSAT e NPS por categoria de ticket
-display(spark.sql(f"""
-SELECT `Categoria`,
-       MEASURE(`Tickets`)              AS tickets,
-       ROUND(MEASURE(`CSAT Médio`), 2) AS csat,
-       ROUND(MEASURE(`NPS Médio`), 2)  AS nps
-FROM {fq}.mvw_suporte GROUP BY `Categoria` ORDER BY tickets DESC
-"""))
+
+# MAGIC %sql
+# MAGIC CREATE OR REPLACE VIEW dbacademy.${database}.mvw_receita (
+# MAGIC   `Segmento`      COMMENT 'Segmento do cliente',
+# MAGIC   `Mês`           COMMENT 'Competência (mês)',
+# MAGIC   `Receita`       COMMENT 'Soma faturada',
+# MAGIC   `Inadimplência` COMMENT 'Percentual de faturas não pagas',
+# MAGIC   `Ticket Médio`  COMMENT 'Valor médio por fatura'
+# MAGIC ) WITH METRICS LANGUAGE YAML
+# MAGIC COMMENT 'Métricas de receita' AS $$
+# MAGIC version: 0.1
+# MAGIC source: dbacademy.churn.fato_faturamento
+# MAGIC joins:
+# MAGIC   - name: cliente
+# MAGIC     source: dbacademy.churn.dim_cliente
+# MAGIC     'on': source.id_cliente = cliente.id_cliente
+# MAGIC dimensions:
+# MAGIC   - name: Segmento
+# MAGIC     expr: cliente.segmento
+# MAGIC   - name: Mês
+# MAGIC     expr: date_trunc('MONTH', source.competencia)
+# MAGIC measures:
+# MAGIC   - name: Receita
+# MAGIC     expr: SUM(source.valor)
+# MAGIC   - name: Inadimplência
+# MAGIC     expr: AVG(CASE WHEN NOT source.pago THEN 1.0 ELSE 0.0 END)
+# MAGIC   - name: Ticket Médio
+# MAGIC     expr: AVG(source.valor)
+# MAGIC $$
 
 # COMMAND ----------
-print("✅ Metric views criadas em", fq)
+
+# MAGIC %sql
+# MAGIC CREATE OR REPLACE VIEW dbacademy.${database}.mvw_suporte (
+# MAGIC   `Segmento`   COMMENT 'Segmento do cliente',
+# MAGIC   `Canal`      COMMENT 'Canal do ticket',
+# MAGIC   `Categoria`  COMMENT 'Categoria do ticket',
+# MAGIC   `Tickets`    COMMENT 'Quantidade de tickets',
+# MAGIC   `CSAT Médio` COMMENT 'CSAT médio (1-5)',
+# MAGIC   `NPS Médio`  COMMENT 'NPS médio (0-10)'
+# MAGIC ) WITH METRICS LANGUAGE YAML
+# MAGIC COMMENT 'Métricas de atendimento' AS $$
+# MAGIC version: 0.1
+# MAGIC source: dbacademy.churn.fato_ticket_suporte
+# MAGIC joins:
+# MAGIC   - name: cliente
+# MAGIC     source: dbacademy.churn.dim_cliente
+# MAGIC     'on': source.id_cliente = cliente.id_cliente
+# MAGIC dimensions:
+# MAGIC   - name: Segmento
+# MAGIC     expr: cliente.segmento
+# MAGIC   - name: Canal
+# MAGIC     expr: source.canal
+# MAGIC   - name: Categoria
+# MAGIC     expr: source.categoria
+# MAGIC measures:
+# MAGIC   - name: Tickets
+# MAGIC     expr: COUNT(1)
+# MAGIC   - name: CSAT Médio
+# MAGIC     expr: AVG(source.csat)
+# MAGIC   - name: NPS Médio
+# MAGIC     expr: AVG(source.nps)
+# MAGIC $$
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## 2. Consultar com MEASURE()
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC -- Taxa de churn por segmento
+# MAGIC SELECT `Segmento`, ROUND(MEASURE(`Taxa de Churn`), 3) AS taxa_churn
+# MAGIC FROM dbacademy.${database}.mvw_churn
+# MAGIC GROUP BY `Segmento`
+# MAGIC ORDER BY taxa_churn DESC
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC -- Receita e inadimplência por segmento
+# MAGIC SELECT `Segmento`,
+# MAGIC        ROUND(MEASURE(`Receita`), 2)       AS receita,
+# MAGIC        ROUND(MEASURE(`Inadimplência`), 3) AS inadimplencia
+# MAGIC FROM dbacademy.${database}.mvw_receita
+# MAGIC GROUP BY `Segmento`
+# MAGIC ORDER BY receita DESC
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC -- CSAT e NPS por categoria de ticket
+# MAGIC SELECT `Categoria`,
+# MAGIC        MEASURE(`Tickets`)              AS tickets,
+# MAGIC        ROUND(MEASURE(`CSAT Médio`), 2) AS csat,
+# MAGIC        ROUND(MEASURE(`NPS Médio`), 2)  AS nps
+# MAGIC FROM dbacademy.${database}.mvw_suporte
+# MAGIC GROUP BY `Categoria`
+# MAGIC ORDER BY tickets DESC
+
+# COMMAND ----------
+
+print(f"✅ Metric views criadas em dbacademy.{dbutils.widgets.get('database')}")

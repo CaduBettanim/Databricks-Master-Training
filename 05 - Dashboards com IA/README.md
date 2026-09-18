@@ -83,7 +83,7 @@ Posicione o logo no topo do dashboard, ocupando a largura da página. Com a imag
 Selecione o **Genie** de novo e peça um mapa. Cole **este prompt**:
 
 ```text
-Inclua um mapa contendo a quantidade de assinaturas Canceladas por UF (região), usando as tabelas dbacademy.churn.fato_assinatura e dbacademy.churn.dim_cliente.
+Inclua um mapa contendo a quantidade de assinaturas canceladas por UF (região). Crie o campo uf_iso concatenando "BR-" com o uf, usando as tabelas dbacademy.churn.fato_assinatura e dbacademy.churn.dim_cliente.
 ```
 
 Esperado: um mapa do Brasil com os cancelamentos distribuídos entre ~10 UFs (as maiores: **PR, RJ, BA, SP, CE**).
