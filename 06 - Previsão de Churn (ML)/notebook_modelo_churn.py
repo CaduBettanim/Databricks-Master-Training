@@ -12,8 +12,6 @@
 
 # MAGIC %pip install scikit-learn mlflow
 
-# COMMAND ----------
-
 dbutils.library.restartPython()
 
 # COMMAND ----------
@@ -134,11 +132,21 @@ print("Tabela de scores gravada:", SCORES)
 
 # COMMAND ----------
 
-display(spark.sql(f"""
-  SELECT faixa_risco, COUNT(*) AS clientes, ROUND(AVG(prob_churn), 3) AS prob_media
-  FROM {SCORES} GROUP BY faixa_risco ORDER BY prob_media DESC
-"""))
+# MAGIC %sql
+# MAGIC SELECT
+# MAGIC     faixa_risco,
+# MAGIC     COUNT(*) AS clientes,
+# MAGIC     ROUND(AVG(prob_churn), 3) AS prob_media
+# MAGIC FROM dbacademy.${database}.churn_scores
+# MAGIC GROUP BY faixa_risco
+# MAGIC ORDER BY prob_media DESC
+
 
 # COMMAND ----------
 
-display(spark.sql(f"SELECT * FROM {SCORES} ORDER BY prob_churn DESC LIMIT 10"))
+# MAGIC %sql
+# MAGIC SELECT
+# MAGIC     *
+# MAGIC FROM dbacademy.${database}.churn_scores
+# MAGIC ORDER BY prob_churn DESC
+# MAGIC LIMIT 10
