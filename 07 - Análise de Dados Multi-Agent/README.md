@@ -6,7 +6,7 @@
 
 Até aqui, você montou as análises. Agora vamos abrir isso para o time de negócio com os **Genie Spaces**: qualquer pessoa pergunta em português (*"qual a receita por segmento?"*) e o Genie escreve o SQL, executa e responde, sem escrever uma linha de código.
 
-E vamos um passo além. Você vai criar dois Genies especializados, um de **Faturamento** e um de **Suporte**, e no fim um **Supervisor** que orquestra os dois. O usuário faz uma pergunta só, e o Supervisor descobre sozinho qual especialista deve responder. É a isso que chamamos de solução *multi-agent*.
+E vamos um passo além. Você vai criar dois Genies especializados, um de **Faturamento** e um de **Suporte**, e no fim um **Supervisor** que orquestra os dois. O usuário faz uma pergunta só, e o Supervisor descobre sozinho qual especialista deve responder. É isso que chamamos de solução *multi-agent*.
 
 **Pré-requisito:** [Setup](../00%20-%20Setup) concluído (base `dbacademy.churn`).
 
