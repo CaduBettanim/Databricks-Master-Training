@@ -27,7 +27,7 @@ def _user_token(request: Request):
 async def lista(request: Request):
     rows = await warehouse.query(f"""
         SELECT s.id_cliente, c.nome_cliente, c.cidade, c.uf,
-               floor(datediff(current_date(), c.data_cadastro)/365) anos,
+               floor(datediff(DATE '2026-09-23', c.data_cadastro)/365) anos,
                s.nome_plano, round(s.prob_churn,3) prob, s.fator_principal
         FROM {PE}.churn_scores s JOIN {CH}.dim_cliente c USING(id_cliente)
         WHERE s.faixa_risco='Alto'
