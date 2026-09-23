@@ -67,11 +67,13 @@ USER_API_SCOPES = ["sql", "model-serving"]
 EXPLAIN_MODEL = "databricks-claude-sonnet-4-5"   # leitura por IA dos gráficos (Cockpit)
 WAREHOUSE_NAME = "dbacademy_workshop_wh"          # criado no Setup (Ex. 00)
 
-APP_NAME = "central-retencao-" + re.sub(r"[^a-z0-9-]", "-", DATABASE.lower()).strip("-")
+# Nome do app: prefixo + database normalizado, LIMITADO a 30 caracteres
+# (Databricks Apps exige nome entre 2 e 30 chars). Trunca e remove hífen sobrando no fim.
+APP_NAME = ("central-retencao-" + re.sub(r"[^a-z0-9-]", "-", DATABASE.lower()).strip("-"))[:30].rstrip("-")
 ME = w.current_user.me().user_name
 
 print("Aluno            :", ME)
-print("App              :", APP_NAME)
+print("App              :", APP_NAME, f"({len(APP_NAME)} chars)")
 print("Catálogo/schema  :", f"{CATALOG}.{DATABASE}  (+ {CATALOG}.churn compartilhado)")
 print("Supervisor       :", SUPERVISOR)
 print("Auth             : on-behalf-of-user (roda como VOCÊ; sem grants ao service principal)")
