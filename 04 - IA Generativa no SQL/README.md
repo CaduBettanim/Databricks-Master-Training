@@ -151,5 +151,7 @@ Você está recebendo muitos comentários negativos e isso está impactando a re
 
 **Dica:** Genie Code + AI Functions 😉
 
+Esperado: uma consulta que seleciona 50 comentários com `ai_analyze_sentiment(...) = 'negative'` (use `LIMIT 50`) e aplica `ai_query` em cada um para redigir uma resposta de atendimento. O resultado traz, por linha, o comentário original e a resposta sugerida, pronta para revisão.
+
 ## Explore
 As AI Functions transformam texto livre em dados estruturados: sentimento e categoria viram colunas que você pode agregar, filtrar e cruzar com churn. Esse "sinal" da voz do cliente será usado adiante no modelo (Ex. 6) e nos agentes.

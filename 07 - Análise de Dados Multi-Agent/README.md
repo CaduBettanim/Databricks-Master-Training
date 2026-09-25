@@ -126,4 +126,9 @@ Qual a nota média de NPS por canal de atendimento?
 ```
 Esperado: o Supervisor aciona o agente de **Suporte** → Chat **6,57** · Email **6,54** · Telefone **6,47**.
 
+## Passo 10: Publicar o Supervisor e copiar o endpoint
+O app do Ex. 9 vai chamar este Supervisor por um **endpoint de serving**. Ao criar o Supervisor, o Databricks já o publica como um endpoint; se a página do agente tiver um botão **Deploy** (ou **Publish**) ainda não acionado, clique nele.
+
+Depois, copie o **nome do endpoint**: no menu lateral, abra **Serving** e procure o que começa com `mas-` (algo como `mas-3d713414-endpoint`). Guarde esse nome, porque você vai colá-lo no campo `supervisor_endpoint` do Ex. 9.
+
 > Repare que você não disse a qual Genie perguntar: o Supervisor leu a pergunta, escolheu o especialista e sintetizou a resposta. É assim que uma solução *multi-agent* simplifica a vida do usuário de negócio: uma porta de entrada, vários especialistas atrás dela.

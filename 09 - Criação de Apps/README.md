@@ -29,7 +29,7 @@ Um **Databricks App** (a plataforma hospeda o app com compute próprio) com trê
 O código do app é dirigido por configuração: ele não tem nenhum id ou nome fixo. O notebook de deploy grava as suas informações (seu schema, seu Supervisor, seu warehouse) nas variáveis de ambiente do app. Por isso o mesmo notebook serve para toda a turma: cada um publica a sua instância.
 
 ## Por que você não concede nenhuma permissão
-O app usa **autenticação on-behalf-of (em nome do usuário)**: cada consulta ao warehouse e cada chamada de IA rodam com a identidade de quem está logado no app, e não com uma conta de serviço. Na prática, o Databricks Apps repassa o seu token ao app (habilitado pelos *escopos* `sql` e `model-serving`, que o notebook configura). Afinal, você já tem tudo de que o app precisa: `SELECT` em `dbacademy.churn` (pelo grupo do treino), a posse do seu schema e das suas funções, e a posse do seu Supervisor/Genies. Por isso, nada precisa ser concedido: o app simplesmente age como você. É isso que torna o app reproduzível para a turma inteira sem nenhum passo de administrador.
+Normalmente, um app roda com uma conta de serviço própria, à qual você teria de conceder permissões. A **Central de Retenção** faz diferente: usa **autenticação on-behalf-of** (*em nome do usuário*), em que cada consulta ao warehouse e cada chamada de IA rodam com a identidade de quem está logado no app, e não com uma conta de serviço. Na prática, o Databricks Apps repassa o seu token ao app (habilitado pelos *escopos* `sql` e `model-serving`, que o notebook configura). Afinal, você já tem tudo de que o app precisa: `SELECT` em `dbacademy.churn` (pelo grupo do treino), a posse do seu schema e das suas funções, e a posse do seu Supervisor/Genies. Por isso, nada precisa ser concedido: o app simplesmente age como você. É isso que torna o app reproduzível para a turma inteira sem nenhum passo de administrador.
 
 ## Passo a passo
 
@@ -49,6 +49,8 @@ Abra o notebook importado, anexe **Serverless** e:
    - **database**: o seu schema pessoal (ex.: `cbettanim`).
    - **supervisor_endpoint**: o endpoint do seu Supervisor do Ex. 7 (ex.: `mas-3d713414-endpoint`).
 3. Só então clique em **Run all**.
+
+> **Onde achar o `supervisor_endpoint`:** no menu lateral, abra **Serving** e copie o nome do endpoint que começa com `mas-` (o Supervisor que você publicou no Ex. 7, Passo 10).
 
 O notebook faz todo o trabalho pesado:
 - baixa o código do app do GitHub e o prepara com a sua configuração;
