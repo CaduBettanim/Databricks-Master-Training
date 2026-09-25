@@ -4,29 +4,29 @@
 
 > _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
 
-Primeiro contato com os dados de churn: explorar no **SQL Editor** e usar o **Genie Code** (assistente de IA ✨) para gerar consultas em linguagem natural.
+Seu primeiro contato com os dados de churn: você vai explorar no **SQL Editor** e usar o **Genie Code** (assistente de IA ✨) para gerar consultas em linguagem natural.
 
-**Pré-requisito:** [Setup](../00%20-%20Setup) concluído — a base `dbacademy.churn` deve existir.
+**Pré-requisito:** [Setup](../00%20-%20Setup) concluído. A base `dbacademy.churn` deve existir.
 
 ## Objetivo
 - Navegar no SQL Editor e consultar a base compartilhada `dbacademy.churn`.
-- Deixar o **Genie Code** escrever SQL a partir de perguntas em português.
+- Deixar o Genie Code escrever SQL a partir de perguntas em português.
 - Conhecer recursos Delta (histórico, time travel).
 
 > As consultas prontas estão em [`consultas.sql`](./consultas.sql). Ajuste o catálogo se você não usou `dbacademy`.
 
 ---
 
-## Passo 0 — Crie o seu database pessoal
-Você lê a base compartilhada `dbacademy.churn`, mas o que **você criar** (a partir do Ex. 3) vai no **seu** schema. Convenção: 1ª letra do nome + sobrenome (ex.: *João Silva* → `jsilva`).
+## Passo 0: Crie o seu database pessoal
+Você lê a base compartilhada `dbacademy.churn`, mas o que você criar (a partir do Ex. 3) vai no seu schema. Convenção: 1ª letra do nome + sobrenome (ex.: *João Silva* → `jsilva`).
 ```sql
 CREATE SCHEMA IF NOT EXISTS dbacademy.<seu_db>;
 ```
 
-## Passo 1 — Abrir o SQL Editor
+## Passo 1: Abrir o SQL Editor
 No menu lateral, **SQL Editor**. No seletor de contexto, escolha o catálogo `dbacademy` e o schema `churn`.
 
-## Passo 2 — Consultas guiadas
+## Passo 2: Consultas guiadas
 Rode uma a uma e observe os resultados:
 
 **2.1 Clientes por segmento**
@@ -57,13 +57,13 @@ ORDER BY qtd DESC;
 
 > Todas as consultas também estão em [`consultas.sql`](./consultas.sql).
 
-## Passo 3 — Genie Code: gerar SQL em linguagem natural
+## Passo 3: Genie Code para gerar SQL em linguagem natural
 
-O **Genie Code** é o assistente do SQL Editor que **escreve o código SQL** para você — diferente da **Genie** (espaço conversacional, Ex. 7), que *responde perguntas*. Aqui o foco é **montar consulta**.
+O Genie Code é o assistente do SQL Editor que escreve o código SQL para você. É diferente da **Genie** (espaço conversacional, Ex. 7), que *responde perguntas*. Aqui o foco é montar a consulta.
 
-> **Regra de ouro (para todos gerarem o mesmo resultado):** **nomeie sempre a tabela**. Não precisa listar as colunas — os comentários que documentamos no Setup fazem a IA acertar. Só acrescente um detalhe quando houver ambiguidade real: **qual data** (há mais de uma), o **limiar** de um termo vago, ou a **definição** de uma métrica aberta.
+> **Regra de ouro (para todos gerarem o mesmo resultado):** **nomeie sempre a tabela**. Não precisa listar as colunas: os comentários que documentamos no Setup fazem a IA acertar. Só acrescente um detalhe quando houver ambiguidade real: qual data (há mais de uma), o limiar de um termo vago, ou a definição de uma métrica aberta.
 
-Abra o assistente (✨) no SQL Editor e cole **um prompt de cada vez** (use o botão de copiar no canto de cada bloco), revise o SQL gerado e execute:
+Abra o assistente (✨) no SQL Editor e cole um prompt de cada vez (use o botão de copiar no canto de cada bloco), revise o SQL gerado e execute:
 
 **1. Taxa de churn por segmento**
 ```text
@@ -149,7 +149,7 @@ Qual plano tem a maior taxa de churn e quantos clientes perdeu?
 **Top motivos:** Insatisfação **196** · Preço **148** · Concorrência **104** · Atendimento **80** · Mudança de necessidade **12**
 **Taxa de churn por segmento:** Consumidor **0,303** · PME **0,239** · Corporativo **0,166**
 
-**🎯 Desafio — churn por plano:**
+**🎯 Desafio (churn por plano):**
 | Plano | Taxa de churn | Clientes perdidos |
 |-------|:---:|:---:|
 | **Básico** | **0,317** | **257** |
@@ -157,4 +157,4 @@ Qual plano tem a maior taxa de churn e quantos clientes perdeu?
 | Premium | 0,225 | 92 |
 | Empresarial | 0,157 | 31 |
 
-➡️ O plano **Básico** concentra o maior churn — coerente com o negócio (menor barreira de saída, menor valor percebido).
+➡️ O plano **Básico** concentra o maior churn, coerente com o negócio (menor barreira de saída, menor valor percebido).
