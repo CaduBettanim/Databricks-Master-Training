@@ -54,7 +54,7 @@ dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas o
 # MAGIC   - name: Clientes
 # MAGIC     expr: COUNT(DISTINCT source.id_cliente)
 # MAGIC   - name: Taxa de Churn
-# MAGIC     expr: SUM(source.churn_flag) / (COUNT(DISTINCT source.id_cliente) * 13.5)
+# MAGIC     expr: COUNT(source.churn_flag) / COUNT(DISTINCT source.id_cliente)
 # MAGIC $$
 
 # COMMAND ----------
