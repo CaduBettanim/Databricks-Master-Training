@@ -1,21 +1,21 @@
-# Databricks Master Training — Análise de Clientes & Churn
+# Databricks Master Training: Análise de Clientes & Churn
 
 ![Arquitetura do Master Training na plataforma Databricks](arquitetura.gif)
 
-Treinamento hands-on na plataforma Databricks que leva o participante **do SQL self-service aos agentes de IA**, sempre sobre um mesmo desafio de negócio: **entender e reduzir o churn** (cancelamento) de clientes.
+Treinamento hands-on na plataforma Databricks que leva o participante do SQL self-service aos agentes de IA, sempre sobre um mesmo desafio de negócio: entender e reduzir o churn (cancelamento) de clientes.
 
 ## Objetivo
 
-Capacitar times de **negócio e dados** a usar a plataforma Databricks de ponta a ponta — em modo **low-code** — para responder a uma pergunta real: *por que os clientes cancelam e como retê-los?*
+Capacitar times de negócio e dados a usar a plataforma Databricks de ponta a ponta, em modo **low-code**, para responder a uma pergunta real: *por que os clientes cancelam e como retê-los?*
 
 Ao longo da trilha, o participante:
 - consulta e modela dados de churn (SQL, Metric Views);
-- aplica **IA Generativa** sobre texto (tickets de suporte);
-- cria dashboards e **agentes conversacionais (Genie)**;
-- treina um **modelo de churn** e o serve com governança;
-- orquestra tudo em um **agente supervisor** e entrega um **app** de retenção.
+- aplica IA Generativa sobre texto (tickets de suporte);
+- cria dashboards e agentes conversacionais (Genie);
+- treina um modelo de churn e o serve com governança;
+- orquestra tudo em um agente supervisor e entrega um app de retenção.
 
-O domínio é uma **empresa de assinatura genérica**, então a trilha se adapta a qualquer cliente/indústria. Todo o conteúdo é **reproduzível em qualquer workspace** — os dados vêm de CSVs versionados neste repositório.
+O domínio é uma empresa de assinatura genérica, então a trilha se adapta a qualquer cliente/indústria. Todo o conteúdo é reproduzível em qualquer workspace: os dados vêm de CSVs versionados neste repositório.
 
 ## Arquitetura de dados
 
@@ -35,8 +35,8 @@ O domínio é uma **empresa de assinatura genérica**, então a trilha se adapta
 | **05 - Dashboards com IA** | Painel executivo de churn no AI/BI, com os gráficos montados pelo Assistente (✨) a partir de prompts. |
 | **06 - Previsão de Churn (ML)** | Treinar e registrar um modelo de probabilidade de churn e gerar a tabela de scores que alimenta os agentes e o app. |
 | **07 - Análise de Dados Multi-Agent** | Criar dois Genies (Faturamento e Suporte) e um agente Supervisor que orquestra os dois, roteando cada pergunta ao especialista certo. |
-| **08 - Retenção com ML e GenAI** | Criar funções governadas (UC Functions) que transformam o score em ação: o perfil 360 do cliente e um e-mail de retenção personalizado — com as regras de oferta em SQL e a IA só na escrita. |
-| **09 - Criação de Apps** | Publicar a **Central de Retenção**: o app que amarra o treinamento inteiro — Cockpit de churn (mapa + gráficos com leitura por IA), Assistente (o Supervisor do Ex. 7) e Retenção personalizada (as funções do Ex. 8) — com um único notebook de deploy. |
+| **08 - Retenção com ML e GenAI** | Criar funções governadas (UC Functions) que transformam o score em ação: o perfil 360 do cliente e um e-mail de retenção personalizado, com as regras de oferta em SQL e a IA só na escrita. |
+| **09 - Criação de Apps** | Publicar a **Central de Retenção**: o app que amarra o treinamento inteiro. Reúne o Cockpit de churn (mapa + gráficos com leitura por IA), o Assistente (o Supervisor do Ex. 7) e a Retenção personalizada (as funções do Ex. 8), com um único notebook de deploy. |
 | **10 - Fechamento (Próximos Passos)** | Retrospectiva do desafio de churn concluído, resumo de tudo que foi construído e os próximos passos na Databricks Academy (Jornada Lakehouse). |
 
 ## Como começar
