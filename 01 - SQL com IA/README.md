@@ -54,14 +54,6 @@ GROUP BY motivo_cancelamento
 ORDER BY qtd DESC;
 ```
 
-**2.4 Taxa de churn por segmento**
-```sql
-SELECT c.segmento, ROUND(AVG(a.churn_flag), 3) AS taxa_churn
-FROM dbacademy.churn.fato_assinatura a
-JOIN dbacademy.churn.dim_cliente c ON a.id_cliente = c.id_cliente
-GROUP BY c.segmento
-ORDER BY taxa_churn DESC;
-```
 
 > Todas as consultas também estão em [`consultas.sql`](./consultas.sql).
 

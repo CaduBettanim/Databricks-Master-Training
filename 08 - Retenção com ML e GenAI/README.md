@@ -82,7 +82,7 @@ A próxima função monta a oferta a partir de três regras de negócio. Elas us
 De volta ao **Genie Code** (✨), cole o prompt abaixo (troque `<seu_db>`). Ele calcula as regras acima em SQL (`CASE`) e usa `ai_query` para redigir o e-mail. Revise e clique em **Run**:
 
 ```text
-Crie uma UC Function (função SQL de tabela) chamada gerar_email_retencao(p_id STRING) no schema dbacademy.<seu_db>, usando as tabelas dbacademy.churn.dim_cliente e dbacademy.<seu_db>.churn_scores unidas por id_cliente. Ela retorna uma coluna email com um e-mail de retenção personalizado em português para o cliente cujo id_cliente = p_id. Calcule em SQL com CASE três ofertas e depois use ai_query('databricks-meta-llama-3-3-70b-instruct', ...) para redigir o e-mail citando nome, cidade e anos de casa, oferecendo exatamente: (a) desconto de 15% se o cliente tem 5 anos ou mais de casa (calcule por data_cadastro com datediff), senão 10%; (b) se nome_plano = 'Básico' então 10GB de internet grátis, senão o dobro da internet + WhatsApp ilimitado; (c) conforme fator_principal: 'Insatisfação (CSAT)' -> gerente de conta dedicado, 'Inadimplência' -> renegociação da fatura sem juros, 'Baixo uso' -> sessão gratuita de treinamento, caso contrário -> ligação com um especialista.
+Crie uma UC Function (função SQL de tabela) chamada gerar_email_retencao(p_id STRING) no schema dbacademy.<seu_db>, usando as tabelas dbacademy.churn.dim_cliente e dbacademy.<seu_db>.churn_scores unidas por id_cliente. Ela retorna uma coluna email com um e-mail de retenção personalizado em português para o cliente cujo id_cliente = p_id. Meça o tempo de casa com datediff entre a data de referência da base DATE '2026-09-23' e data_cadastro (use essa data fixa, não a data atual, para o resultado ficar estável). Calcule em SQL com CASE três ofertas e depois use ai_query('databricks-meta-llama-3-3-70b-instruct', ...) para redigir o e-mail citando nome, cidade e anos de casa, oferecendo exatamente: (a) desconto de 15% se o cliente tem 5 anos ou mais de casa, senão 10%; (b) se nome_plano = 'Básico' então 10GB de internet grátis, senão o dobro da internet + WhatsApp ilimitado; (c) conforme fator_principal: 'Insatisfação (CSAT)' -> gerente de conta dedicado, 'Inadimplência' -> renegociação da fatura sem juros, 'Baixo uso' -> sessão gratuita de treinamento, caso contrário -> ligação com um especialista.
 ```
 
 <details>
@@ -96,9 +96,11 @@ RETURNS TABLE (email STRING)
 RETURN
   WITH dados AS (
     SELECT dc.nome_cliente, dc.cidade,
-      FLOOR(DATEDIFF(CURRENT_DATE(), dc.data_cadastro) / 365) AS anos_de_casa,
+      -- data de referência da base (a base é um retrato de 23/09/2026); medir o tempo de casa
+      -- contra ela, e não contra a data atual, mantém o resultado estável ao longo do tempo.
+      FLOOR(DATEDIFF(DATE '2026-09-23', dc.data_cadastro) / 365) AS anos_de_casa,
       cs.nome_plano, cs.fator_principal,
-      CASE WHEN DATEDIFF(CURRENT_DATE(), dc.data_cadastro) >= 5 * 365 THEN '15%' ELSE '10%' END AS desconto,
+      CASE WHEN DATEDIFF(DATE '2026-09-23', dc.data_cadastro) >= 5 * 365 THEN '15%' ELSE '10%' END AS desconto,
       CASE WHEN cs.nome_plano = 'Básico' THEN '10 GB de internet grátis'
            ELSE 'o dobro da sua internet atual + WhatsApp ilimitado' END AS oferta_internet,
       CASE WHEN cs.fator_principal = 'Insatisfação (CSAT)' THEN 'um gerente de conta dedicado'
@@ -122,6 +124,8 @@ RETURN
 </details>
 
 > **Repare no que o Genie faz sozinho:** ele consulta as tabelas, descobre os valores de `fator_principal` e `nome_plano`, monta os `CASE` certos e o `ai_query`. Você só descreveu as regras. Se ele assumir um setor específico (ex.: "telecom"), acrescente ao prompt *"empresa de assinatura genérica, não cite o setor"*.
+
+> **Por que uma data fixa (`DATE '2026-09-23'`) e não `CURRENT_DATE()`?** A base é um retrato (dados estáticos). Medir o "tempo de casa" contra a data de hoje faria o resultado mudar sozinho conforme os dias passam (um cliente na véspera dos 5 anos viraria 15% no dia seguinte). Usando a data de referência da base, o resultado é o mesmo para toda a turma, em qualquer dia.
 
 Teste com a Marina (5 anos · Básico · Insatisfação):
 ```sql
