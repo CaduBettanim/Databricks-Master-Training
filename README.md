@@ -1,6 +1,6 @@
 # Databricks Master Training: Análise de Clientes & Churn
 
-![Arquitetura do Master Training na plataforma Databricks](arquitetura.gif)
+![Arquitetura do Master Training na plataforma Databricks](assets/arquitetura.gif)
 
 Treinamento hands-on na plataforma Databricks que leva o participante do SQL self-service aos agentes de IA, sempre sobre um mesmo desafio de negócio: entender e reduzir o churn (cancelamento) de clientes.
 

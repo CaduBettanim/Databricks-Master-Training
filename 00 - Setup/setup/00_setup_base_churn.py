@@ -20,7 +20,7 @@
 # MAGIC > seção **7. Relatório final** (`✅ CHECKS COMPLETOS`). Se houver ❌/⚠️, corrija e re-execute.
 # MAGIC
 # MAGIC > Metric views (Ex.3), modelo (Ex.6) e os Genies/Supervisor (Ex.7) são criados por cada aluno
-# MAGIC > no schema pessoal `<catálogo>.<seu_db>` — habilitado aqui via `CREATE SCHEMA`.
+# MAGIC > no schema pessoal `<catálogo>.<seu_schema>` — habilitado aqui via `CREATE SCHEMA`.
 
 # COMMAND ----------
 
@@ -339,7 +339,7 @@ if WAREHOUSE_ID:
     try:
         w.warehouses.update_permissions(warehouse_id=WAREHOUSE_ID, access_control_list=[
             WarehouseAccessControlRequest(group_name=GROUP, permission_level=WarehousePermissionLevel.CAN_MANAGE)])
-        print(f"{OK} Concedido CAN_USE do warehouse para {GROUP}.")
+        print(f"{OK} Concedido CAN_MANAGE do warehouse para {GROUP}.")
     except Exception as e:
         print(f"{NO} Não foi possível conceder permissão de warehouse: {e}")
 
