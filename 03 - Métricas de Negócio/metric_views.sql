@@ -1,11 +1,11 @@
 -- Exercício 3 — Metric Views
 -- Fonte (somente leitura): dbacademy.churn
--- As views são criadas no SEU schema pessoal: substitua <seu_db> pelo seu database.
+-- As views são criadas no SEU schema pessoal: substitua <seu_schema> pelo seu database.
 
 -- =====================================================================
 -- 1) mvw_churn — métricas de churn/retenção
 -- =====================================================================
-CREATE OR REPLACE VIEW dbacademy.<seu_db>.mvw_churn (
+CREATE OR REPLACE VIEW dbacademy.<seu_schema>.mvw_churn (
   `Segmento`      COMMENT 'Segmento do cliente',
   `Plano`         COMMENT 'Nome do plano',
   `Mês`           COMMENT 'Mês do cancelamento',
@@ -42,7 +42,7 @@ $$;
 -- =====================================================================
 -- 2) mvw_receita — métricas de receita e inadimplência
 -- =====================================================================
-CREATE OR REPLACE VIEW dbacademy.<seu_db>.mvw_receita (
+CREATE OR REPLACE VIEW dbacademy.<seu_schema>.mvw_receita (
   `Segmento`      COMMENT 'Segmento do cliente',
   `Mês`           COMMENT 'Competência (mês)',
   `Receita`       COMMENT 'Soma faturada',
@@ -73,7 +73,7 @@ $$;
 -- =====================================================================
 -- 3) mvw_suporte — métricas de atendimento
 -- =====================================================================
-CREATE OR REPLACE VIEW dbacademy.<seu_db>.mvw_suporte (
+CREATE OR REPLACE VIEW dbacademy.<seu_schema>.mvw_suporte (
   `Segmento`   COMMENT 'Segmento do cliente',
   `Canal`      COMMENT 'Canal do ticket',
   `Categoria`  COMMENT 'Categoria do ticket',
@@ -109,7 +109,7 @@ $$;
 -- =====================================================================
 -- Taxa de churn por segmento
 SELECT `Segmento`, ROUND(MEASURE(`Taxa de Churn`), 3) AS taxa_churn
-FROM dbacademy.<seu_db>.mvw_churn
+FROM dbacademy.<seu_schema>.mvw_churn
 GROUP BY `Segmento`
 ORDER BY taxa_churn DESC;
 
@@ -117,7 +117,7 @@ ORDER BY taxa_churn DESC;
 SELECT `Segmento`,
        ROUND(MEASURE(`Receita`), 2)       AS receita,
        ROUND(MEASURE(`Inadimplência`), 3) AS inadimplencia
-FROM dbacademy.<seu_db>.mvw_receita
+FROM dbacademy.<seu_schema>.mvw_receita
 GROUP BY `Segmento`
 ORDER BY receita DESC;
 
@@ -126,6 +126,6 @@ SELECT `Categoria`,
        MEASURE(`Tickets`)             AS tickets,
        ROUND(MEASURE(`CSAT Médio`),2) AS csat,
        ROUND(MEASURE(`NPS Médio`),2)  AS nps
-FROM dbacademy.<seu_db>.mvw_suporte
+FROM dbacademy.<seu_schema>.mvw_suporte
 GROUP BY `Categoria`
 ORDER BY tickets DESC;
