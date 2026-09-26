@@ -54,24 +54,31 @@ Quanto mais barato o plano, maior o churn.
 
 > Repare: você montou 4 gráficos sem escrever uma linha de SQL, usando a medida governada que já tinha criado no Ex. 3. É a fonte única da verdade virando painel.
 
-### Passo 2.1: Veja a metric view propagar na dashboard
-Vamos transformar a `Taxa de Churn` de fração para percentual, sem tocar em nenhum gráfico:
+### Passo 2.1: 🕵️ Você percebeu o erro? Corrija e veja propagar
+Repare na sua dashboard: o KPI de churn está marcando **100%**, mas ao longo do guia o churn aparece como **~27%**. O número não bate, e sacar o porquê é o desafio. 😉
+
 1. No menu lateral à esquerda, vá em **Catalog → `dbacademy` → `<seu_schema>` → Tables → `mvw_churn`**
 2. Logo acima, clique no botão **Edit**
 3. Selecione a measure chamada **`Taxa de Churn`**
-4. Altere a **Expressão** de `SUM(source.churn_flag) / COUNT(DISTINCT source.id_cliente)` para:
+4. Corrija a **Expressão** trocando `COUNT` por `SUM` no numerador, de:
     ```
-    100 * SUM(source.churn_flag) / COUNT(DISTINCT source.id_cliente)
+    COUNT(source.churn_flag) / COUNT(DISTINCT source.id_cliente)
+    ```
+    para:
+    ```
+    SUM(source.churn_flag) / COUNT(DISTINCT source.id_cliente)
     ```
 5. Clique em **Save**
 6. Volte à dashboard e clique no botão de **refresh**
 
-O KPI e os gráficos de churn saltam de fração para percentual:
+O KPI e os gráficos de churn caem de 100% para a taxa real:
 
 | | KPI | Básico | Padrão | Premium | Empresarial |
 |---|---|---|---|---|---|
-| **Antes** | 0,27 | 0,317 | 0,274 | 0,225 | 0,157 |
-| **Depois** | 27 | 31,7 | 27,4 | 22,5 | 15,7 |
+| **Antes (COUNT, errado)** | 1,00 | 1,00 | 1,00 | 1,00 | 1,00 |
+| **Depois (SUM, correto)** | 0,27 | 0,317 | 0,274 | 0,225 | 0,157 |
+
+A causa estava na measure `Taxa de Churn`: `COUNT(churn_flag)` conta **todas** as linhas (todo cliente tem a flag, 0 ou 1), enquanto `SUM(churn_flag)` soma só os **cancelamentos** (flag = 1). Só o `SUM` dá a taxa de churn real.
 
 Essa é a grande vantagem de uma metric view: você muda a regra uma única vez e todos os gráficos que a usam mudam juntos.
 
