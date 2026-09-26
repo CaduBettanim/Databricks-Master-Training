@@ -33,24 +33,11 @@ Logo após criar a dashboard, cole este prompt no espaço para texto abaixo de *
 Utilizando a metric view mvw_churn do dbacademy.<seu_schema>, crie análises de churn: um indicador (KPI) com a Taxa de Churn geral; um gráfico de barras com a Taxa de Churn por Plano, da maior para a menor; um gráfico de barras com a Taxa de Churn por Segmento; e um gráfico de linha com os Cancelamentos por Mês.
 ```
 
-Resultados esperados:
-
-**KPI Taxa de Churn:** ≈ **27%** (540 cancelamentos em 2.000 clientes)
-
-**Por plano:**
-- Básico **31,7%**
-- Padrão **27,4%**
-- Premium **22,5%**
-- Empresarial **15,7%**
-
-**Por segmento:**
-- Consumidor **30,3%**
-- PME **23,9%**
-- Corporativo **16,6%**
-
-**Cancelamentos por mês:** série mensal (2023–2025) com ~12 a 21 cancelamentos/mês
-
-Quanto mais barato o plano, maior o churn.
+Resultado esperado: 4 gráficos na dashboard:
+- Um KPI com a Taxa de Churn geral
+- Barras com a Taxa de Churn por Plano
+- Barras com a Taxa de Churn por Segmento
+- Uma linha com os Cancelamentos por Mês: série mensal (2023–2025) com ~12 a 21 cancelamentos/mês
 
 > Repare: você montou 4 gráficos sem escrever uma linha de SQL, usando a medida governada que já tinha criado no Ex. 3. É a fonte única da verdade virando painel.
 
@@ -79,6 +66,23 @@ O KPI e os gráficos de churn caem de 100% para a taxa real:
 | **Depois (SUM, correto)** | 0,27 | 0,317 | 0,274 | 0,225 | 0,157 |
 
 A causa estava na measure `Taxa de Churn`: `COUNT(churn_flag)` conta **todas** as linhas (todo cliente tem a flag, 0 ou 1), enquanto `SUM(churn_flag)` soma só os **cancelamentos** (flag = 1). Só o `SUM` dá a taxa de churn real.
+
+Resultados esperados após a correção:
+
+**KPI Taxa de Churn:** ≈ **27%** (540 cancelamentos em 2.000 clientes)
+
+**Por plano:**
+- Básico **31,7%**
+- Padrão **27,4%**
+- Premium **22,5%**
+- Empresarial **15,7%**
+
+**Por segmento:**
+- Consumidor **30,3%**
+- PME **23,9%**
+- Corporativo **16,6%**
+
+Quanto mais barato o plano, maior o churn.
 
 Essa é a grande vantagem de uma metric view: você muda a regra uma única vez e todos os gráficos que a usam mudam juntos.
 
