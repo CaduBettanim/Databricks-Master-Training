@@ -1,6 +1,6 @@
 # 04 - IA Generativa no SQL
 
-![Trilha do Master Training com destaque no que foi construído até o Exercício 04](../assets/04%20-%20arquitetura.gif)
+![Trilha do Master Training com destaque no que foi construído até o Exercício 04](../assets/04%20-%20arquitetura.gif?v=20260928)
 
 > _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
 

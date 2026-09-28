@@ -1,6 +1,6 @@
 # 10 - Fechamento (Próximos Passos)
 
-![Arquitetura completa do Master Training: tudo o que você construiu](../assets/10%20-%20arquitetura.gif)
+![Arquitetura completa do Master Training: tudo o que você construiu](../assets/10%20-%20arquitetura.gif?v=20260928)
 
 > _A plataforma completa que você construiu ao longo da trilha, do dado cru ao app de retenção._
 

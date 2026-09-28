@@ -1,6 +1,6 @@
 # 09 - Criação de Apps
 
-![Trilha do Master Training com destaque no que foi construído até o Exercício 09](../assets/09%20-%20arquitetura.gif)
+![Trilha do Master Training com destaque no que foi construído até o Exercício 09](../assets/09%20-%20arquitetura.gif?v=20260928)
 
 > _Tudo o que você construiu durante a trilha._
 
