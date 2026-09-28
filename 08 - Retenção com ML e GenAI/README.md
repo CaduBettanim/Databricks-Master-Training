@@ -14,80 +14,13 @@ O pulo do gato deste módulo: as regras de negócio ficam **governadas no Unity 
 
 ## Objetivo
 Criar duas UC Functions no seu schema `dbacademy.<seu_schema>`, uma de cada vez, usando o **Genie Code**:
-- **`get_cliente_360(id)`**: passa o id do cliente, recebe o perfil dele (cadastro + risco)
+- **`get_cliente_360(id)`**: passa o id do cliente, recebe o perfil dele (cadastro + risco) **e as ofertas de retenção já calculadas pelas regras de negócio**
 - **`gerar_email_retencao(id)`**: passa o id, recebe o e-mail de retenção pronto, com a oferta certa aplicada
 
 ---
 
-## Passo 1: Criar a `get_cliente_360` (do id ao perfil)
-1. No menu lateral à esquerda, selecione **SQL Editor**
-2. Você já deverá ser direcionado ao editor com uma query, caso contrário, crie uma através de **SQL Query** abaixo de **Create new**
-3. Abra o Genie Code clicando na lâmpada no canto superior direito
-4. Cole o prompt abaixo, trocando `<seu_schema>` pelo nome do seu schema:
-```text
-Crie uma UC Function (função SQL de tabela) chamada get_cliente_360(p_id STRING) no schema dbacademy.<seu_schema>. Ela junta as tabelas dbacademy.churn.dim_cliente e dbacademy.<seu_schema>.churn_scores por id_cliente e retorna o perfil do cliente cujo id_cliente = p_id: nome_cliente, cidade, uf, segmento, canal_aquisicao, data_cadastro (de dim_cliente) e nome_plano, preco_mensal, prob_churn, faixa_risco, fator_principal (de churn_scores).
-```
-5. Revise o `CREATE FUNCTION` gerado e clique em **Run**
-
-<details>
-<summary>👉 Resultado esperado:</summary>
-
-> Troque `<seu_schema>` pelo nome do seu schema antes de rodar
-
-```sql
-CREATE OR REPLACE FUNCTION dbacademy.<seu_schema>.get_cliente_360(p_id STRING)
-RETURNS TABLE (
-    nome_cliente STRING,
-    cidade STRING,
-    uf STRING,
-    segmento STRING,
-    canal_aquisicao STRING,
-    data_cadastro DATE,
-    nome_plano STRING,
-    preco_mensal DOUBLE,
-    prob_churn DOUBLE,
-    faixa_risco STRING,
-    fator_principal STRING
-)
-RETURN
-    SELECT
-        c.nome_cliente,
-        c.cidade,
-        c.uf,
-        c.segmento,
-        c.canal_aquisicao,
-        c.data_cadastro,
-        s.nome_plano,
-        s.preco_mensal,
-        s.prob_churn,
-        s.faixa_risco,
-        s.fator_principal
-    FROM dbacademy.churn.dim_cliente c
-    JOIN dbacademy.<seu_schema>.churn_scores s ON c.id_cliente = s.id_cliente
-    WHERE c.id_cliente = p_id;
-```
-
-</details>
-
-Teste a função:
-```sql
-SELECT
-    *
-FROM dbacademy.<seu_schema>.get_cliente_360('C01575');
-```
-Resultado esperado (a cliente Marina Ribeiro):
-
-| nome | cidade/uf | cliente desde | plano | risco | fator principal |
-|------|-----------|---------------|-------|-------|-----------------|
-| Marina Ribeiro | Fortaleza/CE | 2021 | Básico (R$ 49,90) | **Alto** | Insatisfação (CSAT) |
-
-> Um único ponto de entrada para "tudo sobre o cliente", juntando o cadastro (`dim_cliente`) com o seu score do Ex. 6 (`churn_scores`).
-
-### Por que funções, e não SQL solto no app?
-Uma função vira um ativo governado do Unity Catalog: o app fica fino (só chama a função), o acesso é controlado (EXECUTE) e a mesma lógica é reutilizada por outras ferramentas. É a diferença entre "cada um faz do seu jeito" e "uma regra única, governada".
-
-## Passo 2: As regras de retenção
-A próxima função monta a oferta a partir de três regras de negócio. Elas usam só dados que já temos, inclusive o `fator_principal` que o modelo do Ex. 6 calculou:
+## Passo 1: As regras de retenção
+As ofertas saem de três regras de negócio. Elas usam só dados que já temos, inclusive o `fator_principal` que o modelo do Ex. 6 calculou:
 
 | Regra | Condição | Oferta |
 |-------|----------|--------|
@@ -99,6 +32,67 @@ A próxima função monta a oferta a partir de três regras de negócio. Elas us
 | | Inadimplência | renegociação da fatura sem juros |
 | | Baixo uso | sessão gratuita de treinamento |
 | | Detrator (NPS) | ligação com um especialista |
+
+O tempo de casa é medido contra a **data de referência da base**, `DATE '2026-09-23'` (e não a data de hoje), para o resultado ser o mesmo para toda a turma em qualquer dia.
+
+## Passo 2: Criar a `get_cliente_360` (do id ao perfil + ofertas)
+1. No menu lateral à esquerda, selecione **SQL Editor**
+2. Você já deverá ser direcionado ao editor com uma query, caso contrário, crie uma através de **SQL Query** abaixo de **Create new**
+3. Abra o Genie Code clicando na lâmpada no canto superior direito
+4. Cole o prompt abaixo, trocando `<seu_schema>` pelo nome do seu schema:
+```text
+Crie uma UC Function (função SQL de tabela) chamada get_cliente_360(p_id STRING) no schema dbacademy.<seu_schema>. Ela junta as tabelas dbacademy.churn.dim_cliente e dbacademy.<seu_schema>.churn_scores por id_cliente e retorna, para o cliente cujo id_cliente = p_id: nome_cliente, cidade, uf, segmento, canal_aquisicao, data_cadastro (de dim_cliente) e nome_plano, preco_mensal, prob_churn, faixa_risco, fator_principal (de churn_scores). Acrescente quatro colunas calculadas em SQL, medindo o tempo de casa com datediff entre a data de referência DATE '2026-09-23' e data_cadastro: anos_de_casa (inteiro); desconto = '15%' se tiver 5 anos ou mais de casa, senão '10%'; oferta_internet = '10 GB de internet grátis' se nome_plano = 'Básico', senão 'o dobro da sua internet atual + WhatsApp ilimitado'; oferta_fator conforme fator_principal: 'Insatisfação (CSAT)' -> 'um gerente de conta dedicado', 'Inadimplência' -> 'renegociação da sua fatura sem juros', 'Baixo uso' -> 'uma sessão gratuita de treinamento', caso contrário -> 'uma ligação com um especialista'.
+```
+5. Revise o `CREATE FUNCTION` gerado e clique em **Run**
+
+<details>
+<summary>👉 Resultado esperado:</summary>
+
+> Troque `<seu_schema>` pelo nome do seu schema antes de rodar
+
+```sql
+CREATE OR REPLACE FUNCTION dbacademy.<seu_schema>.get_cliente_360(p_id STRING)
+RETURNS TABLE (nome_cliente STRING, cidade STRING, uf STRING, segmento STRING,
+  canal_aquisicao STRING, data_cadastro DATE, nome_plano STRING, preco_mensal DOUBLE,
+  prob_churn DOUBLE, faixa_risco STRING, fator_principal STRING,
+  anos_de_casa INT, desconto STRING, oferta_internet STRING, oferta_fator STRING)
+RETURN
+  SELECT c.nome_cliente, c.cidade, c.uf, c.segmento, c.canal_aquisicao, c.data_cadastro,
+         s.nome_plano, s.preco_mensal, s.prob_churn, s.faixa_risco, s.fator_principal,
+         CAST(FLOOR(DATEDIFF(DATE '2026-09-23', c.data_cadastro) / 365) AS INT) AS anos_de_casa,
+         CASE WHEN DATEDIFF(DATE '2026-09-23', c.data_cadastro) >= 5 * 365 THEN '15%' ELSE '10%' END AS desconto,
+         CASE WHEN s.nome_plano = 'Básico' THEN '10 GB de internet grátis'
+              ELSE 'o dobro da sua internet atual + WhatsApp ilimitado' END AS oferta_internet,
+         CASE WHEN s.fator_principal = 'Insatisfação (CSAT)' THEN 'um gerente de conta dedicado'
+              WHEN s.fator_principal = 'Inadimplência' THEN 'renegociação da sua fatura sem juros'
+              WHEN s.fator_principal = 'Baixo uso' THEN 'uma sessão gratuita de treinamento'
+              ELSE 'uma ligação com um especialista' END AS oferta_fator
+  FROM dbacademy.churn.dim_cliente c
+  JOIN dbacademy.<seu_schema>.churn_scores s ON c.id_cliente = s.id_cliente
+  WHERE c.id_cliente = p_id;
+```
+
+</details>
+
+Teste a função com duas clientes, uma de cada lado das regras:
+```sql
+SELECT nome_cliente, nome_plano, anos_de_casa, desconto, oferta_internet, oferta_fator
+FROM dbacademy.<seu_schema>.get_cliente_360('C01575')
+UNION ALL
+SELECT nome_cliente, nome_plano, anos_de_casa, desconto, oferta_internet, oferta_fator
+FROM dbacademy.<seu_schema>.get_cliente_360('C00018');
+```
+Resultado esperado:
+
+| nome | plano | anos de casa | desconto | internet | gesto |
+|------|-------|:---:|:---:|----------|-------|
+| Marina Ribeiro | Básico | 5 | **15%** | 10 GB de internet grátis | um gerente de conta dedicado |
+| Gabriela Cardoso | Empresarial | 4 | **10%** | o dobro da sua internet atual + WhatsApp ilimitado | renegociação da sua fatura sem juros |
+
+> Um único ponto de entrada para "tudo sobre o cliente", juntando o cadastro (`dim_cliente`) com o seu score do Ex. 6 (`churn_scores`) e já com a oferta decidida pela regra. É exatamente essa função que o app do Ex. 9 vai chamar.
+
+### Por que funções, e não SQL solto no app?
+Uma função vira um ativo governado do Unity Catalog: o app fica fino (só chama a função), o acesso é controlado (EXECUTE) e a mesma lógica é reutilizada por outras ferramentas. É a diferença entre "cada um faz do seu jeito" e "uma regra única, governada".
 
 ## Passo 3: Criar a `gerar_email_retencao` (do perfil ao e-mail)
 1. De volta ao Genie Code, cole o prompt abaixo, trocando `<seu_schema>` pelo nome do seu schema:
@@ -183,4 +177,4 @@ Leia os dois e-mails lado a lado: a mesma função, ofertas diferentes, cada uma
 > **A lição:** a **regra de negócio é governada** (SQL, verificável, igual para todos), a **IA cuida só da linguagem**. Você nunca fica refém de a IA "inventar" um desconto, e criou tudo isso só descrevendo o que queria ao Genie Code.
 
 ## Explore
-Você acabou de construir o motor de ação da retenção: dado um cliente em risco, sai a oferta certa e o e-mail pronto, com a regra de negócio governada e a IA só na escrita. No próximo módulo (Ex. 9 - Criação de Apps), o app **Central de Retenção** vai chamar exatamente essas duas funções: o atendente digita o id, vê o perfil e o risco, e clica para gerar o e-mail.
+Você acabou de construir o motor de ação da retenção: dado um cliente em risco, sai a oferta certa e o e-mail pronto, com a regra de negócio governada e a IA só na escrita. No próximo módulo (Ex. 9 - Criação de Apps), o app **Central de Retenção** vai chamar a `get_cliente_360`: o atendente digita o id, vê o perfil e o risco, e clica para gerar o e-mail. Lá, quem escreve o texto é um **modelo governado pelo Unity Gateway**, que você vai criar no seu schema, a partir das mesmas ofertas calculadas aqui.

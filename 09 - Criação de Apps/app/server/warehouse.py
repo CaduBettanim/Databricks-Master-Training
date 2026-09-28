@@ -44,7 +44,8 @@ async def query(sql: str, token: Optional[str]) -> list[dict]:
             _run_query, sql, token, config.get_workspace_host(), config.WAREHOUSE_ID
         )
     except Exception as exc:
-        print(f"[warehouse] erro: {exc}")
+        causa = exc.__cause__ or exc.__context__
+        print(f"[warehouse] erro: {type(exc).__name__}: {exc} | causa: {type(causa).__name__ if causa else None}: {str(causa)[:300] if causa else ''}")
         return []
 
 
