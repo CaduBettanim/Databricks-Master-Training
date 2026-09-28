@@ -5,9 +5,9 @@
 -- Amostra variada (csat alto, médio e baixo) para ver a IA distinguindo os casos
 -- 1) ai_analyze_sentiment — sentimento das reclamações
 WITH amostra AS (
-  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
-  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
-  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 ORDER BY id_ticket LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 ORDER BY id_ticket LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 ORDER BY id_ticket LIMIT 2)
 )
 SELECT LEFT(texto_reclamacao, 60) AS trecho, csat,
        ai_analyze_sentiment(texto_reclamacao) AS sentimento
@@ -29,9 +29,9 @@ ORDER BY qtd DESC;
 -- 1c) Sentimento com um MODELO ESPECÍFICO via ai_query
 --     Troque o endpoint: databricks-meta-llama-3-3-70b-instruct | databricks-gpt-oss-120b | databricks-claude-haiku-4-5
 WITH amostra AS (
-  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
-  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
-  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 ORDER BY id_ticket LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 ORDER BY id_ticket LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 ORDER BY id_ticket LIMIT 2)
 )
 SELECT csat, LEFT(texto_reclamacao, 60) AS trecho,
        ai_query('databricks-meta-llama-3-3-70b-instruct',
@@ -40,9 +40,9 @@ FROM amostra ORDER BY csat DESC;
 
 -- 2) ai_classify — classificar o assunto do ticket
 WITH amostra AS (
-  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
-  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
-  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 ORDER BY id_ticket LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 ORDER BY id_ticket LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 ORDER BY id_ticket LIMIT 2)
 )
 SELECT LEFT(texto_reclamacao, 60) AS trecho, csat,
        ai_classify(texto_reclamacao,
@@ -51,9 +51,9 @@ FROM amostra ORDER BY csat DESC;
 
 -- 2b) Classificação com um MODELO ESPECÍFICO via ai_query
 WITH amostra AS (
-  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
-  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
-  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 ORDER BY id_ticket LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 ORDER BY id_ticket LIMIT 2)
+  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 ORDER BY id_ticket LIMIT 2)
 )
 SELECT csat, LEFT(texto_reclamacao, 60) AS trecho,
        ai_query('databricks-gpt-oss-120b',
