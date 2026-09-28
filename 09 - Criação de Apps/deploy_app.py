@@ -4,10 +4,14 @@
 # MAGIC
 # MAGIC Este notebook **implanta o seu app** *Central de Retenção* — o painel que amarra todo o
 # MAGIC treinamento: o **Cockpit** de churn (mapa + gráficos com leitura por IA), o **Assistente**
-# MAGIC (o Supervisor do Ex. 7) e a **Retenção Personalizada** (as funções do Ex. 8).
+# MAGIC (o Supervisor do Ex. 7) e a **Retenção Personalizada** (a função `get_cliente_360` do Ex. 8).
 # MAGIC
-# MAGIC Você **não escreve código** e **não concede nenhuma permissão manual**: preencha os dois
-# MAGIC campos no topo e clique em **Run all**.
+# MAGIC A IA do app (a leitura dos gráficos e o e-mail de retenção) passa por um **model service do
+# MAGIC Unity Gateway** que este notebook cria no **seu** schema: um modelo governado pelo Unity
+# MAGIC Catalog, com limite de uso e registro de cada chamada.
+# MAGIC
+# MAGIC Você **não escreve código** e **não concede nenhuma permissão manual**: preencha os campos no
+# MAGIC topo e clique em **Run all**.
 # MAGIC
 # MAGIC **Como o app acessa os dados (on-behalf-of):** o app roda cada consulta e cada chamada de
 # MAGIC IA **com a identidade do usuário logado** (autenticação *on-behalf-of-user*, via o header
@@ -19,7 +23,7 @@
 # MAGIC **Pré-requisitos** (no seu schema `dbacademy.<seu_schema>`):
 # MAGIC - **Ex. 7** — seu **Supervisor** publicado (endpoint `mas-...-endpoint`).
 # MAGIC - **Ex. 6** — a tabela `churn_scores`.
-# MAGIC - **Ex. 8** — as funções `gerar_email_retencao` (e `get_cliente_360`).
+# MAGIC - **Ex. 8** — a função `get_cliente_360` (com as ofertas calculadas em SQL).
 # MAGIC
 # MAGIC > Rode no cluster `dbacademy_workshop_cluster`. O app roda em compute próprio do Databricks Apps.
 
@@ -30,7 +34,9 @@
 # MAGIC 1. **Rode só a célula abaixo** (Shift+Enter) para os campos aparecerem no topo do notebook.
 # MAGIC 2. Preencha **1. Seu schema** (ex.: `cbettanim`) e **2. Endpoint do Supervisor (Ex.07)**
 # MAGIC    (o endpoint do seu Supervisor do Ex. 7, ex.: `mas-3d713414-endpoint`).
-# MAGIC 3. Só então clique em **Run all**.
+# MAGIC 3. O campo **5. Model service** já vem com `retencao-gateway`: é o nome do modelo que o
+# MAGIC    notebook vai criar no Unity Gateway, dentro do seu schema. Pode deixar como está.
+# MAGIC 4. Só então clique em **Run all**.
 
 # COMMAND ----------
 
@@ -46,6 +52,7 @@ dbutils.widgets.text("database", "", "1. Seu schema (ex.: cbettanim)")
 dbutils.widgets.text("supervisor_endpoint", "", "2. Endpoint do Supervisor (Ex.07)")
 dbutils.widgets.text("catalog", "dbacademy", "3. Catálogo (opcional)")
 dbutils.widgets.dropdown("warehouse", _wh_sel, _wh_choices, "4. Warehouse (default: do Setup)")
+dbutils.widgets.text("model_service", "retencao-gateway", "5. Model service (Unity Gateway)")
 
 # COMMAND ----------
 
@@ -53,6 +60,7 @@ DATABASE = dbutils.widgets.get("database").strip()
 SUPERVISOR = dbutils.widgets.get("supervisor_endpoint").strip()
 CATALOG = dbutils.widgets.get("catalog").strip() or "dbacademy"
 WAREHOUSE_W = dbutils.widgets.get("warehouse").strip()
+MODEL_SERVICE_NAME = dbutils.widgets.get("model_service").strip() or "retencao-gateway"
 
 assert DATABASE, "Preencha o widget '1. Seu schema' (ex.: cbettanim)."
 assert SUPERVISOR, "Preencha o widget '2. Endpoint do Supervisor (Ex.07)' (ex.: mas-...-endpoint do Ex. 7)."
@@ -62,10 +70,12 @@ from databricks.sdk import WorkspaceClient
 
 w = WorkspaceClient()
 
-# Escopos OBO: `sql` (SQL Warehouse) + `model-serving` (serving endpoints: Supervisor + LLM).
-USER_API_SCOPES = ["sql", "model-serving"]
+# Escopos OBO: `sql` (SQL Warehouse) + `model-serving` (serving endpoints: Supervisor) +
+# `ai-gateway` (model service do Unity Gateway). Sem `ai-gateway`, o Gateway responde 403.
+USER_API_SCOPES = ["sql", "model-serving", "ai-gateway"]
 EXPLAIN_MODEL = "databricks-claude-sonnet-4-5"   # leitura por IA dos gráficos (Cockpit)
 WAREHOUSE_NAME = "dbacademy_workshop_wh"          # criado no Setup (Ex. 00)
+GATEWAY_DEST_MODEL = "models/system.ai.gpt-oss-20b"  # modelo por trás do model service
 
 # Nome do app: prefixo + database normalizado, LIMITADO a 30 caracteres
 # (Databricks Apps exige nome entre 2 e 30 chars). Trunca e remove hífen sobrando no fim.
@@ -75,7 +85,9 @@ ME = w.current_user.me().user_name
 print("Aluno            :", ME)
 print("App              :", APP_NAME, f"({len(APP_NAME)} chars)")
 print("Catálogo/schema  :", f"{CATALOG}.{DATABASE}  (+ {CATALOG}.churn compartilhado)")
+GATEWAY_MODEL = f"{CATALOG}.{DATABASE}.{MODEL_SERVICE_NAME}"
 print("Supervisor       :", SUPERVISOR)
+print("Model service    :", GATEWAY_MODEL, "(Unity Gateway)")
 print("Auth             : on-behalf-of-user (roda como VOCÊ; sem grants ao service principal)")
 
 # COMMAND ----------
@@ -108,7 +120,46 @@ print(f"Warehouse: '{WH_NAME}' (id {WH_ID}) — resolvido por {WH_VIA}.")
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Passo 3 — Preparar o código-fonte do app (com a SUA configuração)
+# MAGIC ## Passo 3 — Criar o seu model service no Unity Gateway
+# MAGIC Um **model service** é um modelo de IA governado pelo Unity Catalog: ele fica no **seu**
+# MAGIC schema (você é o dono), tem **limite de uso** (60 chamadas por minuto) e uma **tabela de
+# MAGIC inferência** que registra cada chamada (pergunta e resposta). O app vai usá-lo para ler os
+# MAGIC gráficos e para escrever o e-mail de retenção. Se ele já existir, só reaproveitamos.
+
+# COMMAND ----------
+
+def api(method, path, body=None):
+    return w.api_client.do(method, path, body=body)
+
+_ms_path = f"/api/2.1/unity-catalog/model-services/{GATEWAY_MODEL}"
+try:
+    api("GET", _ms_path)
+    print(f"Model service '{GATEWAY_MODEL}' já existe — reaproveitando.")
+except Exception:
+    api("POST", f"/api/2.1/unity-catalog/model-services?model_service_id={MODEL_SERVICE_NAME}"
+                f"&parent=schemas/{CATALOG}.{DATABASE}", body={
+        "comment": "Master Training — modelo da Central de Retenção (Unity Gateway)",
+        "config": {
+            "routing": {"destinations": [{
+                "destination_type": "DESTINATION_TYPE_PAY_PER_TOKEN_FOUNDATION_MODEL",
+                "name": "primary", "traffic_percentage": 100,
+                "pay_per_token_config": {"model": GATEWAY_DEST_MODEL}}]},
+            "rate_limits": [{"key": "RATE_LIMIT_KEY_SERVICE",
+                             "renewal_period": "RATE_LIMIT_RENEWAL_PERIOD_MINUTE", "requests": 60}],
+            "inference_table": {"parent": f"schemas/{CATALOG}.{DATABASE}",
+                                "table_name_prefix": MODEL_SERVICE_NAME.replace("-", "_")},
+        },
+    })
+    print(f"Model service '{GATEWAY_MODEL}' criado.")
+_ms = api("GET", _ms_path)
+_dest = (_ms.get("config") or {}).get("routing", {}).get("destinations", [{}])[0]
+print("  destino        :", (_dest.get("pay_per_token_config") or {}).get("model"))
+print("  inference table:", ((_ms.get("config") or {}).get("inference_table") or {}).get("table"))
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Passo 4 — Preparar o código-fonte do app (com a SUA configuração)
 # MAGIC Este notebook é **autocontido**: ele **baixa o código do app** do repositório público no
 # MAGIC GitHub (a pasta `09 - Criação de Apps/app/`), copia para uma pasta sua no workspace e grava
 # MAGIC os seus valores no `app.yaml`. O app é **inteiramente dirigido por config**
@@ -139,7 +190,7 @@ if os.path.exists(STAGE):
 shutil.copytree(SRC_APP, STAGE)
 
 # app.yaml com a config do aluno. Obs.: os escopos OBO NÃO vão no app.yaml (chave ignorada e
-# pode falhar o build); são configurados no APP (campo user_api_scopes) no Passo 5.
+# pode falhar o build); são configurados no APP (campo user_api_scopes) no Passo 6.
 APP_YAML = f"""command:
   - "uvicorn"
   - "app:app"
@@ -155,6 +206,8 @@ env:
     value: "{SUPERVISOR}"
   - name: CR_EXPLAIN_MODEL
     value: "{EXPLAIN_MODEL}"
+  - name: CR_GATEWAY_MODEL
+    value: "{GATEWAY_MODEL}"
   - name: CR_CATALOG
     value: "{CATALOG}"
   - name: CR_SCHEMA_CHURN
@@ -171,13 +224,10 @@ print(APP_YAML)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Passo 4 — Criar o app (compute próprio + service principal)
+# MAGIC ## Passo 5 — Criar o app (compute próprio + service principal)
 # MAGIC Se já existir (re-execução), seguimos em frente. Esperamos o compute ficar **ACTIVE**.
 
 # COMMAND ----------
-
-def api(method, path, body=None):
-    return w.api_client.do(method, path, body=body)
 
 try:
     api("GET", f"/api/2.0/apps/{APP_NAME}")
@@ -204,10 +254,10 @@ assert SP, "Service principal do app ainda não disponível; re-execute esta cé
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Passo 5 — Configurar OBO (escopos) + o warehouse
+# MAGIC ## Passo 6 — Configurar OBO (escopos) + o warehouse
 # MAGIC O ÚNICO preparo necessário — e nenhum é uma concessão ao usuário/SP:
-# MAGIC - **user_api_scopes** = `sql`, `model-serving` → habilita o app a usar o token do usuário
-# MAGIC   nas chamadas de SQL e de serving endpoints;
+# MAGIC - **user_api_scopes** = `sql`, `model-serving`, `ai-gateway` → habilita o app a usar o token
+# MAGIC   do usuário nas chamadas de SQL, do Supervisor e do seu model service do Unity Gateway;
 # MAGIC - **recurso warehouse** (CAN_USE) → o app precisa declarar o warehouse que vai usar.
 # MAGIC
 # MAGIC **Não há** GRANT de UC, EXECUTE, CAN_QUERY em endpoints, nem CAN_RUN em Genies: tudo isso é
@@ -230,7 +280,7 @@ print("recursos    :", [r["name"] for r in _app.get("resources", [])])
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Passo 6 — Publicar (deploy)
+# MAGIC ## Passo 7 — Publicar (deploy)
 
 # COMMAND ----------
 
@@ -258,6 +308,7 @@ print("  CENTRAL DE RETENÇÃO — publicada (autenticação on-behalf-of usuár
 print("=" * 66)
 print("  App URL :", APP_URL)
 print("  Deploy  :", estado)
+print("  Modelo  :", GATEWAY_MODEL, "(Unity Gateway)")
 print("  Escopos :", USER_API_SCOPES, "(o app usa o SEU token nas chamadas)")
 print("  Grants  : NENHUM concedido ao service principal — desnecessário sob OBO.")
 print("  Manual  : nada além dos 2 campos deste notebook.")
