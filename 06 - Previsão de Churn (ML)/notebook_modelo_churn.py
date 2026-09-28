@@ -6,7 +6,7 @@
 # MAGIC **Fonte:** `dbacademy.churn.feature_churn` (features comportamentais).
 # MAGIC **Cria no seu schema:** `modelo_churn` (o modelo) e `churn_scores` (a tabela de scores).
 # MAGIC
-# MAGIC Anexe **Serverless** e rode as células em ordem.
+# MAGIC Anexe o cluster `dbacademy_workshop_cluster` e rode as células em ordem.
 
 # COMMAND ----------
 
@@ -129,6 +129,10 @@ print("Tabela de scores gravada:", SCORES)
 
 # MAGIC %md
 # MAGIC ## Confira o resultado
+
+# COMMAND ----------
+
+print(f"AUC (teste): {auc:.3f}")
 
 # COMMAND ----------
 

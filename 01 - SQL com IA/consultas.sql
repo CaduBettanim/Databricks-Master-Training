@@ -4,7 +4,7 @@
 
 -- Passo 0 — Crie seu database pessoal (você vai usá-lo a partir do Ex. 3)
 -- Convenção: 1ª letra do nome + sobrenome (ex.: João Silva -> jsilva)
-CREATE SCHEMA IF NOT EXISTS dbacademy.<seu_db>;
+CREATE SCHEMA IF NOT EXISTS dbacademy.<seu_schema>;
 
 -- Passo 2 — Consultas guiadas -------------------------------------------------
 

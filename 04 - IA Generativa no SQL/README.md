@@ -1,55 +1,79 @@
 # 04 - IA Generativa no SQL
 
-![Trilha do Master Training com destaque no que foi construído até o Exercício 04](arquitetura.gif)
+![Trilha do Master Training com destaque no que foi construído até o Exercício 04](../assets/04%20-%20arquitetura.gif)
 
 > _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
 
 Vamos aplicar **IA Generativa direto no SQL** sobre o texto dos tickets de suporte (a "voz do cliente"), sem treinar modelo e sem sair do SQL Editor.
 
-**Pré-requisito:** [Setup](../00%20-%20Setup) concluído (base `dbacademy.churn`).
+> Você pode encontrar todas as consultas usadas aqui em [`ai_functions.sql`](./ai_functions.sql)
 
 ## Objetivo
-Usar as **AI Functions** do Databricks para analisar o campo `texto_reclamacao` da `fato_ticket_suporte`:
+Usar as **AI Functions** do Databricks para analisar o campo `texto_reclamacao` da tabela `fato_ticket_suporte`:
 - `ai_analyze_sentiment`: sentimento (positive / neutral / negative)
 - `ai_classify`: classificar o assunto do ticket
 - `ai_mask`: mascarar dados pessoais (PII)
 - `ai_summarize`: resumir as principais dores
 
-> As funções chamam um modelo de IA, então podem levar alguns segundos por linha. Use os `LIMIT` dos exemplos. Todas as consultas estão em [`ai_functions.sql`](./ai_functions.sql).
+> As funções chamam um modelo de IA, então podem levar alguns segundos por linha. Por isso as consultas usam `LIMIT`
 
 ---
 
-## 1a. Sentimento: `ai_analyze_sentiment`
+## Passo 0: Abrir o SQL Editor
+1. No menu lateral à esquerda, selecione **SQL Editor**
+2. Você já deverá ser direcionado ao editor com uma query, caso contrário, crie uma através de **SQL Query** abaixo de **Create New**
+
+Para cada consulta deste exercício, copie a consulta clicando no ícone de dois quadrados no canto do bloco, cole no SQL Editor e rode.
+
+## Passo 1: Análise de sentimento
+
+### 1a. Sentimento com `ai_analyze_sentiment`
 ```sql
 WITH amostra AS (
-  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
-  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
-  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+    ( SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
+    UNION ALL
+    ( SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
+    UNION ALL
+    ( SELECT texto_reclamacao, csa FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
 )
-SELECT LEFT(texto_reclamacao, 60) AS trecho, csat,
-       ai_analyze_sentiment(texto_reclamacao) AS sentimento
-FROM amostra ORDER BY csat DESC;
+SELECT
+    LEFT(texto_reclamacao, 60) AS trecho,
+    csat,
+    ai_analyze_sentiment(texto_reclamacao) AS sentimento
+FROM amostra
+ORDER BY csat DESC;
 ```
-Resultado: `csat 5 → positive` · `csat 3 → neutral` · `csat 1 → negative`. O sentimento acompanha a nota.
+Resultado:
+- `csat 5 → positive`
+- `csat 3 → neutral`
+- `csat 1 → negative`
+
+O sentimento acompanha a nota.
 
 > **Dica:** usamos uma amostra variada (csat 5, 3 e 1) de propósito, para ver a IA distinguindo os casos. Se você ordenar só pelos piores tickets, tudo volta negativo.
 
-## 1b. Distribuição de sentimento com Genie Code (últimos 100)
-Agora, em vez de escrever o SQL, peça ao Genie Code. Cole este prompt no assistente (✨), revise o SQL gerado e execute:
+### 1b. Distribuição de sentimento com Genie Code (últimos 100)
+Agora vamos pedir o SQL ao Genie Code em vez de escrevê-lo:
+1. Abra o Genie Code clicando na lâmpada no canto superior direito
+2. Cole o prompt abaixo
+3. Revise o SQL gerado e execute
 ```text
 Usando a tabela dbacademy.churn.fato_ticket_suporte, escreva uma consulta que aplique ai_analyze_sentiment na coluna texto_reclamacao dos últimos 100 tickets (por data_abertura) e conte quantos são positivos, neutros e negativos.
 ```
 
 <details>
-<summary>👉 Resultado:</summary>
+<summary>👉 Resultado esperado:</summary>
 
 ```sql
-SELECT sentimento, COUNT(*) AS qtd
+SELECT
+    sentimento,
+    COUNT(*) AS qtd
 FROM (
-  SELECT ai_analyze_sentiment(texto_reclamacao) AS sentimento
-  FROM dbacademy.churn.fato_ticket_suporte
-  ORDER BY data_abertura DESC
-  LIMIT 100
+    SELECT
+        ai_analyze_sentiment(texto_reclamacao) AS sentimento
+    FROM dbacademy.churn.fato_ticket_suporte
+    ORDER BY data_abertura DESC
+    LIMIT 100
 )
 GROUP BY sentimento
 ORDER BY qtd DESC;
@@ -57,83 +81,126 @@ ORDER BY qtd DESC;
 
 </details>
 
-Resultado esperado (últimos 100): **aproximadamente 32 positive · 36 neutral · 32 negative** (como é IA, pode variar 1–2).
-> Roda em segundos por ser uma amostra. Repare: o texto livre virou um indicador contável, e você gerou a consulta só descrevendo o que queria.
+Resultado esperado (últimos 100), podendo variar 1–2 por ser IA:
+- **~32** positive
+- **~36** neutral
+- **~32** negative
 
-## 1c. Sentimento com um modelo específico: `ai_query`
-As funções acima usam o modelo padrão do Databricks. Com `ai_query` você escolhe qual modelo usar. Selecione uma destas 3 opções e altere o 1º argumento da query com seu modelo favorito:
-- `databricks-meta-llama-3-3-70b-instruct` (Llama)
-- `databricks-gpt-oss-120b` (OpenAI)
-- `databricks-claude-haiku-4-5` (Claude)
+> O texto livre virou um indicador contável, e você gerou a consulta só descrevendo o que queria
+
+### 1c. Sentimento com um modelo específico: `ai_query`
+1. Copie a consulta abaixo
+2. Troque o 1º argumento do `ai_query` por um destes modelos:
+    - `databricks-claude-haiku-4-5` (Claude)
+    - `databricks-meta-llama-3-3-70b-instruct` (Llama)
+    - `databricks-gpt-oss-120b` (OpenAI)
+3. Rode a consulta
 ```sql
 WITH amostra AS (
-  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
-  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
-  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
+    UNION ALL
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
+    UNION ALL
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
 )
-SELECT csat, LEFT(texto_reclamacao, 60) AS trecho,
-       ai_query('databricks-meta-llama-3-3-70b-instruct',
-                'Classifique o sentimento como positive, neutral ou negative. Responda apenas com a palavra. Comentário: ' || texto_reclamacao) AS sentimento
-FROM amostra ORDER BY csat DESC;
+SELECT
+    csat,
+    LEFT(texto_reclamacao, 60) AS trecho,
+    ai_query(
+        'databricks-meta-llama-3-3-70b-instruct',
+        'Classifique o sentimento como positive, neutral ou negative. Responda apenas com a palavra. Comentário: ' || texto_reclamacao
+    ) AS sentimento
+FROM amostra
+ORDER BY csat DESC;
 ```
-Resultado (Llama): `csat 5 → Positive` · `csat 3 → Neutral` · `csat 1 → Negative`.
+Resultado (Claude):
+- `csat 5 → Positive`
+- `csat 3 → Neutral`
+- `csat 1 → Negative`
 
-## 2. Classificação: `ai_classify`
+As funções dos passos anteriores usam o modelo padrão do Databricks. Com `ai_query` você escolhe qual modelo usar.
+
+## Passo 2: Classificação
+
+### 2a. Classificação com `ai_classify`
 ```sql
 WITH amostra AS (
-  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
-  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
-  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
+    UNION ALL
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
+    UNION ALL
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
 )
-SELECT LEFT(texto_reclamacao, 60) AS trecho, csat,
-       ai_classify(texto_reclamacao,
-                   ARRAY('Cobrança','Técnico','Cancelamento','Elogio','Dúvida')) AS categoria_ia
-FROM amostra ORDER BY csat DESC;
+SELECT
+    LEFT(texto_reclamacao, 60) AS trecho,
+    csat,
+    ai_classify(texto_reclamacao, ARRAY('Cobrança','Técnico','Cancelamento','Elogio','Dúvida')) AS categoria_ia
+FROM amostra
+ORDER BY csat DESC;
 ```
 A IA lê o texto livre e escolhe uma das categorias que você definiu (ex.: elogio → `Elogio`, "já pedi cancelamento…" → `Cancelamento`).
 
-## 2b. Classificação com um modelo específico: `ai_query`
-Mesma ideia da 1c, agora classificando o assunto. Selecione um modelo (Llama, GPT-OSS ou Claude) e altere o 1º argumento:
+### 2b. Classificação com um modelo específico: `ai_query`
+Mesma ideia da 1c, agora classificando o assunto:
+1. Copie a consulta abaixo
+2. Troque o 1º argumento do `ai_query` por um dos modelos da 1c
+3. Rode a consulta
 ```sql
 WITH amostra AS (
-  (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
-  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
-  UNION ALL (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
+    UNION ALL
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
+    UNION ALL
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
 )
-SELECT csat, LEFT(texto_reclamacao, 60) AS trecho,
-       ai_query('databricks-gpt-oss-120b',
-                'Classifique o assunto em uma destas categorias: Cobrança, Técnico, Cancelamento, Elogio, Dúvida. Responda apenas com a categoria. Comentário: ' || texto_reclamacao) AS categoria
-FROM amostra ORDER BY csat DESC;
+SELECT
+    csat,
+    LEFT(texto_reclamacao, 60) AS trecho,
+    ai_query(
+        'databricks-gpt-oss-120b',
+        'Classifique o assunto em uma destas categorias: Cobrança, Técnico, Cancelamento, Elogio, Dúvida. Responda apenas com a categoria. Comentário: ' || texto_reclamacao
+    ) AS categoria
+FROM amostra
+ORDER BY csat DESC;
 ```
-Resultado (GPT-OSS): `csat 5 → Elogio` · `csat 3 → Dúvida` · `csat 1 → Cancelamento`.
+Resultado (GPT-OSS):
+- `csat 5 → Elogio`
+- `csat 3 → Dúvida`
+- `csat 1 → Cancelamento`
 
-## 3. Mascaramento de PII: `ai_mask`
+## Passo 3: Mascaramento de PII com `ai_mask`
 ```sql
-SELECT ai_mask(texto_reclamacao, ARRAY('person','phone','email')) AS texto_anonimizado
+SELECT
+    ai_mask(texto_reclamacao, ARRAY('person','phone','email')) AS texto_anonimizado
 FROM dbacademy.churn.fato_ticket_suporte
 WHERE texto_reclamacao LIKE '%@%' OR texto_reclamacao LIKE '%-____%'
 LIMIT 5;
 ```
-Ex.: *"Meu email é c00015@exemplo.com.br e ainda não recebi retorno."* →
-*"Meu email é **[MASKED]** e ainda não recebi retorno."*
+Ex.: *"Meu email é c00015@exemplo.com.br e ainda não recebi retorno."* → *"Meu email é **[MASKED]** e ainda não recebi retorno."*
+
 Ótimo para compartilhar dados de suporte sem expor informações pessoais: um gancho com a governança do Unity Catalog.
 
-## 4. Resumo dos comentários com Genie Code: `ai_summarize`
-Novamente, peça ao Genie Code. Cole este prompt no assistente (✨), revise o SQL gerado e execute:
+## Passo 4: Resumo dos comentários com Genie Code e `ai_summarize`
+Novamente, vamos pedir o SQL ao Genie Code:
+1. Abra o Genie Code clicando na lâmpada no canto superior direito
+2. Cole o prompt abaixo
+3. Revise o SQL gerado e execute
 ```text
 Usando a tabela dbacademy.churn.fato_ticket_suporte, gere uma consulta que pegue os últimos 100 comentários e use ai_summarize para resumir o que os clientes estão dizendo.
 ```
 
 <details>
-<summary>👉 Resultado:</summary>
+<summary>👉 Resultado esperado:</summary>
 
 ```sql
-SELECT ai_summarize(array_join(collect_list(texto_reclamacao), ' | '), 150) AS resumo
+SELECT
+    ai_summarize(array_join(collect_list(texto_reclamacao), ' | '), 150) AS resumo
 FROM (
-  SELECT texto_reclamacao
-  FROM dbacademy.churn.fato_ticket_suporte
-  ORDER BY data_abertura DESC
-  LIMIT 100
+    SELECT
+        texto_reclamacao
+    FROM dbacademy.churn.fato_ticket_suporte
+    ORDER BY data_abertura DESC
+    LIMIT 100
 );
 ```
 

@@ -1,37 +1,45 @@
 # 01 - SQL com IA
 
-![Trilha do Master Training com destaque no que foi construído até o Exercício 01](arquitetura.gif)
+![Trilha do Master Training com destaque no que foi construído até o Exercício 01](../assets/01%20-%20arquitetura.gif)
 
 > _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
 
-Seu primeiro contato com os dados de churn: você vai explorar no **SQL Editor** e usar o **Genie Code** (assistente de IA ✨) para gerar consultas em linguagem natural.
-
-**Pré-requisito:** [Setup](../00%20-%20Setup) concluído. A base `dbacademy.churn` deve existir.
+Seu primeiro contato com os dados de churn: você vai explorar no **SQL Editor** e usar o **Genie Code** para gerar consultas através de linguagem natural.
 
 ## Objetivo
-- Navegar no SQL Editor e consultar a base compartilhada `dbacademy.churn`.
-- Deixar o Genie Code escrever SQL a partir de perguntas em português.
-- Conhecer recursos Delta (histórico, time travel).
+- Navegar no SQL Editor e consultar a base compartilhada `dbacademy.churn`
+- Usar o Genie Code para escrever SQL a partir de perguntas em português
+- Conhecer recursos do formato Delta (histórico, time travel)
 
-> As consultas prontas estão em [`consultas.sql`](./consultas.sql). Ajuste o catálogo se você não usou `dbacademy`.
+> Você pode encontrar todas as consultas usadas aqui em [`consultas.sql`](./consultas.sql)
 
 ---
 
-## Passo 0: Crie o seu database pessoal
-Você lê a base compartilhada `dbacademy.churn`, mas o que você criar (a partir do Ex. 3) vai no seu schema. Convenção: 1ª letra do nome + sobrenome (ex.: *João Silva* → `jsilva`).
+## Passo 0: Abrir o SQL Editor
+No menu lateral à esquerda, selecione **SQL Editor**. Abaixo de **Create new**, clique em **SQL Query**.
+No seletor de contexto ao lado de **Run all**, escolha o catálogo `dbacademy` e o schema `churn`, como a seguir:
+![Imagem do catálogo+schema no SQL Editor](../assets/01%20-%20catálogo+schema%20no%20SQL%20Editor.png)
+
+## Passo 1: Crie o seu database pessoal
+Agora você deve criar o seu próprio _schema_, onde ficarão todas as bases que você criar a partir do Ex. 3.
+Para o nome do schema, vamos seguir o padrão "1ª letra do nome + sobrenome" (ex.: João Silva → jsilva).
 ```sql
-CREATE SCHEMA IF NOT EXISTS dbacademy.<seu_db>;
+CREATE SCHEMA IF NOT EXISTS dbacademy.<seu_schema>;
 ```
 
-## Passo 1: Abrir o SQL Editor
-No menu lateral, **SQL Editor**. No seletor de contexto, escolha o catálogo `dbacademy` e o schema `churn`.
 
 ## Passo 2: Consultas guiadas
-Rode uma a uma e observe os resultados:
+Para cada uma das consultas a seguir:
+1. Copie a consulta clicando no ícone de dois quadrados no canto de cada bloco
+2. Cole a consulta no SQL Editor
+3. Rode a consulta
+4. Observe os resultados
 
 **2.1 Clientes por segmento**
 ```sql
-SELECT segmento, COUNT(*) AS clientes
+SELECT
+    segmento,
+    COUNT(*) AS clientes
 FROM dbacademy.churn.dim_cliente
 GROUP BY segmento
 ORDER BY clientes DESC;
@@ -39,7 +47,9 @@ ORDER BY clientes DESC;
 
 **2.2 Assinaturas ativas x canceladas**
 ```sql
-SELECT status, COUNT(*) AS qtd
+SELECT
+    status,
+    COUNT(*) AS qtd
 FROM dbacademy.churn.fato_assinatura
 GROUP BY status
 ORDER BY qtd DESC;
@@ -47,23 +57,19 @@ ORDER BY qtd DESC;
 
 **2.3 Top motivos de cancelamento**
 ```sql
-SELECT motivo_cancelamento, COUNT(*) AS qtd
+SELECT
+    motivo_cancelamento,
+    COUNT(*) AS qtd
 FROM dbacademy.churn.fato_assinatura
 WHERE churn_flag = 1
 GROUP BY motivo_cancelamento
 ORDER BY qtd DESC;
 ```
 
+## Passo 3: Usando o Genie Code
+O **Genie Code** é o assistente de desenvolvimento da Databricks, nós podemos utilizá-lo no SQL Editor para escrever consultas SQL através de linguagem natural. É diferente dos _Genie Agents_ que vamos tratar no Ex. 7, cujo objetivo é _responder perguntas e gerar insights_. Aqui o foco é montar a consulta.
 
-> Todas as consultas também estão em [`consultas.sql`](./consultas.sql).
-
-## Passo 3: Genie Code para gerar SQL em linguagem natural
-
-O Genie Code é o assistente do SQL Editor que escreve o código SQL para você. É diferente da **Genie** (espaço conversacional, Ex. 7), que *responde perguntas*. Aqui o foco é montar a consulta.
-
-> **Regra de ouro (para todos gerarem o mesmo resultado):** **nomeie sempre a tabela**. Não precisa listar as colunas: os comentários que documentamos no Setup fazem a IA acertar. Só acrescente um detalhe quando houver ambiguidade real: qual data (há mais de uma), o limiar de um termo vago, ou a definição de uma métrica aberta.
-
-Abra o assistente (✨) no SQL Editor e cole um prompt de cada vez (use o botão de copiar no canto de cada bloco), revise o SQL gerado e execute:
+Abra o Genie Code clicando na lâmpada no canto superior direito e cole um prompt de cada vez , revise o SQL gerado e execute:
 
 **1. Taxa de churn por segmento**
 ```text
@@ -74,7 +80,9 @@ Escreva o SQL da taxa de churn por segmento usando a tabela dbacademy.churn.feat
 <summary>👉 Resultado:</summary>
 
 ```sql
-SELECT segmento, ROUND(AVG(churn_flag), 3) AS taxa_churn
+SELECT
+    segmento,
+    ROUND(AVG(churn_flag), 3) AS taxa_churn
 FROM dbacademy.churn.feature_churn
 GROUP BY segmento
 ORDER BY taxa_churn DESC;
@@ -91,7 +99,9 @@ Escreva uma query com os 5 principais motivos de cancelamento das assinaturas ca
 <summary>👉 Resultado:</summary>
 
 ```sql
-SELECT motivo_cancelamento, COUNT(*) AS qtd
+SELECT
+    motivo_cancelamento,
+    COUNT(*) AS qtd
 FROM dbacademy.churn.fato_assinatura
 WHERE churn_flag = 1
 GROUP BY motivo_cancelamento
@@ -110,7 +120,9 @@ Escreva a taxa de churn por plano usando dbacademy.churn.fato_assinatura e dbaca
 <summary>👉 Resultado:</summary>
 
 ```sql
-SELECT p.nome_plano, ROUND(AVG(a.churn_flag), 3) AS taxa_churn
+SELECT
+    p.nome_plano,
+    ROUND(AVG(a.churn_flag), 3) AS taxa_churn
 FROM dbacademy.churn.fato_assinatura a
 JOIN dbacademy.churn.dim_plano p ON a.id_plano = p.id_plano
 GROUP BY p.nome_plano
@@ -128,7 +140,9 @@ Conte quantas assinaturas foram canceladas por mês usando dbacademy.churn.fato_
 <summary>👉 Resultado:</summary>
 
 ```sql
-SELECT date_trunc('month', data_fim) AS mes, COUNT(*) AS cancelamentos
+SELECT
+    date_trunc('month', data_fim) AS mes,
+    COUNT(*) AS cancelamentos
 FROM dbacademy.churn.fato_assinatura
 WHERE churn_flag = 1
 GROUP BY 1
@@ -144,10 +158,26 @@ Qual plano tem a maior taxa de churn e quantos clientes perdeu?
 
 ## Resultados esperados (dataset fixo → valores exatos)
 
-**Clientes por segmento:** Consumidor **1.200** · PME **595** · Corporativo **205**
-**Assinaturas:** Ativa **1.460** · Cancelada **540**
-**Top motivos:** Insatisfação **196** · Preço **148** · Concorrência **104** · Atendimento **80** · Mudança de necessidade **12**
-**Taxa de churn por segmento:** Consumidor **0,303** · PME **0,239** · Corporativo **0,166**
+**Clientes por segmento:**
+- Consumidor **1.200**
+- PME **595**
+- Corporativo **205**
+
+**Assinaturas:**
+- Ativa **1.460**
+- Cancelada **540**
+
+**Top motivos:**
+- Insatisfação **196**
+- Preço **148**
+- Concorrência **104**
+- Atendimento **80** 
+- Mudança de necessidade **12**
+
+**Taxa de churn por segmento:**
+- Consumidor **0,303**
+- PME **0,239**
+- Corporativo **0,166**
 
 **🎯 Desafio (churn por plano):**
 | Plano | Taxa de churn | Clientes perdidos |

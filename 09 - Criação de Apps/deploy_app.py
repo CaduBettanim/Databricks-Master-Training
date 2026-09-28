@@ -16,19 +16,19 @@
 # MAGIC — **nada precisa ser concedido** ao *service principal* do app. Esse é o pulo do gato deste
 # MAGIC deploy: zero concessões, funciona para qualquer aluno.
 # MAGIC
-# MAGIC **Pré-requisitos** (no seu schema `dbacademy.<seu_db>`):
+# MAGIC **Pré-requisitos** (no seu schema `dbacademy.<seu_schema>`):
 # MAGIC - **Ex. 7** — seu **Supervisor** publicado (endpoint `mas-...-endpoint`).
 # MAGIC - **Ex. 6** — a tabela `churn_scores`.
 # MAGIC - **Ex. 8** — as funções `gerar_email_retencao` (e `get_cliente_360`).
 # MAGIC
-# MAGIC > Rode em **Serverless**. O app roda em compute próprio do Databricks Apps.
+# MAGIC > Rode no cluster `dbacademy_workshop_cluster`. O app roda em compute próprio do Databricks Apps.
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ## Passo 1 — Preencha os campos e rode tudo
 # MAGIC 1. **Rode só a célula abaixo** (Shift+Enter) para os campos aparecerem no topo do notebook.
-# MAGIC 2. Preencha **database** (seu schema pessoal, ex.: `cbettanim`) e **supervisor_endpoint**
+# MAGIC 2. Preencha **1. Seu schema** (ex.: `cbettanim`) e **2. Endpoint do Supervisor (Ex.07)**
 # MAGIC    (o endpoint do seu Supervisor do Ex. 7, ex.: `mas-3d713414-endpoint`).
 # MAGIC 3. Só então clique em **Run all**.
 
@@ -42,7 +42,7 @@ _WH_DEFAULT = "dbacademy_workshop_wh"
 _wh_choices = _wh_names or [""]
 _wh_sel = _WH_DEFAULT if _WH_DEFAULT in _wh_names else (_wh_names[0] if _wh_names else "")
 
-dbutils.widgets.text("database", "", "1. Seu database pessoal (ex.: cbettanim)")
+dbutils.widgets.text("database", "", "1. Seu schema (ex.: cbettanim)")
 dbutils.widgets.text("supervisor_endpoint", "", "2. Endpoint do Supervisor (Ex.07)")
 dbutils.widgets.text("catalog", "dbacademy", "3. Catálogo (opcional)")
 dbutils.widgets.dropdown("warehouse", _wh_sel, _wh_choices, "4. Warehouse (default: do Setup)")
@@ -54,8 +54,8 @@ SUPERVISOR = dbutils.widgets.get("supervisor_endpoint").strip()
 CATALOG = dbutils.widgets.get("catalog").strip() or "dbacademy"
 WAREHOUSE_W = dbutils.widgets.get("warehouse").strip()
 
-assert DATABASE, "Preencha o widget 'database' (seu schema pessoal, ex.: cbettanim)."
-assert SUPERVISOR, "Preencha o widget 'supervisor_endpoint' (ex.: mas-...-endpoint do Ex. 7)."
+assert DATABASE, "Preencha o widget '1. Seu schema' (ex.: cbettanim)."
+assert SUPERVISOR, "Preencha o widget '2. Endpoint do Supervisor (Ex.07)' (ex.: mas-...-endpoint do Ex. 7)."
 
 import os, re, shutil, time
 from databricks.sdk import WorkspaceClient
