@@ -49,6 +49,9 @@ theme:
 extra_css:
   - assets/extra.css
 
+extra_javascript:
+  - assets/header-links.js
+
 # same-dir permite mkdocs.yml na raiz junto dos READMEs (MkDocs recusa
 # docs_dir: . sem ele). `search` precisa ser listado ao definir plugins.
 plugins:
