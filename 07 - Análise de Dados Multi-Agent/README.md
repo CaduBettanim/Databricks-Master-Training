@@ -154,8 +154,8 @@ Resultado esperado: o Supervisor aciona o agente de **Suporte** →
 
 > Repare que você não disse a qual Genie perguntar: o Supervisor leu a pergunta, escolheu o especialista e sintetizou a resposta. É assim que uma solução *multi-agent* simplifica a vida do usuário de negócio: uma porta de entrada, vários especialistas atrás dela.
 
-## Passo 10: Publicar o Supervisor e copiar o endpoint
-1. Se a página do agente tiver um botão **Deploy** (ou **Publish**) ainda não acionado, clique nele
+## Passo 10: Renomear o Supervisor e copiar o endpoint
+1. Clique no ícone de lápis ao lado no nome do supervisor e renomeie como `supervisor-<seu_schema>`
 2. Clique no botão **Endpoint** em cima
 3. Copie e guarde o nome do endpoint que começa com `mas-` (algo como `mas-3d713414-endpoint`)
 
