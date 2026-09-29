@@ -1,5 +1,7 @@
 site_name: Databricks Master Training
 site_description: Trilha hands-on de Análise de Clientes & Churn na plataforma Databricks
+# URL pública (Pages do fork); troque junto com repo_url ao ir para o upstream.
+site_url: https://cwrneiro.github.io/Databricks-Master-Training/
 
 # Fork para testes; troque para o upstream depois de validar:
 #   https://github.com/CaduBettanim/Databricks-Master-Training
@@ -21,34 +23,37 @@ exclude_docs: |
 theme:
   name: material
   language: pt-BR
-  logo: assets/logo_master_training.png
-  favicon: assets/logo_master_training.png
+  logo: assets/logo.png
+  favicon: assets/favicon.png
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
-      primary: red
-      accent: red
       toggle:
         icon: material/weather-night
         name: Modo escuro
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: red
-      accent: red
       toggle:
         icon: material/weather-sunny
         name: Modo claro
   features:
+    - navigation.instant
+    - navigation.instant.progress
     - navigation.top
     - navigation.footer
     - search.suggest
     - content.code.copy
     - content.action.edit
 
+# Paleta de cores Databricks (lava red) aplicada via CSS.
+extra_css:
+  - assets/extra.css
+
 # same-dir permite mkdocs.yml na raiz junto dos READMEs (MkDocs recusa
 # docs_dir: . sem ele). `search` precisa ser listado ao definir plugins.
 plugins:
-  - search
+  - search:
+      lang: pt
   - same-dir
 
 markdown_extensions:
