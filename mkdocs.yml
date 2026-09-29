@@ -65,6 +65,11 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
 
+# Página não listada (líderes de dados): fica fora do menu; a busca é
+# desativada no front matter da própria página (search: exclude: true).
+not_in_nav: |
+  00 - Setup/Setup guiado/README.md
+
 nav:
   - Início: README.md
   - 00 - Setup: "00 - Setup/README.md"
