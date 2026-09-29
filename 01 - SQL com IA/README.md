@@ -45,6 +45,17 @@ GROUP BY segmento
 ORDER BY clientes DESC;
 ```
 
+<details markdown="1">
+<summary>👉 Resultado esperado:</summary>
+
+| Segmento | Clientes |
+|----------|:---:|
+| Consumidor | 1.200 |
+| PME | 595 |
+| Corporativo | 205 |
+
+</details>
+
 **2.2 Assinaturas ativas x canceladas**
 ```sql
 SELECT
@@ -54,6 +65,16 @@ FROM dbacademy.churn.fato_assinatura
 GROUP BY status
 ORDER BY qtd DESC;
 ```
+
+<details markdown="1">
+<summary>👉 Resultado esperado:</summary>
+
+| Status | Qtd |
+|--------|:---:|
+| Ativa | 1.460 |
+| Cancelada | 540 |
+
+</details>
 
 **2.3 Top motivos de cancelamento**
 ```sql
@@ -66,6 +87,19 @@ GROUP BY motivo_cancelamento
 ORDER BY qtd DESC;
 ```
 
+<details markdown="1">
+<summary>👉 Resultado esperado:</summary>
+
+| Motivo | Qtd |
+|--------|:---:|
+| Insatisfação | 196 |
+| Preço | 148 |
+| Concorrência | 104 |
+| Atendimento | 80 |
+| Mudança de necessidade | 12 |
+
+</details>
+
 ## Passo 3: Usando o Genie Code
 O **Genie Code** é o assistente de desenvolvimento da Databricks, nós podemos utilizá-lo no SQL Editor para escrever consultas SQL através de linguagem natural. É diferente dos _Genie Agents_ que vamos tratar no Ex. 7, cujo objetivo é _responder perguntas e gerar insights_. Aqui o foco é montar a consulta.
 
@@ -76,8 +110,8 @@ Abra o Genie Code clicando na lâmpada no canto superior direito e cole um promp
 Escreva o SQL da taxa de churn por segmento usando a tabela dbacademy.churn.feature_churn.
 ```
 
-<details>
-<summary>👉 Resultado:</summary>
+<details markdown="1">
+<summary>👉 Resultado esperado:</summary>
 
 ```sql
 SELECT
@@ -88,6 +122,12 @@ GROUP BY segmento
 ORDER BY taxa_churn DESC;
 ```
 
+| Segmento | Taxa de churn |
+|----------|:---:|
+| Consumidor | 0,303 |
+| PME | 0,239 |
+| Corporativo | 0,166 |
+
 </details>
 
 **2. Top 5 motivos de cancelamento**
@@ -95,8 +135,8 @@ ORDER BY taxa_churn DESC;
 Escreva uma query com os 5 principais motivos de cancelamento das assinaturas canceladas (churn_flag = 1) usando a dbacademy.churn.fato_assinatura.
 ```
 
-<details>
-<summary>👉 Resultado:</summary>
+<details markdown="1">
+<summary>👉 Resultado esperado:</summary>
 
 ```sql
 SELECT
@@ -109,6 +149,14 @@ ORDER BY qtd DESC
 LIMIT 5;
 ```
 
+| Motivo | Qtd |
+|--------|:---:|
+| Insatisfação | 196 |
+| Preço | 148 |
+| Concorrência | 104 |
+| Atendimento | 80 |
+| Mudança de necessidade | 12 |
+
 </details>
 
 **3. Taxa de churn por plano**
@@ -116,8 +164,8 @@ LIMIT 5;
 Escreva a taxa de churn por plano usando dbacademy.churn.fato_assinatura e dbacademy.churn.dim_plano.
 ```
 
-<details>
-<summary>👉 Resultado:</summary>
+<details markdown="1">
+<summary>👉 Resultado esperado:</summary>
 
 ```sql
 SELECT
@@ -129,6 +177,13 @@ GROUP BY p.nome_plano
 ORDER BY taxa_churn DESC;
 ```
 
+| Plano | Taxa de churn |
+|-------|:---:|
+| Básico | 0,317 |
+| Padrão | 0,274 |
+| Premium | 0,225 |
+| Empresarial | 0,157 |
+
 </details>
 
 **4. Cancelamentos por mês**
@@ -136,8 +191,8 @@ ORDER BY taxa_churn DESC;
 Conte quantas assinaturas foram canceladas por mês usando dbacademy.churn.fato_assinatura, considerando apenas as canceladas (churn_flag = 1) pela data de cancelamento (data_fim).
 ```
 
-<details>
-<summary>👉 Resultado:</summary>
+<details markdown="1">
+<summary>👉 Resultado esperado:</summary>
 
 ```sql
 SELECT
@@ -154,32 +209,9 @@ ORDER BY 1;
 ## 🎯 Desafio
 Qual plano tem a maior taxa de churn e quantos clientes perdeu?
 
----
+<details markdown="1">
+<summary>👉 Resultado esperado:</summary>
 
-## Resultados esperados (dataset fixo → valores exatos)
-
-**Clientes por segmento:**
-- Consumidor **1.200**
-- PME **595**
-- Corporativo **205**
-
-**Assinaturas:**
-- Ativa **1.460**
-- Cancelada **540**
-
-**Top motivos:**
-- Insatisfação **196**
-- Preço **148**
-- Concorrência **104**
-- Atendimento **80** 
-- Mudança de necessidade **12**
-
-**Taxa de churn por segmento:**
-- Consumidor **0,303**
-- PME **0,239**
-- Corporativo **0,166**
-
-**🎯 Desafio (churn por plano):**
 | Plano | Taxa de churn | Clientes perdidos |
 |-------|:---:|:---:|
 | **Básico** | **0,317** | **257** |
@@ -188,3 +220,5 @@ Qual plano tem a maior taxa de churn e quantos clientes perdeu?
 | Empresarial | 0,157 | 31 |
 
 ➡️ O plano **Básico** concentra o maior churn, coerente com o negócio (menor barreira de saída, menor valor percebido).
+
+</details>
