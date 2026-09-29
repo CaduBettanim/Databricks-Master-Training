@@ -32,9 +32,9 @@
 # MAGIC %md
 # MAGIC ## Passo 1 — Preencha os campos e rode tudo
 # MAGIC 1. **Rode só a célula abaixo** (Shift+Enter) para os campos aparecerem no topo do notebook.
-# MAGIC 2. Preencha **1. Seu schema** (ex.: `cbettanim`) e **2. Endpoint do Supervisor (Ex.07)**
+# MAGIC 2. Preencha **Seu schema** (ex.: `cbettanim`) e **Endpoint do Supervisor (Ex.07)**
 # MAGIC    (o endpoint do seu Supervisor do Ex. 7, ex.: `mas-3d713414-endpoint`).
-# MAGIC 3. O campo **5. Model service** já vem com `retencao-gateway`: é o nome do modelo que o
+# MAGIC 3. O campo **Model service** já vem com `retencao-gateway`: é o nome do modelo que o
 # MAGIC    notebook vai criar no Unity Gateway, dentro do seu schema. Pode deixar como está.
 # MAGIC 4. Só então clique em **Run all**.
 
@@ -48,22 +48,21 @@ _WH_DEFAULT = "dbacademy_workshop_wh"
 _wh_choices = _wh_names or [""]
 _wh_sel = _WH_DEFAULT if _WH_DEFAULT in _wh_names else (_wh_names[0] if _wh_names else "")
 
-dbutils.widgets.text("database", "", "1. Seu schema (ex.: cbettanim)")
-dbutils.widgets.text("supervisor_endpoint", "", "2. Endpoint do Supervisor (Ex.07)")
-dbutils.widgets.text("catalog", "dbacademy", "3. Catálogo (opcional)")
-dbutils.widgets.dropdown("warehouse", _wh_sel, _wh_choices, "4. Warehouse (default: do Setup)")
-dbutils.widgets.text("model_service", "retencao-gateway", "5. Model service (Unity Gateway)")
+dbutils.widgets.text("schema", "", "Seu schema")
+dbutils.widgets.text("supervisor_endpoint", "", "Endpoint do Supervisor (Ex.07)")
+dbutils.widgets.dropdown("warehouse", _wh_sel, _wh_choices, "Warehouse")
+dbutils.widgets.text("model_service", "retencao-gateway", "Model service")
 
 # COMMAND ----------
 
-DATABASE = dbutils.widgets.get("database").strip()
+SCHEMA = dbutils.widgets.get("schema").strip()
 SUPERVISOR = dbutils.widgets.get("supervisor_endpoint").strip()
-CATALOG = dbutils.widgets.get("catalog").strip() or "dbacademy"
+CATALOG = "dbacademy"
 WAREHOUSE_W = dbutils.widgets.get("warehouse").strip()
 MODEL_SERVICE_NAME = dbutils.widgets.get("model_service").strip() or "retencao-gateway"
 
-assert DATABASE, "Preencha o widget '1. Seu schema' (ex.: cbettanim)."
-assert SUPERVISOR, "Preencha o widget '2. Endpoint do Supervisor (Ex.07)' (ex.: mas-...-endpoint do Ex. 7)."
+assert SCHEMA, "Preencha o widget 'Seu schema' (ex.: cbettanim)."
+assert SUPERVISOR, "Preencha o widget 'Endpoint do Supervisor (Ex.07)' (ex.: mas-...-endpoint do Ex. 7)."
 
 import os, re, shutil, time
 from databricks.sdk import WorkspaceClient
@@ -79,13 +78,13 @@ GATEWAY_DEST_MODEL = "models/system.ai.gpt-oss-20b"  # modelo por trás do model
 
 # Nome do app: prefixo + database normalizado, LIMITADO a 30 caracteres
 # (Databricks Apps exige nome entre 2 e 30 chars). Trunca e remove hífen sobrando no fim.
-APP_NAME = ("central-retencao-" + re.sub(r"[^a-z0-9-]", "-", DATABASE.lower()).strip("-"))[:30].rstrip("-")
+APP_NAME = ("central-retencao-" + re.sub(r"[^a-z0-9-]", "-", SCHEMA.lower()).strip("-"))[:30].rstrip("-")
 ME = w.current_user.me().user_name
 
 print("Aluno            :", ME)
 print("App              :", APP_NAME, f"({len(APP_NAME)} chars)")
-print("Catálogo/schema  :", f"{CATALOG}.{DATABASE}  (+ {CATALOG}.churn compartilhado)")
-GATEWAY_MODEL = f"{CATALOG}.{DATABASE}.{MODEL_SERVICE_NAME}"
+print("Catálogo/schema  :", f"{CATALOG}.{SCHEMA}  (+ {CATALOG}.churn compartilhado)")
+GATEWAY_MODEL = f"{CATALOG}.{SCHEMA}.{MODEL_SERVICE_NAME}"
 print("Supervisor       :", SUPERVISOR)
 print("Model service    :", GATEWAY_MODEL, "(Unity Gateway)")
 print("Auth             : on-behalf-of-user (roda como VOCÊ; sem grants ao service principal)")
@@ -137,7 +136,7 @@ try:
     print(f"Model service '{GATEWAY_MODEL}' já existe — reaproveitando.")
 except Exception:
     api("POST", f"/api/2.1/unity-catalog/model-services?model_service_id={MODEL_SERVICE_NAME}"
-                f"&parent=schemas/{CATALOG}.{DATABASE}", body={
+                f"&parent=schemas/{CATALOG}.{SCHEMA}", body={
         "comment": "Master Training — modelo da Central de Retenção (Unity Gateway)",
         "config": {
             "routing": {"destinations": [{
@@ -146,7 +145,7 @@ except Exception:
                 "pay_per_token_config": {"model": GATEWAY_DEST_MODEL}}]},
             "rate_limits": [{"key": "RATE_LIMIT_KEY_SERVICE",
                              "renewal_period": "RATE_LIMIT_RENEWAL_PERIOD_MINUTE", "requests": 60}],
-            "inference_table": {"parent": f"schemas/{CATALOG}.{DATABASE}",
+            "inference_table": {"parent": f"schemas/{CATALOG}.{SCHEMA}",
                                 "table_name_prefix": MODEL_SERVICE_NAME.replace("-", "_")},
         },
     })
@@ -213,7 +212,7 @@ env:
   - name: CR_SCHEMA_CHURN
     value: "churn"
   - name: CR_SCHEMA_PESSOAL
-    value: "{DATABASE}"
+    value: "{SCHEMA}"
 """
 with open(os.path.join(STAGE, "app.yaml"), "w") as f:
     f.write(APP_YAML)

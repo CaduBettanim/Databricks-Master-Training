@@ -6,9 +6,7 @@
 
 # COMMAND ----------
 
-NOME_CATALOGO = "dbacademy"
-_schemas = [r[0] for r in spark.sql(f"SHOW SCHEMAS IN {NOME_CATALOGO}").collect() if r[0] != "churn"]
-dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas or [""], "Seu schema (dbacademy.<schema>)")
+dbutils.widgets.text("schema", "", "Seu schema")
 
 # COMMAND ----------
 
@@ -18,12 +16,12 @@ dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas o
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE SCHEMA IF NOT EXISTS IDENTIFIER('dbacademy.' || :database)
+# MAGIC CREATE SCHEMA IF NOT EXISTS IDENTIFIER('dbacademy.' || :schema)
 
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE OR REPLACE VIEW IDENTIFIER('dbacademy.' || :database || '.mvw_churn') (
+# MAGIC CREATE OR REPLACE VIEW IDENTIFIER('dbacademy.' || :schema || '.mvw_churn') (
 # MAGIC   `Segmento`      COMMENT 'Segmento do cliente',
 # MAGIC   `Plano`         COMMENT 'Nome do plano',
 # MAGIC   `Mês`           COMMENT 'Mês do cancelamento',
@@ -60,7 +58,7 @@ dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas o
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE OR REPLACE VIEW IDENTIFIER('dbacademy.' || :database || '.mvw_receita') (
+# MAGIC CREATE OR REPLACE VIEW IDENTIFIER('dbacademy.' || :schema || '.mvw_receita') (
 # MAGIC   `Segmento`      COMMENT 'Segmento do cliente',
 # MAGIC   `Mês`           COMMENT 'Competência (mês)',
 # MAGIC   `Receita`       COMMENT 'Soma faturada',
@@ -91,7 +89,7 @@ dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas o
 # COMMAND ----------
 
 # MAGIC %sql
-# MAGIC CREATE OR REPLACE VIEW IDENTIFIER('dbacademy.' || :database || '.mvw_suporte') (
+# MAGIC CREATE OR REPLACE VIEW IDENTIFIER('dbacademy.' || :schema || '.mvw_suporte') (
 # MAGIC   `Segmento`   COMMENT 'Segmento do cliente',
 # MAGIC   `Canal`      COMMENT 'Canal do ticket',
 # MAGIC   `Categoria`  COMMENT 'Categoria do ticket',
@@ -132,7 +130,7 @@ dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas o
 # MAGIC %sql
 # MAGIC -- Taxa de churn por segmento
 # MAGIC SELECT `Segmento`, ROUND(MEASURE(`Taxa de Churn`), 3) AS taxa_churn
-# MAGIC FROM IDENTIFIER('dbacademy.' || :database || '.mvw_churn')
+# MAGIC FROM IDENTIFIER('dbacademy.' || :schema || '.mvw_churn')
 # MAGIC GROUP BY `Segmento`
 # MAGIC ORDER BY taxa_churn DESC
 
@@ -143,7 +141,7 @@ dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas o
 # MAGIC SELECT `Segmento`,
 # MAGIC        ROUND(MEASURE(`Receita`), 2)       AS receita,
 # MAGIC        ROUND(MEASURE(`Inadimplência`), 3) AS inadimplencia
-# MAGIC FROM IDENTIFIER('dbacademy.' || :database || '.mvw_receita')
+# MAGIC FROM IDENTIFIER('dbacademy.' || :schema || '.mvw_receita')
 # MAGIC GROUP BY `Segmento`
 # MAGIC ORDER BY receita DESC
 
@@ -155,10 +153,10 @@ dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas o
 # MAGIC        MEASURE(`Tickets`)              AS tickets,
 # MAGIC        ROUND(MEASURE(`CSAT Médio`), 2) AS csat,
 # MAGIC        ROUND(MEASURE(`NPS Médio`), 2)  AS nps
-# MAGIC FROM IDENTIFIER('dbacademy.' || :database || '.mvw_suporte')
+# MAGIC FROM IDENTIFIER('dbacademy.' || :schema || '.mvw_suporte')
 # MAGIC GROUP BY `Categoria`
 # MAGIC ORDER BY tickets DESC
 
 # COMMAND ----------
 
-print(f"✅ Metric views criadas em dbacademy.{dbutils.widgets.get('database')}")
+print(f"✅ Metric views criadas em dbacademy.{dbutils.widgets.get('schema')}")

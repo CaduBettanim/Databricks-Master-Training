@@ -22,12 +22,11 @@ dbutils.library.restartPython()
 
 # COMMAND ----------
 
-_schemas = [r[0] for r in spark.sql("SHOW SCHEMAS IN dbacademy").collect() if r[0] != "churn"]
-dbutils.widgets.dropdown("database", _schemas[0] if _schemas else "", _schemas or [""], "Seu schema (dbacademy.<schema>)")
-SEU_DB = dbutils.widgets.get("database")
-SCHEMA = f"dbacademy.{SEU_DB}"
-MODEL  = f"{SCHEMA}.modelo_churn"
-SCORES = f"{SCHEMA}.churn_scores"
+dbutils.widgets.text("schema", "", "Seu schema")
+SCHEMA = dbutils.widgets.get("schema")
+SCHEMA_FQN = f"dbacademy.{SCHEMA}"
+MODEL  = f"{SCHEMA_FQN}.modelo_churn"
+SCORES = f"{SCHEMA_FQN}.churn_scores"
 print("Modelo  ->", MODEL)
 print("Scores  ->", SCORES)
 
@@ -141,7 +140,7 @@ print(f"AUC (teste): {auc:.3f}")
 # MAGIC     faixa_risco,
 # MAGIC     COUNT(*) AS clientes,
 # MAGIC     ROUND(AVG(prob_churn), 3) AS prob_media
-# MAGIC FROM dbacademy.${database}.churn_scores
+# MAGIC FROM dbacademy.${schema}.churn_scores
 # MAGIC GROUP BY faixa_risco
 # MAGIC ORDER BY prob_media DESC
 
@@ -151,6 +150,6 @@ print(f"AUC (teste): {auc:.3f}")
 # MAGIC %sql
 # MAGIC SELECT
 # MAGIC     *
-# MAGIC FROM dbacademy.${database}.churn_scores
+# MAGIC FROM dbacademy.${schema}.churn_scores
 # MAGIC ORDER BY prob_churn DESC
 # MAGIC LIMIT 10
