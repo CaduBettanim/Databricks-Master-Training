@@ -8,6 +8,10 @@ site_url: https://cwrneiro.github.io/Databricks-Master-Training/
 repo_url: https://github.com/cwrneiro/Databricks-Master-Training
 edit_uri: edit/main/
 
+# Link no rodapé para a preparação da turma. Caminho absoluto a partir da raiz
+# do site (mesmo nome de repositório no fork e no upstream).
+copyright: '<a href="/Databricks-Master-Training/00%20-%20Setup/">00 - Setup</a>'
+
 # O repositório inteiro é a fonte da documentação (READMEs ficam intocados).
 # Por isso o site precisa ser construído FORA da árvore do repo (o MkDocs
 # recusa um site_dir dentro do docs_dir). `mkdocs serve` ignora isso e usa
@@ -49,9 +53,6 @@ theme:
 extra_css:
   - assets/extra.css
 
-extra_javascript:
-  - assets/header-links.js
-
 # same-dir permite mkdocs.yml na raiz junto dos READMEs (MkDocs recusa
 # docs_dir: . sem ele). `search` precisa ser listado ao definir plugins.
 plugins:
@@ -68,14 +69,15 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
 
-# Página não listada (líderes de dados): fica fora do menu; a busca é
-# desativada no front matter da própria página (search: exclude: true).
+# Páginas fora do menu lateral. "00 - Setup" é acessível pelo rodapé e pela
+# home; "Setup guiado" fica dentro de "00 - Setup" e fora da busca (front
+# matter search: exclude na própria página).
 not_in_nav: |
+  00 - Setup/README.md
   00 - Setup/Setup guiado/README.md
 
 nav:
   - Início: README.md
-  - 00 - Setup: "00 - Setup/README.md"
   - 01 - SQL com IA: "01 - SQL com IA/README.md"
   - 02 - Geração de Alertas: "02 - Geração de Alertas/README.md"
   - 03 - Métricas de Negócio: "03 - Métricas de Negócio/README.md"

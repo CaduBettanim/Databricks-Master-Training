@@ -6,6 +6,9 @@
 
 Um único notebook, rodado uma vez pelo **administrador de conta**, que faz tudo: prepara a turma (grupo, permissões, compute), carrega a base compartilhada de churn e verifica que cada participante (e o workspace) está pronto. É **idempotente** (seguro re-executar).
 
+!!! tip "Líderes de dados: veja o Setup Guiado"
+    Vídeos curtos sobre a dinâmica do treinamento, a preparação do ambiente e o envio das evidências: **[Setup Guiado](<Setup guiado/README.md>)**.
+
 ## Conteúdo
 
 | Pasta | O quê |

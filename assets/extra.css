@@ -20,31 +20,3 @@
   border-radius: .4rem;
   background: #000;
 }
-
-/* Atalhos no canto superior direito do cabeçalho (Setup / Setup guiado). */
-.md-ext-links {
-  display: flex;
-  align-items: center;
-  gap: .2rem;
-  margin-left: auto;
-  margin-right: .3rem;
-}
-.md-ext-links a {
-  color: var(--md-primary-bg-color);
-  font-size: .68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  line-height: 1;
-  padding: .4rem .55rem;
-  border-radius: .2rem;
-  white-space: nowrap;
-  opacity: .85;
-}
-.md-ext-links a:hover {
-  opacity: 1;
-  background: rgba(255, 255, 255, .15);
-}
-@media screen and (max-width: 59.9375em) {
-  .md-ext-links { display: none; }
-}
