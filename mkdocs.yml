@@ -1,11 +1,9 @@
 site_name: Databricks Master Training
 site_description: Trilha hands-on de Análise de Clientes & Churn na plataforma Databricks
-# URL pública (Pages do fork); troque junto com repo_url ao ir para o upstream.
-site_url: https://cwrneiro.github.io/Databricks-Master-Training/
+# URL pública do site (GitHub Pages do upstream).
+site_url: https://cadubettanim.github.io/Databricks-Master-Training/
 
-# Fork para testes; troque para o upstream depois de validar:
-#   https://github.com/CaduBettanim/Databricks-Master-Training
-repo_url: https://github.com/cwrneiro/Databricks-Master-Training
+repo_url: https://github.com/CaduBettanim/Databricks-Master-Training
 edit_uri: edit/main/
 
 # Link no rodapé para a preparação da turma. Caminho absoluto a partir da raiz
