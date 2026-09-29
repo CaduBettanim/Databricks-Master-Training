@@ -2,15 +2,16 @@
 Aba 3 — Retenção Personalizada.
 
   - /retencao/lista: os 12 clientes mais propensos a churn (faixa Alto).
-  - /retencao/email: chama a UC function gerar_email_retencao(id) — a regra de negócio da oferta
-    é decidida em SQL (CASE) dentro da função; a IA só REDIGE o texto. 100% verificável.
+  - /retencao/email: chama a UC function get_cliente_360(id), que devolve o perfil E as ofertas
+    já calculadas em SQL (CASE: a regra de negócio é governada no Unity Catalog). O texto do
+    e-mail é redigido pelo modelo do Unity Gateway (CR_GATEWAY_MODEL); a IA só escreve.
 """
 from __future__ import annotations
 
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
-from .. import config, warehouse
+from .. import config, llm, warehouse
 from ..warehouse import num
 
 router = APIRouter()
@@ -64,9 +65,17 @@ async def email(req: EmailReq, request: Request):
     cid = _sanitiza_id(req.id_cliente)
     if not cid:
         return {"ok": False, "erro": "ID inválido."}
-    rows = await warehouse.query(
-        f"SELECT email FROM {PE}.gerar_email_retencao('{cid}')", _user_token(request)
-    )
-    if not rows or not rows[0].get("email"):
+    token = _user_token(request)
+    rows = await warehouse.query(f"SELECT * FROM {PE}.get_cliente_360('{cid}')", token)
+    if not rows:
         return {"ok": False, "erro": "ID não encontrado na base de risco."}
-    return {"ok": True, "id_cliente": cid, "email": rows[0]["email"]}
+    perfil = rows[0]
+    texto = await llm.redigir_email_retencao(perfil, token)
+    if not texto:
+        return {"ok": False, "erro": "Não foi possível gerar o e-mail agora. Tente novamente."}
+    return {
+        "ok": True,
+        "id_cliente": cid,
+        "email": texto,
+        "ofertas": {k: perfil.get(k) for k in ("desconto", "oferta_internet", "oferta_fator")},
+    }

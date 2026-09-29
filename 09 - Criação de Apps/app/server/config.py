@@ -58,6 +58,9 @@ SCHEMA_PESSOAL = os.environ.get("CR_SCHEMA_PESSOAL", "cbettanim")
 SUPERVISOR_ENDPOINT = os.environ.get("CR_SUPERVISOR_ENDPOINT", "mas-3d713414-endpoint")
 # Foundation model p/ a "leitura da IA" dos gráficos (✨ Explicar).
 EXPLAIN_MODEL = os.environ.get("CR_EXPLAIN_MODEL", "databricks-claude-sonnet-4-5")
+# Model service do Unity Gateway (catalogo.schema.nome). Quando definido, as chamadas de chat
+# do app (✨ Explicar e o e-mail de retenção) passam pelo Gateway em vez do serving endpoint.
+GATEWAY_MODEL = os.environ.get("CR_GATEWAY_MODEL", "").strip()
 
 
 @lru_cache(maxsize=1)

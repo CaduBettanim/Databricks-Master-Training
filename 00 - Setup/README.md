@@ -1,6 +1,6 @@
 # 00 - Setup: Base compartilhada + Habilitação da turma
 
-![Trilha do Master Training com destaque no que foi construído até o Exercício 00](../assets/00%20-%20arquitetura.gif)
+![Trilha do Master Training com destaque no que foi construído até o Exercício 00](../assets/00%20-%20arquitetura.gif?v=20260928)
 
 > _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
 

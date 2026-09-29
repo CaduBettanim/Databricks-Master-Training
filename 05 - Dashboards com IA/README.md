@@ -1,6 +1,6 @@
 # 05 - Dashboards com IA
 
-![Trilha do Master Training com destaque no que foi construído até o Exercício 05](../assets/05%20-%20arquitetura.gif)
+![Trilha do Master Training com destaque no que foi construído até o Exercício 05](../assets/05%20-%20arquitetura.gif?v=20260928)
 
 > _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
 

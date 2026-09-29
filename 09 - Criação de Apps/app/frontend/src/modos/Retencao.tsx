@@ -75,7 +75,7 @@ export function Retencao() {
           <div className="act">
             <button className="btn btn-crm" onClick={enviarCrm}>📤 Enviar para CRM</button>
             <span className="muted" style={{ fontSize: 12 }}>
-              Gerado por <code>gerar_email_retencao('{atual.id}')</code>
+              Ofertas de <code>get_cliente_360('{atual.id}')</code> · texto pelo Unity Gateway
             </span>
           </div>
         </div>

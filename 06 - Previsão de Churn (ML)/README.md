@@ -1,6 +1,6 @@
 # 06 - Previsão de Churn (ML)
 
-![Trilha do Master Training com destaque no que foi construído até o Exercício 06](../assets/06%20-%20arquitetura.gif)
+![Trilha do Master Training com destaque no que foi construído até o Exercício 06](../assets/06%20-%20arquitetura.gif?v=20260928)
 
 > _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
 

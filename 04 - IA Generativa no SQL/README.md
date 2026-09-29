@@ -1,6 +1,6 @@
 # 04 - IA Generativa no SQL
 
-![Trilha do Master Training com destaque no que foi construído até o Exercício 04](../assets/04%20-%20arquitetura.gif)
+![Trilha do Master Training com destaque no que foi construído até o Exercício 04](../assets/04%20-%20arquitetura.gif?v=20260928)
 
 > _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
 
@@ -30,11 +30,11 @@ Para cada consulta deste exercício, copie a consulta clicando no ícone de dois
 ### 1a. Sentimento com `ai_analyze_sentiment`
 ```sql
 WITH amostra AS (
-    ( SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
+    ( SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 ORDER BY id_ticket LIMIT 2)
     UNION ALL
-    ( SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
+    ( SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 ORDER BY id_ticket LIMIT 2)
     UNION ALL
-    ( SELECT texto_reclamacao, csa FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+    ( SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 ORDER BY id_ticket LIMIT 2)
 )
 SELECT
     LEFT(texto_reclamacao, 60) AS trecho,
@@ -50,7 +50,7 @@ Resultado:
 
 O sentimento acompanha a nota.
 
-> **Dica:** usamos uma amostra variada (csat 5, 3 e 1) de propósito, para ver a IA distinguindo os casos. Se você ordenar só pelos piores tickets, tudo volta negativo.
+> **Dica:** usamos uma amostra variada (csat 5, 3 e 1) de propósito, para ver a IA distinguindo os casos. Se você ordenar só pelos piores tickets, tudo volta negativo. O `ORDER BY id_ticket` garante que toda a turma veja os **mesmos** tickets: sem ele, o `LIMIT 2` pega linhas quaisquer, e alguns tickets de csat 3 têm texto positivo ("Estou satisfeito...").
 
 ### 1b. Distribuição de sentimento com Genie Code (últimos 100)
 Agora vamos pedir o SQL ao Genie Code em vez de escrevê-lo:
@@ -97,11 +97,11 @@ Resultado esperado (últimos 100), podendo variar 1–2 por ser IA:
 3. Rode a consulta
 ```sql
 WITH amostra AS (
-    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 ORDER BY id_ticket LIMIT 2)
     UNION ALL
-    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 ORDER BY id_ticket LIMIT 2)
     UNION ALL
-    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 ORDER BY id_ticket LIMIT 2)
 )
 SELECT
     csat,
@@ -125,11 +125,11 @@ As funções dos passos anteriores usam o modelo padrão do Databricks. Com `ai_
 ### 2a. Classificação com `ai_classify`
 ```sql
 WITH amostra AS (
-    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 ORDER BY id_ticket LIMIT 2)
     UNION ALL
-    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 ORDER BY id_ticket LIMIT 2)
     UNION ALL
-    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 ORDER BY id_ticket LIMIT 2)
 )
 SELECT
     LEFT(texto_reclamacao, 60) AS trecho,
@@ -147,11 +147,11 @@ Mesma ideia da 1c, agora classificando o assunto:
 3. Rode a consulta
 ```sql
 WITH amostra AS (
-    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 LIMIT 2)
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 5 ORDER BY id_ticket LIMIT 2)
     UNION ALL
-    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 LIMIT 2)
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 3 ORDER BY id_ticket LIMIT 2)
     UNION ALL
-    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 LIMIT 2)
+    (SELECT texto_reclamacao, csat FROM dbacademy.churn.fato_ticket_suporte WHERE csat = 1 ORDER BY id_ticket LIMIT 2)
 )
 SELECT
     csat,
@@ -167,6 +167,8 @@ Resultado (GPT-OSS):
 - `csat 5 → Elogio`
 - `csat 3 → Dúvida`
 - `csat 1 → Cancelamento`
+
+> Um dos tickets de csat 1 diz *"Já pedi cancelamento e continuam cobrando"*. Ele fala de cancelamento **e** de cobrança, então o modelo pode classificá-lo como **Cobrança**. As duas respostas são defensáveis: é por isso que vale escolher bem as categorias (e o modelo) para o seu caso.
 
 ## Passo 3: Mascaramento de PII com `ai_mask`
 ```sql

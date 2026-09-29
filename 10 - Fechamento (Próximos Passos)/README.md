@@ -1,6 +1,6 @@
 # 10 - Fechamento (Próximos Passos)
 
-![Arquitetura completa do Master Training: tudo o que você construiu](../assets/10%20-%20arquitetura.gif)
+![Arquitetura completa do Master Training: tudo o que você construiu](../assets/10%20-%20arquitetura.gif?v=20260928)
 
 > _A plataforma completa que você construiu ao longo da trilha, do dado cru ao app de retenção._
 
@@ -30,7 +30,7 @@ Você fechou o ciclo **Detectar → Diagnosticar → Decidir → Agir**, sempre 
 | **06 · Previsão de Churn (ML)** | Modelo de probabilidade de churn + a tabela `churn_scores` |
 | **07 · Análise de Dados Multi-Agent** | Dois Genies (Faturamento e Suporte) + um Supervisor que orquestra |
 | **08 · Retenção com ML e GenAI** | UC Functions: o perfil 360 do cliente e o e-mail de retenção personalizado |
-| **09 · Criação de Apps** | A **Central de Retenção**: Cockpit + Assistente + Retenção, num único deploy |
+| **09 · Criação de Apps** | A **Central de Retenção**: Cockpit + Assistente + Retenção, num único deploy, com a IA passando por um model service do Unity Gateway |
 
 É o mesmo padrão que você leva para qualquer caso de uso e indústria: **dados → métricas → IA → agentes → app**, tudo governado pelo Unity Catalog.
 
