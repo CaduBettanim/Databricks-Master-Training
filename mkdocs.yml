@@ -45,7 +45,6 @@ theme:
     - navigation.footer
     - search.suggest
     - content.code.copy
-    - content.action.edit
 
 # Paleta de cores Databricks (lava red) aplicada via CSS.
 extra_css:

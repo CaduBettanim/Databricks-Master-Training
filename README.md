@@ -23,6 +23,18 @@ O domínio é uma empresa de assinatura genérica, então a trilha se adapta a q
 - **Schema pessoal por participante** (`<catálogo>.<seu_database>`): recebe o que cada um cria nos exercícios (metric views, modelo, funções, etc.).
 - Objetos de workspace (Genie, Supervisor, App) são criados por participante.
 
+<details markdown="1">
+<summary>👉 Tabelas da base compartilhada churn</summary>
+
+| Objeto | Tipo | Conteúdo |
+|--------|------|----------|
+| `dim_cliente`, `dim_plano`, `dim_data` | Dimensões | Cliente, plano e calendário |
+| `fato_assinatura`, `fato_uso`, `fato_faturamento`, `fato_ticket_suporte` | Fatos | Assinaturas, uso, faturamento e tickets de suporte |
+| `feature_churn` | Tabela analítica | Uma linha por cliente, pronta para análise e ML |
+| `kb_volume` | Volume | Base de conhecimento: FAQ, Política de Retenção, Playbook de CS |
+
+</details>
+
 ## Trilha
 
 | Módulo | Conteúdo |
