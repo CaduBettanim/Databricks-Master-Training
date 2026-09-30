@@ -4,9 +4,9 @@
 # environment_version = "5"
 # ///
 # MAGIC %md
-# MAGIC # Desmontagem do Workshop: Base de Churn + turma (`00_setup_base_churn`)
+# MAGIC # Desmontagem do Workshop: Base de Churn + turma (`00_setup`)
 # MAGIC
-# MAGIC Reverte os recursos criados por `00_setup_base_churn`. **Idempotente**: qualquer coisa
+# MAGIC Reverte os recursos criados por `00_setup`. **Idempotente**: qualquer coisa
 # MAGIC já ausente é ignorada, portanto é seguro re-executar.
 # MAGIC
 # MAGIC Cada alternador é `true`/`false`. Os padrões removem os recursos **específicos do workshop**

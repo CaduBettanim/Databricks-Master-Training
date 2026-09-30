@@ -73,7 +73,7 @@ NOME_SCHEMA   = "churn"                      # schema COMPARTILHADO (somente lei
 GROUP          = "dbacademy_workshop"
 WAREHOUSE_NAME = "dbacademy_workshop_wh"
 CLUSTER_NAME   = "dbacademy_workshop_cluster"
-CSV_BASE = "https://raw.githubusercontent.com/CaduBettanim/Databricks-Master-Training/main/00%20-%20Setup/data"
+CSV_BASE = "https://raw.githubusercontent.com/CaduBettanim/Databricks-Master-Training/main/00%20-%20Setup%20and%20teardown/data"
 fq = f"{NOME_CATALOGO}.{NOME_SCHEMA}"
 
 CREATE_CATALOG   = dbutils.widgets.get("create_catalog") == "true"

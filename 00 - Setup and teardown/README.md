@@ -1,4 +1,4 @@
-# 00 - Setup: Base compartilhada + Habilitação da turma
+# 00 - Setup and teardown: Base compartilhada + Habilitação da turma
 
 ![Trilha do Master Training com destaque no que foi construído até o Exercício 00](../assets/00%20-%20arquitetura.gif?v=20260928)
 
@@ -14,7 +14,7 @@ Um único notebook, rodado uma vez pelo **administrador de conta**, que faz tudo
 | Pasta | O quê |
 |-------|-------|
 | `data/` | CSVs de origem (dataset fixo, 1 por tabela) |
-| `setup/` | `00_setup_base_churn.py` (prepara a turma, carrega os dados e verifica tudo) e `00_teardown_base_churn.py` (remove os recursos ao fim do workshop) |
+| `notebooks/` | `00_setup.py` (prepara a turma, carrega os dados e verifica tudo) e `00_teardown.py` (remove os recursos ao fim do workshop) |
 
 ## O que o Setup faz
 > O setup é idempotente, então pode ser rodado várias vezes
@@ -45,7 +45,7 @@ Um único notebook, rodado uma vez pelo **administrador de conta**, que faz tudo
 
 1. Importe o notebook por URL: **Workspace → Três pontinhos no topo → Import → URL**, e cole o seguinte:
 ```
-https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/00%20-%20Setup/setup/00_setup_base_churn.py
+https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/00%20-%20Setup%20and%20teardown/notebooks/00_setup.py
 ```
 2. Rode as duas primeiras células para exibir os widgets
 3. Selecione os participantes que participarão do treinamento. Não é necessário alterar os outros parâmetros
@@ -58,7 +58,7 @@ https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/00%20-%20Se
 ## Desmontagem (após o workshop)
 > É necessário ser um administrador de conta para rodar a desmontagem
 
-O notebook `00_teardown_base_churn.py` reverte o que o Setup criou. É **idempotente** (recursos já ausentes são ignorados, seguro re-executar).
+O notebook `00_teardown.py` reverte o que o Setup criou. É **idempotente** (recursos já ausentes são ignorados, seguro re-executar).
 
 ### O que a Desmontagem faz
 Cada alternador é `true`/`false`. Os padrões removem os recursos **específicos do workshop**:
@@ -71,7 +71,7 @@ Cada alternador é `true`/`false`. Os padrões removem os recursos **específico
 ### Passos
 1. Importe o notebook por URL: **Workspace → Três pontinhos no topo → Import → URL**, e cole o seguinte:
 ```
-https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/00%20-%20Setup/setup/00_teardown_base_churn.py
+https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/00%20-%20Setup%20and%20teardown/notebooks/00_teardown.py
 ```
 2. Rode as duas primeiras células para exibir os widgets
 3. Ajuste os alternadores conforme o que deseja remover
