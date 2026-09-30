@@ -8,7 +8,7 @@ edit_uri: edit/main/
 
 # Link no rodapé para a preparação da turma. Caminho absoluto a partir da raiz
 # do site (mesmo nome de repositório no fork e no upstream).
-copyright: '<a href="/Databricks-Master-Training/00%20-%20Setup/">00 - Setup</a>'
+copyright: '<a href="/Databricks-Master-Training/00%20-%20Setup%20and%20teardown/">00 - Setup and teardown</a>'
 
 # O repositório inteiro é a fonte da documentação (READMEs ficam intocados).
 # Por isso o site precisa ser construído FORA da árvore do repo (o MkDocs
@@ -66,12 +66,12 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
 
-# Páginas fora do menu lateral. "00 - Setup" é acessível pelo rodapé e pela
-# home; "Setup guiado" fica dentro de "00 - Setup" e fora da busca (front
+# Páginas fora do menu lateral. "00 - Setup and teardown" é acessível pelo rodapé e pela
+# home; "Setup guiado" fica dentro de "00 - Setup and teardown" e fora da busca (front
 # matter search: exclude na própria página).
 not_in_nav: |
-  00 - Setup/README.md
-  00 - Setup/Setup guiado/README.md
+  00 - Setup and teardown/README.md
+  00 - Setup and teardown/Setup guiado/README.md
 
 nav:
   - Início: README.md

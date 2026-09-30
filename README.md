@@ -39,7 +39,7 @@ O domínio é uma empresa de assinatura genérica, então a trilha se adapta a q
 
 | Módulo | Conteúdo |
 |--------|----------|
-| **00 - Setup** | Preparação da base compartilhada de churn (dados + documentação + base de conhecimento). Começe por aqui. |
+| **00 - Setup and teardown** | Preparação da base compartilhada de churn (dados + documentação + base de conhecimento). Começe por aqui. |
 | **01 - SQL com IA** | Explorar a base no SQL Editor e gerar SQL com o assistente (Genie Code). |
 | **02 - Geração de Alertas** | Criar alertas que disparam quando um indicador de churn cruza um limite. |
 | **03 - Métricas de Negócio** | Definir métricas governadas (churn, receita, suporte) e consultá-las com MEASURE(). |
@@ -53,4 +53,4 @@ O domínio é uma empresa de assinatura genérica, então a trilha se adapta a q
 
 ## Como começar
 
-Abra a pasta **[`00 - Setup`](./00%20-%20Setup)** e siga o `README.md` de lá.
+Abra a pasta **[`00 - Setup and teardown`](./00%20-%20Setup%20and%20teardown)** e siga o `README.md` de lá.
