@@ -16,7 +16,7 @@ Agora vamos definir métricas de negócio uma única vez (governadas no Unity Ca
 https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/03%20-%20M%C3%A9tricas%20de%20Neg%C3%B3cio/notebook_metric_views.py
 ```
 2. Após clicar em **Import**, você será redirecionado para o notebook
-3. No dropdown na barra superior, ao lado de **Run all**, selecione o cluster `dbacademy_workshop_cluster`
+3. No dropdown na barra superior, ao lado de Run all, selecione o cluster `dbacademy_workshop_cluster`
 4. Rode a primeira célula do notebook para exibir o widget
 5. No widget **Seu schema**, selecione o schema que você criou no Ex. 1
 6. Clique em **Run all**
