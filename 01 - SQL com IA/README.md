@@ -76,30 +76,6 @@ ORDER BY qtd DESC;
 
 </details>
 
-**2.3 Top motivos de cancelamento**
-```sql
-SELECT
-    motivo_cancelamento,
-    COUNT(*) AS qtd
-FROM dbacademy.churn.fato_assinatura
-WHERE churn_flag = 1
-GROUP BY motivo_cancelamento
-ORDER BY qtd DESC;
-```
-
-<details markdown="1">
-<summary>👉 Resultado esperado:</summary>
-
-| Motivo | Qtd |
-|--------|:---:|
-| Insatisfação | 196 |
-| Preço | 148 |
-| Concorrência | 104 |
-| Atendimento | 80 |
-| Mudança de necessidade | 12 |
-
-</details>
-
 ## Passo 3: Usando o Genie Code
 O **Genie Code** é o assistente de desenvolvimento da Databricks, nós podemos utilizá-lo no SQL Editor para escrever consultas SQL através de linguagem natural. É diferente dos _Genie Agents_ que vamos tratar no Ex. 7, cujo objetivo é _responder perguntas e gerar insights_. Aqui o foco é montar a consulta.
 

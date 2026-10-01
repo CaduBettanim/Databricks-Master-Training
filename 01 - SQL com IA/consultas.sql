@@ -20,25 +20,11 @@ FROM dbacademy.churn.fato_assinatura
 GROUP BY status
 ORDER BY qtd DESC;
 
--- 2.3 Top motivos de cancelamento
-SELECT motivo_cancelamento, COUNT(*) AS qtd
-FROM dbacademy.churn.fato_assinatura
-WHERE churn_flag = 1
-GROUP BY motivo_cancelamento
-ORDER BY qtd DESC;
-
--- 2.4 Taxa de churn por segmento
-SELECT c.segmento, ROUND(AVG(a.churn_flag), 3) AS taxa_churn
-FROM dbacademy.churn.fato_assinatura a
-JOIN dbacademy.churn.dim_cliente c ON a.id_cliente = c.id_cliente
-GROUP BY c.segmento
-ORDER BY taxa_churn DESC;
-
 -- Passo 3 — Gabarito dos prompts do Genie Code (Passo 3 do README) -------------
 -- O Genie gera o SQL a partir do texto; estas são as consultas de REFERÊNCIA
 -- (mesmo resultado esperado). Repare nos filtros que evitam resultado errado.
 
--- #1 Taxa de churn por segmento (via feature_churn — mesmo resultado do 2.4)
+-- #1 Taxa de churn por segmento (via feature_churn)
 SELECT segmento, ROUND(AVG(churn_flag), 3) AS taxa_churn
 FROM dbacademy.churn.feature_churn
 GROUP BY segmento
