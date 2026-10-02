@@ -15,6 +15,8 @@
 # MAGIC
 # MAGIC **É idempotente** (create-if-not-exists + grants idempotentes): seguro re-executar.
 # MAGIC
+# MAGIC ***Este notebook (e o treinamento) deve rodar no workspace corporativo, e não no Databricks Free Edition.***
+# MAGIC
 # MAGIC > ⚠️ Rode as **duas primeiras células** para exibir os widgets, selecione os participantes e
 # MAGIC > use **Run all**. **Todas as células devem terminar com sucesso.** O veredito final está na
 # MAGIC > seção **7. Relatório final** (`✅ CHECKS COMPLETOS`). Se houver ❌/⚠️, corrija e re-execute.
