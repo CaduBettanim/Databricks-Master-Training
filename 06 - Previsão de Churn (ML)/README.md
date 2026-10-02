@@ -25,7 +25,7 @@ A partir da tabela de features `dbacademy.churn.feature_churn` (comportamento de
 https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/06%20-%20Previs%C3%A3o%20de%20Churn%20%28ML%29/notebook_modelo_churn.py
 ```
 2. Após clicar em **Import**, você será redirecionado para o notebook
-3. No dropdown na barra superior, ao lado de **Run all**, selecione o cluster `dbacademy_workshop_cluster`
+3. No dropdown na barra superior, ao lado de Run all, selecione o cluster `dbacademy_workshop_cluster`
 4. Rode as células em ordem até a primeira célula de código abaixo de **Passo 1 — Configure o seu schema**, que exibe o widget
 5. No widget **Seu schema**, selecione o schema que você criou no Ex. 1
 6. Clique em **Run all**
