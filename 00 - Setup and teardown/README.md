@@ -4,7 +4,9 @@
 
 > _Em destaque, o que você já construiu na trilha até este ponto; em cinza, o que ainda vem._
 
-Um único notebook, rodado uma vez pelo **administrador de conta**, que faz tudo: prepara a turma (grupo, permissões, compute), carrega a base compartilhada de churn e verifica que cada participante (e o workspace) está pronto. É **idempotente** (seguro re-executar).
+Um único notebook, rodado uma vez pelo **administrador de conta**, que faz tudo: prepara a turma (grupo, permissões, compute), carrega a base compartilhada de churn e verifica que cada participante (e o workspace) está pronto. É **idempotente**.
+
+***O treinamento deve ser rodado no workspace corporativo, e não no Databricks Free Edition.***
 
 !!! tip "Líderes de dados: veja o Setup Guiado"
     Vídeos curtos sobre a dinâmica do treinamento, a preparação do ambiente e o envio das evidências: **[Setup Guiado](<Setup guiado/README.md>)**.
