@@ -59,6 +59,7 @@ https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/00%20-%20Se
 
 ## Desmontagem (após o workshop)
 > É necessário ser um administrador de conta para rodar a desmontagem
+
 > ATENÇÃO: Antes de executar o processo de teardown, os endpoints dos supervisors devem ser apagados manualmente: Workspace > "Agents" > Passe o mouse pelo agente > No canto direito selecione os 3 pontos > "Deletar/Apagar" 
 
 O notebook `00_teardown.py` reverte o que o Setup criou. É **idempotente** (recursos já ausentes são ignorados, seguro re-executar).
