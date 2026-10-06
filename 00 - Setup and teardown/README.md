@@ -59,6 +59,7 @@ https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/00%20-%20Se
 
 ## Desmontagem (após o workshop)
 > É necessário ser um administrador de conta para rodar a desmontagem
+> ATENÇÃO: Antes de executar o processo de teardown, os endpoints dos supervisors devem ser apagados manualmente: Workspace > "Agents" > Passe o mouse pelo agente > No canto direito selecione os 3 pontos > "Deletar/Apagar" 
 
 O notebook `00_teardown.py` reverte o que o Setup criou. É **idempotente** (recursos já ausentes são ignorados, seguro re-executar).
 
@@ -69,7 +70,6 @@ Cada alternador é `true`/`false`. Os padrões removem os recursos **específico
 2. Exclui a SQL Warehouse `dbacademy_workshop_wh`
 3. Exclui o cluster multiuso `dbacademy_workshop_cluster`
 4. **REMOVER CATÁLOGO** vem **desativado** (`false`): o catálogo `dbacademy` pertence ao administrador e contém tanto a base compartilhada `dbacademy.churn` (tabelas + volume `kb_volume`) quanto o schema pessoal `dbacademy.<username>` de cada participante. Ative (`true`) apenas se o Setup criou o catálogo e o workshop foi completamente encerrado, pois o `DROP CATALOG ... CASCADE` apaga tudo isso.
-ATENÇÃO: Antes de executar o processo de teardown, os endpoints dos supervisors devem ser apagados manualmente: Workspace > "Agents" > Passe o mouse pelo agente > No canto direito selecione os 3 pontos > "Deletar/Apagar" 
 
 ### Passos
 1. Importe o notebook por URL: **Workspace → Três pontinhos no topo → Import → URL**, e cole o seguinte:
