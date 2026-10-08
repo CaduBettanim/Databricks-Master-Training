@@ -7,6 +7,7 @@
 Seu primeiro contato com os dados de churn: você vai explorar no **SQL Editor** e usar o **Genie Code** para gerar consultas através de linguagem natural.
 
 ## Objetivo
+- Navegar pela estrutura de dados no Unity Catalog (catálogo → schema → tabela)
 - Navegar no SQL Editor e consultar a base compartilhada `dbacademy.churn`
 - Usar o Genie Code para escrever SQL a partir de perguntas em português
 - Conhecer recursos do formato Delta (histórico, time travel)
@@ -15,7 +16,21 @@ Seu primeiro contato com os dados de churn: você vai explorar no **SQL Editor**
 
 ---
 
-## Passo 0: Abrir o SQL Editor
+## Passo 0: Conhecer a base no Unity Catalog
+Antes de consultar, vamos ver como os dados estão organizados. No Unity Catalog, todo dado tem um endereço em três partes: **catálogo → schema → tabela**.
+
+### 0.1 Navegar no Catalog Explorer
+1. No menu lateral à esquerda, clique em **Catalog**
+2. Abra o catálogo **`dbacademy`** e depois o schema **`churn`**. É a base compartilhada do treino, com as tabelas de clientes, planos, assinaturas, uso, faturamento e tickets de suporte
+3. Clique na tabela **`fato_assinatura`** e explore as abas:
+    - **Overview:** as colunas e o comentário de cada uma (ex.: `churn_flag` = "1 se cancelou (churn), 0 se ativo")
+    - **Sample Data:** algumas linhas de exemplo, sem escrever SQL
+    - **Details:** dono, formato (Delta) e data de criação
+4. Ainda na lista de colunas, repare que `id_cliente` está marcada como **chave estrangeira (FK)**: ela aponta para a tabela `dim_cliente`. Clique em **View relationships** para ver como as tabelas se ligam
+
+> Esses comentários e relacionamentos não são só documentação: são eles que ajudam o **Genie Code** (neste exercício) e os **Genies** (Ex. 7) a escrever o SQL certo.
+
+### 0.2 Abrir o SQL Editor
 No menu lateral à esquerda, selecione **SQL Editor**. Abaixo de **Create new**, clique em **SQL Query**.
 No seletor de contexto ao lado de **Run all**, escolha o catálogo `dbacademy` e o schema `churn`, como a seguir:
 ![Imagem do catálogo+schema no SQL Editor](../assets/01%20-%20catálogo+schema%20no%20SQL%20Editor.png)
