@@ -523,11 +523,19 @@ try:
             ep = w.serving_endpoints.get(ep_name)
             if ep and ep.config and ep.config.served_entities:
                 for entity in ep.config.served_entities:
-                    if entity.entity_name:
-                        _endpoint_models[ep_name] = entity.entity_name
+                    # Para endpoints de foundation model Databricks: tentar foundation_model.name primeiro
+                    uc_name = None
+                    if entity.foundation_model and entity.foundation_model.name:
+                        uc_name = entity.foundation_model.name
+                    elif entity.entity_name:
+                        uc_name = entity.entity_name
+
+                    # Manter apenas nomes que começam com "system.ai."
+                    if uc_name and uc_name.startswith("system.ai."):
+                        _endpoint_models[ep_name] = uc_name
                         break
             if ep_name not in _endpoint_models:
-                print(f"  {NO} Endpoint '{ep_name}' sem entity_name resolvível")
+                print(f"  {NO} Endpoint '{ep_name}' sem UC name em system.ai resolvível")
         except Exception as e:
             print(f"  {NO} Endpoint '{ep_name}' não encontrado ou inacessível")
 except Exception as e:
@@ -566,16 +574,16 @@ except Exception as e:
         _other_errors.append(f"USE SCHEMA em system.ai: {e}")
         print(f"    {NO} Erro: {e}")
 
-# EXECUTE em cada modelo UC
+# EXECUTE em cada modelo UC (como função)
 for model_fqn in TRAINING_MODELS:
     try:
         quoted_fqn = _q(model_fqn)
-        spark.sql(f"GRANT EXECUTE ON MODEL {quoted_fqn} TO `{GROUP}`")
+        spark.sql(f"GRANT EXECUTE ON FUNCTION {quoted_fqn} TO `{GROUP}`")
         print(f"  {OK} EXECUTE em {model_fqn}")
     except Exception as e:
         if any(k in str(e) for k in ["PERMISSION_DENIED", "not authorized", "403"]):
             quoted_fqn = _q(model_fqn)
-            _permission_errors.append(f"GRANT EXECUTE ON MODEL {quoted_fqn} TO `{GROUP}`;")
+            _permission_errors.append(f"GRANT EXECUTE ON FUNCTION {quoted_fqn} TO `{GROUP}`;")
         else:
             _other_errors.append(f"EXECUTE em {model_fqn}: {e}")
             print(f"    {NO} Erro: {e}")
