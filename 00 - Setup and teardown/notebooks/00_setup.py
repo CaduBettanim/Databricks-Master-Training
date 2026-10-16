@@ -919,7 +919,7 @@ report = [
     ("Acesso aos modelos de IA para o grupo (USE CATALOG system + USE SCHEMA system.ai + EXECUTE em modelos)", _models_grants_ok),
     (f"Todos os {len(ATTENDEES)} participante(s) passam em todas as verificações", _attendees_ok),
 ]
-report += feature_report  # features de IA (seção 6) bloqueiam o veredito
+report += feature_report  # features de IA (seção 7) bloqueiam o veredito
 
 _all_ok = all(v is True for _, v in report)
 print("=" * 70)
