@@ -890,8 +890,6 @@ _models_schema_grant = _group_has_uc("schema", "system.ai", GROUP, {"USE_SCHEMA"
 _models_grants_ok = None
 
 # Checar: (1) catálogo system, (2) schema system.ai, (3) cada modelo
-_catalog_ok = _models_catalog_grant is True
-_schema_ok = _models_schema_grant is True
 
 if TRAINING_MODELS:
     _all_models_ok = True
@@ -918,7 +916,7 @@ if TRAINING_MODELS:
 
     # Resultado final: False se faltam grants (catálogo, schema ou modelo);
     # None se indeterminado (não conseguiu verificar); True se tudo ok
-    if _catalog_ok is False or _schema_ok is False or _all_models_ok is False:
+    if _models_catalog_grant is False or _models_schema_grant is False or _all_models_ok is False:
         _models_grants_ok = False
     elif _models_catalog_grant is None or _models_schema_grant is None or _any_indeterminate_model:
         _models_grants_ok = None
