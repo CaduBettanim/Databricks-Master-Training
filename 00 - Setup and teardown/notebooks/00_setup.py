@@ -19,7 +19,7 @@
 # MAGIC
 # MAGIC > ⚠️ Rode as **duas primeiras células** para exibir os widgets, selecione os participantes e
 # MAGIC > use **Run all**. **Todas as células devem terminar com sucesso.** O veredito final está na
-# MAGIC > seção **7. Relatório final** (`✅ CHECKS COMPLETOS`). Se houver ❌/⚠️, corrija e re-execute.
+# MAGIC > seção **8. Relatório final** (`✅ CHECKS COMPLETOS`). Se houver ❌/⚠️, corrija e re-execute.
 # MAGIC
 # MAGIC > Metric views (Ex.3), modelo (Ex.6) e os Genies/Supervisor (Ex.7) são criados por cada aluno
 # MAGIC > no schema pessoal `<catálogo>.<seu_schema>` — habilitado aqui via `CREATE SCHEMA`.
@@ -488,7 +488,107 @@ except Exception as e:
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## 5. Verificação: matriz de permissões por participante
+# MAGIC ## 5. Acesso aos modelos de IA (Foundation Models do system.ai)
+# MAGIC Alguns workspaces restringem acesso ao catálogo `system.ai` por padrão. Esta seção garante que
+# MAGIC a turma pode usar os modelos de IA necessários para **Ex. 4** (ai_query + endpoints) e **Ex. 9**
+# MAGIC (criação de modelo serviço Unity Catalog).
+# MAGIC
+# MAGIC Requer **admin de metastore** ou `MANAGE` no esquema `system.ai`. Se falhar com erro de permissão,
+# MAGIC um admin executará os comandos SQL exibidos abaixo — sem isso, os grants não serão aplicados.
+
+# COMMAND ----------
+
+# Resolver UC model names a partir dos serving endpoints
+_TRAINING_ENDPOINT_NAMES = [
+    "databricks-meta-llama-3-3-70b-instruct",  # Ex. 4, ai_query (required)
+    "databricks-gpt-oss-120b",                  # Ex. 4, ai_query (required)
+    "databricks-claude-haiku-4-5",              # Ex. 4, optional
+    "databricks-claude-sonnet-4-5",             # App fallback
+]
+_GPTOSS20B_UC_NAME = "system.ai.gpt-oss-20b"   # Ex. 9, model service (known UC name)
+
+TRAINING_MODELS = []
+_endpoint_models = {}
+_admin_commands = []
+
+# 1. Resolver cada endpoint de serving → UC model name
+try:
+    for ep_name in _TRAINING_ENDPOINT_NAMES:
+        try:
+            ep = w.serving_endpoints.get(ep_name)
+            if ep and ep.config and ep.config.served_entities:
+                for entity in ep.config.served_entities:
+                    if entity.entity_name:
+                        _endpoint_models[ep_name] = entity.entity_name
+                        break
+            if ep_name not in _endpoint_models:
+                print(f"  {NO} Endpoint '{ep_name}' sem entity_name resolvível")
+        except Exception as e:
+            print(f"  {NO} Endpoint '{ep_name}' não encontrado ou inacessível")
+except Exception as e:
+    print(f"{NO} Erro ao resolver endpoints de serving: {e}")
+
+# Adicionar o modelo UC conhecido (gpt-oss-20b para Ex. 9)
+_endpoint_models["gpt-oss-20b (UC)"] = _GPTOSS20B_UC_NAME
+
+# 2. Construir lista única de modelos UC
+TRAINING_MODELS = sorted(set(_endpoint_models.values())) if _endpoint_models else []
+if TRAINING_MODELS:
+    print(f"{OK} Resolvidos {len(TRAINING_MODELS)} modelo(s) UC para acesso: {TRAINING_MODELS}")
+
+# 3. Conceder permissões: USE CATALOG system, USE SCHEMA system.ai, EXECUTE em cada modelo
+_any_permission_error = False
+try:
+    # USE CATALOG system
+    try:
+        spark.sql(f"GRANT USE CATALOG ON CATALOG system TO `{GROUP}`")
+        print(f"  {OK} USE CATALOG em system")
+    except Exception as e:
+        if any(k in str(e) for k in ["PERMISSION_DENIED", "not authorized", "403"]):
+            _admin_commands.append(f"GRANT USE CATALOG ON CATALOG system TO `{GROUP}`;")
+            _any_permission_error = True
+        else:
+            raise
+
+    # USE SCHEMA system.ai
+    try:
+        spark.sql(f"GRANT USE SCHEMA ON SCHEMA system.ai TO `{GROUP}`")
+        print(f"  {OK} USE SCHEMA em system.ai")
+    except Exception as e:
+        if any(k in str(e) for k in ["PERMISSION_DENIED", "not authorized", "403"]):
+            _admin_commands.append(f"GRANT USE SCHEMA ON SCHEMA system.ai TO `{GROUP}`;")
+            _any_permission_error = True
+        else:
+            raise
+
+    # EXECUTE em cada modelo UC
+    for model_fqn in TRAINING_MODELS:
+        try:
+            spark.sql(f"GRANT EXECUTE ON MODEL `{model_fqn}` TO `{GROUP}`")
+            print(f"  {OK} EXECUTE em `{model_fqn}`")
+        except Exception as e:
+            if any(k in str(e) for k in ["PERMISSION_DENIED", "not authorized", "403"]):
+                _admin_commands.append(f"GRANT EXECUTE ON MODEL `{model_fqn}` TO `{GROUP}`;")
+                _any_permission_error = True
+            else:
+                print(f"    {NO} Erro ao conceder EXECUTE em {model_fqn}: {e}")
+
+except Exception as e:
+    print(f"{NO} Erro inesperado ao conceder permissões: {e}")
+
+# Se houve erros de permissão, exibir os comandos para admin executar
+if _any_permission_error:
+    print(f"\n{NO} Alguns grants falharam por falta de permissão (metastore admin ou MANAGE em system.ai necessário).")
+    print("Um admin no SQL Editor executará os comandos abaixo:")
+    for cmd in _admin_commands:
+        print(f"  {cmd}")
+else:
+    print(f"{OK} Acesso aos modelos de IA concedido para {GROUP}.")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## 6. Verificação: matriz de permissões por participante
 # MAGIC | Coluna | Requisito | Necessário por |
 # MAGIC |---|---|---|
 # MAGIC | Acesso ao workspace | `workspace-access` | Todos |
@@ -498,6 +598,7 @@ except Exception as e:
 # MAGIC | Base churn READ | `SELECT` no schema `churn` compartilhado | 01-07 |
 # MAGIC | Warehouse CAN USE | `CAN_USE` no SQL Warehouse | 01, 02, 04, 05, 06 |
 # MAGIC | Cluster CAN ATTACH | `CAN_ATTACH_TO` no cluster | 00, 03, 07 (notebooks) |
+# MAGIC | Modelos de IA | `EXECUTE` em cada modelo do system.ai | 04, 09 |
 
 # COMMAND ----------
 
@@ -527,7 +628,7 @@ for _ in range(6):
 
 import pandas as pd
 COLUMNS = ["Acesso ao workspace", "Databricks SQL", "USE CATALOG", "CREATE SCHEMA",
-           "Base churn READ", "Warehouse CAN USE", "Cluster CAN ATTACH"]
+           "Base churn READ", "Warehouse CAN USE", "Cluster CAN ATTACH", "Modelos de IA"]
 matrix_rows, detail_rows = {}, []
 
 def note(email, col, symbol, message):
@@ -580,6 +681,41 @@ for email in ATTENDEES:
     elif ok is None:
         note(email, "Cluster CAN ATTACH", ERR, f"Cluster '{CLUSTER_NAME}' não encontrado / ACL ilegível")
 
+    # Verificar acesso aos modelos de IA (EXECUTE em cada modelo UC)
+    _missing_models = []
+    _models_status = None  # None = indeterminado, True = todos ok, False = algum ausente
+    if TRAINING_MODELS:
+        _models_status = True
+        for model_fqn in TRAINING_MODELS:
+            # Tentar obter effective privileges para o modelo; usar 'function' como tipo padrão
+            # (modelos registrados podem usar 'registered_model' ou 'function' dependendo da API)
+            _model_privs = None
+            for securable_type in ["function", "registered_model"]:
+                try:
+                    _model_privs = uc_effective_privileges(securable_type, model_fqn, email)
+                    if _model_privs is not None:
+                        break
+                except Exception:
+                    pass
+
+            # Verificar se tem EXECUTE
+            has_exec = uc_has(_model_privs, "EXECUTE")
+            if has_exec is False:
+                _missing_models.append(model_fqn)
+                _models_status = False
+            elif has_exec is None:
+                _models_status = None  # indeterminado se pelo menos um modelo não foi verificável
+
+        row["Modelos de IA"] = OK if _models_status is True else (NO if _models_status is False else ERR)
+        if _missing_models:
+            note(email, "Modelos de IA", row["Modelos de IA"], f"Nenhum EXECUTE nos modelos: {', '.join(_missing_models)}")
+        elif _models_status is None:
+            note(email, "Modelos de IA", ERR, "Não foi possível verificar effective privileges nos modelos UC")
+    else:
+        # Nenhum modelo resolvido
+        row["Modelos de IA"] = ERR
+        note(email, "Modelos de IA", ERR, "Nenhum modelo de IA foi resolvido (endpoints podem estar indisponíveis)")
+
     matrix_rows[email] = row
 
 matrix_df = pd.DataFrame.from_dict(matrix_rows, orient="index", columns=COLUMNS)
@@ -590,7 +726,7 @@ display(matrix_df.reset_index())
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## 5b. Detalhes: apenas falhas e avisos
+# MAGIC ## 6b. Detalhes: apenas falhas e avisos
 
 # COMMAND ----------
 
@@ -602,7 +738,7 @@ else:
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## 6. Features de IA do workspace
+# MAGIC ## 7. Features de IA do workspace
 # MAGIC Features do **workspace inteiro** (não por participante), necessárias para os Ex. 4, 6 e 7:
 # MAGIC | Feature | Sinal | Necessária por |
 # MAGIC |---|---|---|
@@ -677,9 +813,9 @@ display(pd.DataFrame([{"Feature": _l, "Status": _sym(_v)} for _l, _v in feature_
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## 7. Relatório final
+# MAGIC ## 8. Relatório final
 # MAGIC Um único ✅ / ❌ por item preparado ou verificado (⚠️ = não foi possível determinar).
-# MAGIC Inclui as features de IA da seção 6: se qualquer uma faltar, o ambiente é NÃO PRONTO.
+# MAGIC Inclui as features de IA da seção 7: se qualquer uma faltar, o ambiente é NÃO PRONTO.
 
 # COMMAND ----------
 
@@ -732,6 +868,36 @@ except Exception:
 
 _schema_grants = _group_has_uc("schema", fq, GROUP, {"USE_SCHEMA", "SELECT"})
 _volume_grants = _group_has_uc("volume", f"{fq}.kb_volume", GROUP, {"READ_VOLUME"})
+
+# Verificar se os grants de acesso aos modelos foram concedidos (ou se há comando de admin pendente)
+_models_catalog_grant = _group_has_uc("catalog", "system", GROUP, {"USE_CATALOG"}) if "system" else None
+_models_schema_grant = _group_has_uc("schema", "system.ai", GROUP, {"USE_SCHEMA"}) if "system.ai" else None
+_models_grants_ok = None
+if TRAINING_MODELS:
+    _all_models_ok = True
+    _indeterminate = False
+    for model_fqn in TRAINING_MODELS:
+        for securable_type in ["function", "registered_model"]:
+            try:
+                _m_privs = _group_has_uc(securable_type, model_fqn, GROUP, {"EXECUTE"})
+                if _m_privs is not None:
+                    if _m_privs:
+                        break  # tem EXECUTE, ok
+                    else:
+                        _all_models_ok = False  # sem EXECUTE
+                    break  # resolveu, sai do loop de tipos
+                else:
+                    _indeterminate = True
+            except Exception:
+                pass
+    _models_grants_ok = _all_models_ok if not _indeterminate else None
+elif _any_permission_error:
+    # Houve tentativa de grant mas falhou por permissão → marcar como False (precisa de admin)
+    _models_grants_ok = False
+else:
+    # Nenhum modelo foi resolvido (endpoints indisponíveis) → marcar como None
+    _models_grants_ok = None
+
 if ATTENDEES:
     _det_statuses = {d["Status"] for d in detail_rows}
     _attendees_ok = False if NO in _det_statuses else (None if ERR in _det_statuses else True)
@@ -750,6 +916,7 @@ report = [
     ("CAN_USE de warehouse concedido ao grupo", _group_in_acl(WAREHOUSE_ACL, GROUP, {"CAN_USE", "CAN_MANAGE"})),
     ("Cluster Multiuso existe", CLUSTER is not None),
     ("CAN_ATTACH_TO de cluster concedido ao grupo", _group_in_acl(CLUSTER_ACL, GROUP, {"CAN_ATTACH_TO", "CAN_MANAGE"})),
+    ("Acesso aos modelos de IA para o grupo (USE CATALOG system + USE SCHEMA system.ai + EXECUTE em modelos)", _models_grants_ok),
     (f"Todos os {len(ATTENDEES)} participante(s) passam em todas as verificações", _attendees_ok),
 ]
 report += feature_report  # features de IA (seção 6) bloqueiam o veredito
@@ -761,6 +928,6 @@ if _all_ok:
           f"habilitados. Ambiente pronto — pode iniciar o treinamento. 🎉")
 else:
     print(f"{NO} AMBIENTE NÃO PRONTO: um ou mais itens estão ❌/⚠️ abaixo. Corrija a causa e re-execute "
-          f"o notebook inteiro antes do treinamento (detalhes por participante na seção 5b).")
+          f"o notebook inteiro antes do treinamento (detalhes por participante na seção 6b).")
 print("=" * 70)
 display(pd.DataFrame([{"Item": label, "Status": _sym(val)} for label, val in report], columns=["Item", "Status"]))
