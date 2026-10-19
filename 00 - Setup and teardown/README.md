@@ -28,6 +28,7 @@ Um único notebook, rodado uma vez pelo **administrador de conta**, que faz tudo
     - Cluster multiuso `dbacademy_workshop_cluster`
 4. Concede as permissões ao grupo:
     - `USE CATALOG` + `CREATE SCHEMA` no catálogo
+    - `USE SCHEMA` + `EXECUTE` no schema `system.ai` (modelo do model service do Ex. 9)
     - `CAN_MANAGE` na warehouse
     - `CAN_ATTACH_TO` no cluster
 5. Carrega a base compartilhada em `dbacademy.churn` como read-only para os participantes:

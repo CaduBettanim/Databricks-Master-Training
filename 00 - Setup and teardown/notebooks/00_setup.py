@@ -77,6 +77,7 @@ WAREHOUSE_NAME = "dbacademy_workshop_wh"
 CLUSTER_NAME   = "dbacademy_workshop_cluster"
 CSV_BASE = "https://raw.githubusercontent.com/CaduBettanim/Databricks-Master-Training/main/00%20-%20Setup%20and%20teardown/data"
 fq = f"{NOME_CATALOGO}.{NOME_SCHEMA}"
+PREP_CHECK_VERSION = "1.4"                   # versão deste setup (exibida no relatório final)
 
 CREATE_CATALOG   = dbutils.widgets.get("create_catalog") == "true"
 CREATE_WAREHOUSE = dbutils.widgets.get("create_warehouse") == "true"
@@ -304,6 +305,13 @@ try:
     print(f"{OK} Concedidos USE CATALOG + CREATE SCHEMA em {NOME_CATALOGO} para {GROUP}.")
 except Exception as e:
     print(f"{NO} Não foi possível conceder permissões no catálogo '{NOME_CATALOGO}': {e}")
+
+# Modelos do system.ai (Ex. 9: model service do Unity Gateway aponta para system.ai.gpt-oss-20b).
+try:
+    grant_with_retry(f"GRANT USE SCHEMA, EXECUTE ON SCHEMA system.ai TO `{GROUP}`")
+    print(f"{OK} Concedidos USE SCHEMA + EXECUTE em system.ai para {GROUP}.")
+except Exception as e:
+    print(f"{NO} Não foi possível conceder permissões em 'system.ai': {e}")
 
 # COMMAND ----------
 
@@ -746,6 +754,7 @@ report = [
     ("Base churn carregada (2000 clientes / 1253 tickets / churn 0.27)", _base_ok),
     ("Leitura da base churn p/ grupo (USE SCHEMA + SELECT, somente leitura)", _schema_grants),
     ("Leitura do volume kb_volume p/ grupo (READ VOLUME)", _volume_grants),
+    ("USE SCHEMA + EXECUTE em system.ai p/ grupo (Ex. 9)", _group_has_uc("schema", "system.ai", GROUP, {"USE_SCHEMA", "EXECUTE"})),
     ("SQL Warehouse existe", WAREHOUSE is not None),
     ("CAN_USE de warehouse concedido ao grupo", _group_in_acl(WAREHOUSE_ACL, GROUP, {"CAN_USE", "CAN_MANAGE"})),
     ("Cluster Multiuso existe", CLUSTER is not None),
@@ -763,4 +772,5 @@ else:
     print(f"{NO} AMBIENTE NÃO PRONTO: um ou mais itens estão ❌/⚠️ abaixo. Corrija a causa e re-execute "
           f"o notebook inteiro antes do treinamento (detalhes por participante na seção 5b).")
 print("=" * 70)
-display(pd.DataFrame([{"Item": label, "Status": _sym(val)} for label, val in report], columns=["Item", "Status"]))
+display(pd.DataFrame([{"Item": "Versão", "Status": PREP_CHECK_VERSION}] +
+                     [{"Item": label, "Status": _sym(val)} for label, val in report], columns=["Item", "Status"]))
