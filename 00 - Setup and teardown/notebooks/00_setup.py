@@ -11,7 +11,7 @@
 # MAGIC 2. **Carrega a base COMPARTILHADA** `<catálogo>.churn` (CSVs → Delta, `feature_churn`,
 # MAGIC    comentários + PK/FK, volume de conhecimento) e libera **leitura** dela para a turma.
 # MAGIC 3. **Verifica** que cada participante tem o que precisa e que o workspace tem as features
-# MAGIC    de IA usadas nos Ex. 4/6/7 (Model Serving/Foundation Model APIs e Multi-Agent Supervisor).
+# MAGIC    de IA usadas nos Ex. 4/7/9 (Model Serving/Foundation Model APIs e Genie Agents).
 # MAGIC
 # MAGIC **É idempotente** (create-if-not-exists + grants idempotentes): seguro re-executar.
 # MAGIC
@@ -21,7 +21,7 @@
 # MAGIC > use **Run all**. **Todas as células devem terminar com sucesso.** O veredito final está na
 # MAGIC > seção **7. Relatório final** (`✅ CHECKS COMPLETOS`). Se houver ❌/⚠️, corrija e re-execute.
 # MAGIC
-# MAGIC > Metric views (Ex.3), modelo (Ex.6) e os Genies/Supervisor (Ex.7) são criados por cada aluno
+# MAGIC > Metric views (Ex.3), modelo (Ex.6) e os Genies (Ex.7) são criados por cada aluno
 # MAGIC > no schema pessoal `<catálogo>.<seu_schema>` — habilitado aqui via `CREATE SCHEMA`.
 
 # COMMAND ----------
@@ -77,7 +77,7 @@ WAREHOUSE_NAME = "dbacademy_workshop_wh"
 CLUSTER_NAME   = "dbacademy_workshop_cluster"
 CSV_BASE = "https://raw.githubusercontent.com/CaduBettanim/Databricks-Master-Training/main/00%20-%20Setup%20and%20teardown/data"
 fq = f"{NOME_CATALOGO}.{NOME_SCHEMA}"
-PREP_CHECK_VERSION = "1.4"                   # versão deste setup (exibida no relatório final)
+PREP_CHECK_VERSION = "1.5"                   # versão deste setup (exibida no relatório final)
 
 CREATE_CATALOG   = dbutils.widgets.get("create_catalog") == "true"
 CREATE_WAREHOUSE = dbutils.widgets.get("create_warehouse") == "true"
@@ -611,21 +611,20 @@ else:
 
 # MAGIC %md
 # MAGIC ## 6. Features de IA do workspace
-# MAGIC Features do **workspace inteiro** (não por participante), necessárias para os Ex. 4, 6 e 7:
+# MAGIC Features do **workspace inteiro** (não por participante), necessárias para os Ex. 4, 7 e 9:
 # MAGIC | Feature | Sinal | Necessária por |
 # MAGIC |---|---|---|
 # MAGIC | Model Serving / Foundation Model APIs | `serving_endpoints.list()` funciona vs `NotFound` | 4 (AI Functions) |
 # MAGIC | Endpoints do `ai_query` (Ex. 4) | `databricks-meta-llama-3-3-70b-instruct` e `databricks-gpt-oss-120b` presentes na lista | 4 (passos 1c, 2b) |
-# MAGIC | Multi-Agent Supervisor (Agent Bricks) | co-gated com Knowledge Assistant (`GET /knowledge-assistants` responde vs 404) | 7 (Supervisor) |
+# MAGIC | Genie Agents | `GET /api/2.0/genie/spaces` responde vs 404 | 7 (Genies) e 9 (Supervisor do app) |
 # MAGIC
 # MAGIC > O registro do modelo no UC (Ex. 6) usa o Model Registry do Unity Catalog — inerente a
 # MAGIC > workspaces com UC, sem probe dedicado. Ex. 6 **não** cria endpoint de serving.
 
 # COMMAND ----------
 
-# O `list` do Multi-Agent Supervisor responde [] mesmo em regiões sem a feature, então não serve de
-# gate; derivamos MAS do Knowledge Assistant (co-gated, cujo 404 é sinal limpo). Cliente com timeout
-# curto para o probe não pendurar o notebook por minutos em regiões sem a feature.
+# Probe de feature com timeout curto, para não pendurar o notebook por minutos em regiões sem a
+# feature. O Supervisor do Ex. 9 é código do app (não Agent Bricks): só precisa dos Genies.
 from databricks.sdk.core import Config
 try:
     w_probe = WorkspaceClient(config=Config(http_timeout_seconds=5, retry_timeout_seconds=5))
@@ -670,13 +669,12 @@ if SERVING_OK and _missing_ex4:
 _opt = [n for n in EX4_OPTIONAL if n in _ep_ready]
 print(f"ℹ️  Opção adicional do Ex. 4 presente: {', '.join(_opt) if _opt else 'nenhuma (databricks-claude-haiku-4-5)'}")
 
-KA_OK = _feature_probe("/api/2.1/knowledge-assistants")
-MAS_OK = KA_OK  # co-gated com KA
+GENIE_OK = _feature_probe("/api/2.0/genie/spaces")
 
 feature_report = [
     ("Model Serving / Foundation Model APIs — AI Functions (Ex. 4)", SERVING_OK),
     ("Endpoints do ai_query do Ex. 4 (llama-3-3-70b + gpt-oss-120b)", EX4_OK),
-    ("Multi-Agent Supervisor / Agent Bricks (Ex. 7)", MAS_OK),
+    ("Genie Agents (Ex. 7 e Supervisor do app no Ex. 9)", GENIE_OK),
 ]
 print(f"Features de IA. Legenda: {OK} disponível  {NO} indisponível  {ERR} indeterminado")
 display(pd.DataFrame([{"Feature": _l, "Status": _sym(_v)} for _l, _v in feature_report],
