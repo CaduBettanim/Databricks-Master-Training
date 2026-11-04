@@ -33,8 +33,9 @@ INSTRUCOES = (
     "planos) e um de Suporte (tickets, CSAT, NPS, canais). Encaminhe cada pergunta ao "
     "especialista adequado, combine as respostas quando a pergunta envolver os dois temas e "
     "responda sempre em português.\n"
-    "Regras: use SEMPRE uma ferramenta para obter dados e nunca invente números. Passe ao "
-    "especialista a pergunta completa, em português. Na resposta final, diga em uma frase qual "
+    "Regras: use SEMPRE uma ferramenta para obter dados e nunca invente números. Passe a cada "
+    "especialista só a parte da pergunta que é do domínio dele, completa e em português (numa "
+    "pergunta sobre os dois temas, cada um recebe a sua parte). Na resposta final, diga em uma frase qual "
     "especialista respondeu e traga os números principais, com valores em reais no formato "
     "brasileiro (ex.: R$ 383.335,40). Escreva em texto simples, sem markdown (sem asteriscos, "
     "sem tabelas); listas curtas com hífen são permitidas."
@@ -71,7 +72,7 @@ FERRAMENTAS = [
                 "properties": {
                     "pergunta": {
                         "type": "string",
-                        "description": "A pergunta para o especialista, completa e em português.",
+                        "description": "A parte da pergunta que cabe a este especialista, completa e em português.",
                     }
                 },
                 "required": ["pergunta"],

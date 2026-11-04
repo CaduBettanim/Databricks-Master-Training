@@ -43,7 +43,7 @@ O notebook faz todo o trabalho pesado:
 - Confirma os seus Genies de **Faturamento** e **Suporte** (Ex. 7) escolhidos nos campos 2 e 3 e passa os IDs ao app: são os especialistas do Supervisor
 - Cria o seu **model service** `dbacademy.<seu_schema>.retencao-gateway` no Unity Gateway (modelo `gpt-oss-20b`, limite de 60 chamadas por minuto e tabela de inferência)
 - Cria o app (`central-retencao-<seu_schema>`) com compute e *service principal* próprios
-- Habilita o **on-behalf-of** (escopos `sql`, `dashboards.genie`, `ai-gateway` e `model-serving`) e declara o warehouse que o app usa
+- Habilita o **on-behalf-of** (escopos `sql`, `dashboards.genie`, `ai-gateway` e `model-serving`; o Databricks acrescenta sozinho os escopos básicos de identidade `iam.*`) e declara o warehouse que o app usa
 - Publica e imprime a URL
 
 > O notebook é **autocontido**: baixa sozinho o código do app (a pasta `app/`, com o front-end já compilado) do GitHub em tempo de execução. Você não precisa clonar o repositório.

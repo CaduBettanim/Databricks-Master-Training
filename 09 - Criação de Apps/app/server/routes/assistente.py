@@ -26,6 +26,7 @@ async def perguntar(req: PerguntaReq, request: Request):
     token = config.token_for_request(request.headers.get(config.USER_TOKEN_HEADER))
     r = await supervisor.responder(pergunta, token)
     if not r.get("ok"):
-        r["resposta"] = ("O Supervisor não conseguiu responder agora. Tente de novo "
-                         "(o Genie pode estar iniciando o warehouse).")
+        r["resposta"] = ("O Supervisor não conseguiu responder agora. Se é o seu primeiro acesso, "
+                         "confira se você autorizou o app (Authorize); se já autorizou, tente de "
+                         "novo em instantes (o warehouse do Genie pode estar iniciando).")
     return r

@@ -36,8 +36,8 @@
 # MAGIC 1. **Rode só a célula abaixo** (Shift+Enter) para os campos aparecerem no topo do notebook.
 # MAGIC 2. Preencha **1. Seu schema** (ex.: `cbettanim`).
 # MAGIC 3. Confira **2. Genie de Faturamento** e **3. Genie de Suporte**: os dropdowns listam os Genie
-# MAGIC    Agents que **você** criou e já vêm com os seus do Ex. 7 selecionados (o mais recente com
-# MAGIC    "Faturamento" / "Suporte" no nome). São os especialistas do Supervisor do app. Criou ou
+# MAGIC    Agents que **você** criou e já vêm com os seus do Ex. 7 selecionados (o mais recente cujo
+# MAGIC    nome começa com "Faturamento" / "Suporte"). São os especialistas do Supervisor do app. Criou ou
 # MAGIC    renomeou um Genie depois? Rode esta célula de novo para a lista atualizar.
 # MAGIC 4. **4. Warehouse** já vem com `dbacademy_workshop_wh` e **5. Model service** com
 # MAGIC    `retencao-gateway` (o modelo que o notebook vai criar no Unity Gateway, no seu schema).
@@ -212,7 +212,7 @@ def genie_do_widget(widget, dominio):
     m = re.search(r"([0-9a-f]{32})\s*$", dbutils.widgets.get(widget).strip())
     if m:
         sp = w.api_client.do("GET", f"/api/2.0/genie/spaces/{m.group(1)}")
-        return sp["space_id"], sp.get("title"), "selecionado no campo"
+        return sp["space_id"], sp.get("title"), f"do campo {'2' if dominio == 'Faturamento' else '3'}"
     sid, title = achar_genie(listar_genies(), dominio)
     return sid, title, "encontrado pelo nome"
 
