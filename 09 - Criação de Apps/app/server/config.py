@@ -4,12 +4,14 @@ Configuração central e autenticação da Central de Retenção.
 AUTENTICAÇÃO ON-BEHALF-OF (OBO): dentro do Databricks App, TODAS as chamadas de dados e IA
 rodam com a identidade do USUÁRIO LOGADO — não do service principal do app. O Databricks Apps
 injeta o token OAuth do usuário no header `X-Forwarded-Access-Token` (habilitado pelos escopos
-`user_api_scopes` no app.yaml: `sql` para o SQL Warehouse e `model-serving` para os serving
-endpoints). As rotas leem esse header e passam o token para warehouse.py e llm.py.
+`user_api_scopes` do app, que o deploy_app.py configura: `sql` para o SQL Warehouse,
+`dashboards.genie` para os Genies, `ai-gateway` para o model service do Unity Gateway e
+`model-serving` para serving endpoints). As rotas leem esse header e passam o token para
+warehouse.py, llm.py e genie.py.
 
 Consequência (o ponto do OBO): o app NÃO precisa de nenhum GRANT no seu service principal. O
-usuário já tem SELECT em `dbacademy.churn` (grupo do treino), é dono do seu schema pessoal e
-das UC functions, e é dono do Supervisor/Genies — então tudo funciona sem conceder nada ao SP.
+usuário já tem SELECT em `dbacademy.churn` (grupo do treino), é dono do seu schema pessoal, das
+UC functions, do model service e dos Genies — então tudo funciona sem conceder nada ao SP.
 
 Localmente (fora do App) não há header: caímos para o token do profile do CLI (dev), via
 `get_workspace_token()`.
@@ -54,12 +56,15 @@ CATALOG = os.environ.get("CR_CATALOG", "dbacademy")
 SCHEMA_CHURN = os.environ.get("CR_SCHEMA_CHURN", "churn")
 SCHEMA_PESSOAL = os.environ.get("CR_SCHEMA_PESSOAL", "cbettanim")
 
-# Supervisor (Ex.07) — roteia entre os Genies de Faturamento e Suporte.
-SUPERVISOR_ENDPOINT = os.environ.get("CR_SUPERVISOR_ENDPOINT", "mas-3d713414-endpoint")
+# Genies do Ex.07 (IDs dos spaces): os especialistas que o Supervisor em código
+# (server/supervisor.py) consulta. O deploy_app.py os encontra pelo nome e grava aqui.
+GENIE_FATURAMENTO_ID = os.environ.get("CR_GENIE_FATURAMENTO_ID", "").strip()
+GENIE_SUPORTE_ID = os.environ.get("CR_GENIE_SUPORTE_ID", "").strip()
 # Foundation model p/ a "leitura da IA" dos gráficos (✨ Explicar).
 EXPLAIN_MODEL = os.environ.get("CR_EXPLAIN_MODEL", "databricks-claude-sonnet-4-5")
-# Model service do Unity Gateway (catalogo.schema.nome). Quando definido, as chamadas de chat
-# do app (✨ Explicar e o e-mail de retenção) passam pelo Gateway em vez do serving endpoint.
+# Model service do Unity Gateway (catalogo.schema.nome). Quando definido, TODA a IA do app
+# (o Supervisor do Assistente, o ✨ Explicar e o e-mail de retenção) passa pelo Gateway em vez do
+# serving endpoint.
 GATEWAY_MODEL = os.environ.get("CR_GATEWAY_MODEL", "").strip()
 
 
@@ -137,6 +142,8 @@ def summary() -> dict:
         "catalog": CATALOG,
         "schema_churn": SCHEMA_CHURN,
         "schema_pessoal": SCHEMA_PESSOAL,
-        "supervisor_endpoint": SUPERVISOR_ENDPOINT,
+        "genie_faturamento": GENIE_FATURAMENTO_ID or None,
+        "genie_suporte": GENIE_SUPORTE_ID or None,
+        "gateway_model": GATEWAY_MODEL or None,
         "explain_model": EXPLAIN_MODEL,
     }

@@ -6,7 +6,7 @@
 
 Até aqui, você montou as análises. Agora vamos abrir isso para o time de negócio com os **Genie Agents**: qualquer pessoa pergunta em português (*"qual a receita por segmento?"*) e o Genie escreve o SQL, executa e responde, sem escrever uma linha de código.
 
-E vamos um passo além. Você vai criar dois Genies especializados, um de **Faturamento** e um de **Suporte**, e no fim um **Supervisor** que orquestra os dois. O usuário faz uma pergunta só, e o Supervisor descobre sozinho qual especialista deve responder. É isso que chamamos de solução *multi-agent*.
+E vamos preparar uma solução *multi-agent*. Você vai criar dois Genies especializados, um de **Faturamento** e um de **Suporte**. No Ex. 9, o app da Central de Retenção traz um **Supervisor** que orquestra os dois: o usuário faz uma pergunta só, e o Supervisor descobre sozinho qual especialista deve responder.
 
 ---
 
@@ -22,7 +22,9 @@ E vamos um passo além. Você vai criar dois Genies especializados, um de **Fatu
     - `dbacademy.churn.fato_faturamento`
 4. Dê o nome `Faturamento - <seu_schema>`, trocando `<seu_schema>` pelo nome do seu schema
 
-> O Genie infere os relacionamentos entre as tabelas; você não precisa configurar os joins na mão. Vamos reutilizar este Genie Agent na Parte 3, no Supervisor
+> O Genie infere os relacionamentos entre as tabelas; você não precisa configurar os joins na mão. Vamos reutilizar este Genie Agent no Ex. 9, no Supervisor do app
+
+> Use o nome `Faturamento - <seu_schema>`: o notebook do Ex. 9 já traz o seu Genie selecionado por esse nome
 
 ## Passo 2: Perguntar
 Faça as perguntas abaixo, uma por vez:
@@ -58,6 +60,8 @@ Note que você não disse de qual tabela vem o dado: o Genie descobre sozinho, m
     - `dbacademy.churn.dim_cliente`
     - `dbacademy.churn.fato_ticket_suporte`
 3. Dê o nome `Suporte - <seu_schema>`, trocando `<seu_schema>` pelo nome do seu schema
+
+> Como no Passo 1, o nome importa: o notebook do Ex. 9 já traz este Genie selecionado por ele
 
 ## Passo 4: Perguntar
 Faça as perguntas abaixo, uma por vez:
@@ -102,63 +106,6 @@ Desta vez o Genie filtra de **01/10/2024 a 30/09/2025** e responde **≈ 6,5**. 
 
 ---
 
-# Parte 3: Supervisor (multi-agent)
+# Próximo passo: o Supervisor
 
-Você já tem dois especialistas. Agora vamos criar o **Supervisor**: ele recebe a pergunta do usuário e a encaminha para o Genie certo, sem que o usuário precise saber qual é qual.
-
-## Passo 7: Criar o Supervisor e anexar os agentes
-1. No menu lateral à esquerda, abra **Agents**
-2. Clique em **Create agent** e selecione **Supervisor Agent**
-3. Vá em **Tools and sub-agents** e selecione a opção **Genie Agents**
-4. No campo de busca, digite o nome do seu agente de faturamento (`Faturamento - <seu_schema>`) e selecione-o
-5. Na descrição da ferramenta, cole:
-```text
-Especialista em faturamento e cobrança. Responde sobre receita, inadimplência, faturas pagas e não pagas, e valores por plano e por segmento.
-```
-6. Repita os passos 3 a 5 para o agente de suporte (`Suporte - <seu_schema>`), com a descrição:
-```text
-Especialista em atendimento e satisfação do cliente. Responde sobre tickets de suporte, CSAT, NPS, canais e categorias, inclusive por ano fiscal.
-```
-7. Remova a ferramenta que já vem por padrão, chamada `python_exec`: passe o mouse sobre ela, clique no ícone de lixeira e confirme a exclusão
-
-> Neste exercício o Supervisor só coordena os dois Genies, por isso removemos o `python_exec`
-
-## Passo 8: Nomear, instruir e descrever
-> O campo **nome** só fica editável depois que você anexa pelo menos um agente (Passo 7); por isso deixamos essa etapa para agora.
-
-1. Dê um nome ao Supervisor, por exemplo `Analise-Clientes-<seu_schema>`
-2. Em **Instructions**, cole as regras de coordenação:
-```text
-Você coordena dois especialistas: um de Faturamento (receita, inadimplência, faturas, planos) e um de Suporte (tickets, CSAT, NPS, canais). Encaminhe cada pergunta ao especialista adequado, combine as respostas quando a pergunta envolver os dois temas e responda sempre em português.
-```
-3. Mais abaixo, em **Description**, cole:
-```text
-Assistente de análise de clientes: responde perguntas de negócio sobre faturamento e sobre atendimento/suporte, encaminhando cada pergunta ao especialista certo.
-```
-
-## Passo 9: Testar o roteamento
-Faça estas duas perguntas novas, uma de cada domínio, e observe o Supervisor escolher o especialista certo antes de responder:
-
-```text
-Qual o valor total em faturas não pagas?
-```
-Resultado esperado: o Supervisor aciona o agente de **Faturamento** → **≈ R$ 383.335** (3.846 faturas em aberto)
-
-```text
-Qual a nota média de NPS por canal de atendimento?
-```
-Resultado esperado: o Supervisor aciona o agente de **Suporte** →
-- Chat **6,57**
-- Email **6,54**
-- Telefone **6,47**
-
-> Repare que você não disse a qual Genie perguntar: o Supervisor leu a pergunta, escolheu o especialista e sintetizou a resposta. É assim que uma solução *multi-agent* simplifica a vida do usuário de negócio: uma porta de entrada, vários especialistas atrás dela.
-
-## Passo 10: Renomear o Supervisor e copiar o endpoint
-1. Clique no ícone de lápis ao lado no nome do supervisor e renomeie como `supervisor-<seu_schema>`
-2. Clique no botão **Endpoint** em cima
-3. Copie e guarde o nome do endpoint que começa com `mas-` (algo como `mas-3d713414-endpoint`)
-
-Ao criar o Supervisor, o Databricks já o publica como um **endpoint de serving**. É por ele que o app do Ex. 9 vai chamar o Supervisor.
-
-> Você vai colar o nome do endpoint no campo `supervisor_endpoint` do Ex. 9
+Você já tem dois especialistas. No **Ex. 9**, o app da Central de Retenção traz um **Supervisor** escrito em código: um agente que lê a pergunta, escolhe o Genie certo (ou os dois), consulta e sintetiza a resposta. Você não precisa anotar nada: o notebook do Ex. 9 lista os seus Genies e já traz os dois selecionados.
