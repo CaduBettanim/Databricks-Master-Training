@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 import time
 from typing import Optional
 
@@ -85,10 +86,22 @@ FERRAMENTAS = [
 MAX_PASSOS = 4
 
 
+def _nome_ferramenta(bruto) -> str:
+    """Nome da ferramenta sem lixo: o gpt-oss às vezes vaza tokens do formato dele no nome
+    (ex.: 'consultar_suporte<|channel|>commentary')."""
+    return re.split(r"<\|", str(bruto or ""))[0].strip()
+
+
+def _rota(consultas: list[dict]) -> list[str]:
+    """Especialistas válidos acionados, na ordem, sem repetição."""
+    validos = {e["nome"] for e in ESPECIALISTAS.values()}
+    return list(dict.fromkeys(c["especialista"] for c in consultas if c["especialista"] in validos))
+
+
 async def _executar(chamada: dict, token: Optional[str]) -> tuple[str, dict]:
     """Executa UMA chamada de ferramenta. Devolve (conteúdo para o modelo, registro para a UI)."""
     fn = chamada.get("function") or {}
-    esp = ESPECIALISTAS.get(fn.get("name"))
+    esp = ESPECIALISTAS.get(_nome_ferramenta(fn.get("name")))
     args = fn.get("arguments") or {}
     if isinstance(args, str):  # o padrão OpenAI manda os argumentos como texto JSON
         try:
@@ -144,13 +157,13 @@ async def responder(pergunta: str, token: Optional[str]) -> dict:
             print(f"[supervisor] modelo indisponível no passo {passo + 1} "
                   f"(t={time.monotonic() - t0:.1f}s) pergunta={pergunta[:80]!r}")
             return {"ok": False, "resposta": None,
-                    "rota": list(dict.fromkeys(c["especialista"] for c in consultas)),
+                    "rota": _rota(consultas),
                     "consultas": consultas}
         msg = (resp.get("choices") or [{}])[0].get("message") or {}
         chamadas = msg.get("tool_calls") or []
         if not chamadas:
             texto = llm.texto_do_content(msg.get("content")).strip()
-            rota = list(dict.fromkeys(c["especialista"] for c in consultas))
+            rota = _rota(consultas)
             print(f"[supervisor] rota={rota} passos={passo + 1} "
                   f"t={time.monotonic() - t0:.1f}s pergunta={pergunta[:80]!r}")
             return {"ok": bool(texto), "resposta": texto, "rota": rota, "consultas": consultas}
@@ -167,5 +180,5 @@ async def responder(pergunta: str, token: Optional[str]) -> dict:
     print(f"[supervisor] sem resposta final após {MAX_PASSOS} passos "
           f"(t={time.monotonic() - t0:.1f}s) pergunta={pergunta[:80]!r}")
     return {"ok": False, "resposta": None,
-            "rota": list(dict.fromkeys(c["especialista"] for c in consultas)),
+            "rota": _rota(consultas),
             "consultas": consultas}
