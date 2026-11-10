@@ -277,9 +277,7 @@ print("  inference table:", ((_ms.get("config") or {}).get("inference_table") or
 import urllib.request, zipfile, tempfile, glob
 
 # Baixa o repositório do GitHub (a compute do Databricks alcança github.com) e usa o app/ de lá.
-# TEMPORÁRIO (validação do branch feat/supervisor-em-codigo): antes do merge, voltar para
-# "https://github.com/CaduBettanim/Databricks-Master-Training/archive/refs/heads/main.zip".
-ZIP_URL = "https://github.com/vitor-bricks/Databricks-Master-Training/archive/refs/heads/feat/supervisor-em-codigo.zip"
+ZIP_URL = "https://github.com/CaduBettanim/Databricks-Master-Training/archive/refs/heads/main.zip"
 if APP_SOURCE.startswith("/Workspace/"):
     SRC_APP = APP_SOURCE
     assert os.path.isdir(os.path.join(SRC_APP, "server")), f"app_source sem a pasta app/: {SRC_APP}"

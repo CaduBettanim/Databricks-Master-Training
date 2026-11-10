@@ -23,7 +23,7 @@ E tem duas novidades:
 ## Passo 1: Publicar o app
 1. Importe o notebook: **Workspace → Três pontinhos no topo → Import → URL**, e cole o seguinte:
 ```
-https://github.com/vitor-bricks/Databricks-Master-Training/blob/feat/supervisor-em-codigo/09%20-%20Cria%C3%A7%C3%A3o%20de%20Apps/deploy_app.py
+https://github.com/CaduBettanim/Databricks-Master-Training/blob/main/09%20-%20Cria%C3%A7%C3%A3o%20de%20Apps/deploy_app.py
 ```
 2. Após clicar em **Import**, você será redirecionado para o notebook
 3. No dropdown na barra superior, ao lado de **Run all**, selecione o cluster `dbacademy_workshop_cluster`
