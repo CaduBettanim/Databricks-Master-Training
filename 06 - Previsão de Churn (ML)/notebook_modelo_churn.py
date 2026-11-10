@@ -10,7 +10,7 @@
 
 # COMMAND ----------
 
-# MAGIC %pip install scikit-learn mlflow
+# MAGIC %pip install --prefer-binary scikit-learn mlflow
 
 dbutils.library.restartPython()
 

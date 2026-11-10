@@ -28,9 +28,9 @@ Você fechou o ciclo **Detectar → Diagnosticar → Decidir → Agir**, sempre 
 | **04 · IA Generativa no SQL** | AI Functions sobre os tickets: sentimento, categoria, PII e resumo |
 | **05 · Dashboards com IA** | Painel executivo de churn no AI/BI, montado a partir de prompts |
 | **06 · Previsão de Churn (ML)** | Modelo de probabilidade de churn + a tabela `churn_scores` |
-| **07 · Análise de Dados Multi-Agent** | Dois Genies (Faturamento e Suporte) + um Supervisor que orquestra |
+| **07 · Análise de Dados Multi-Agent** | Dois Genies especialistas (Faturamento e Suporte), orquestrados pelo Supervisor do app |
 | **08 · Retenção com ML e GenAI** | UC Functions: o perfil 360 do cliente e o e-mail de retenção personalizado |
-| **09 · Criação de Apps** | A **Central de Retenção**: Cockpit + Assistente + Retenção, num único deploy, com a IA passando por um model service do Unity Gateway |
+| **09 · Criação de Apps** | A **Central de Retenção**: Cockpit + Assistente (Supervisor em código sobre os Genies) + Retenção, num único deploy, com a IA passando por um model service do Unity Gateway |
 
 É o mesmo padrão que você leva para qualquer caso de uso e indústria: **dados → métricas → IA → agentes → app**, tudo governado pelo Unity Catalog.
 

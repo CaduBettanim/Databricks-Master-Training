@@ -13,6 +13,10 @@ export type CockpitDados = {
   D: Record<string, RegiaoDados>;
   kpi: { churn_pct: number; risco_alto: number; mrr_risco: number; auc: string };
 };
+export type Consulta = {
+  especialista: string; pergunta: string; ok: boolean;
+  sql?: string | null; texto?: string | null; linhas?: number;
+};
 export type Cliente = {
   id: string; nome: string; cidade: string; uf: string;
   anos: number; plano: string; prob: number; fator: string;
@@ -36,7 +40,7 @@ export const api = {
       body: JSON.stringify({ chart, regiao, dados }),
     }),
   perguntar: (pergunta: string) =>
-    req<{ resposta: string; ok: boolean }>("/assistente/perguntar", {
+    req<{ resposta: string; ok: boolean; rota?: string[]; consultas?: Consulta[] }>("/assistente/perguntar", {
       method: "POST",
       body: JSON.stringify({ pergunta }),
     }),

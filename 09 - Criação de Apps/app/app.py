@@ -2,8 +2,9 @@
 Central de Retenção — entrypoint FastAPI (Master Training / churn).
 
 Serve a API (/api/*) e o build do React (frontend/dist). Três abas: Cockpit (mapa + gráficos),
-Assistente (Supervisor Ex.07) e Retenção Personalizada (lista de risco + e-mail via UC function).
-Todo o dado vem do Unity Catalog via SQL Warehouse; a IA, de dois serving endpoints.
+Assistente (Supervisor em código, server/supervisor.py, sobre os Genies do Ex.07) e Retenção
+Personalizada (lista de risco + e-mail via UC function). Todo o dado vem do Unity Catalog via SQL
+Warehouse e dos Genies; a IA, do model service do aluno no Unity Gateway.
 
 Local:  uv run uvicorn app:app --reload --port 8000
 Remoto: definido em app.yaml (uvicorn na 8000).

@@ -13,7 +13,7 @@ Ao longo da trilha, o participante:
 - aplica IA Generativa sobre texto (tickets de suporte);
 - cria dashboards e agentes conversacionais (Genie);
 - treina um modelo de churn e o serve com governança;
-- orquestra tudo em um agente supervisor e entrega um app de retenção.
+- orquestra os agentes com um Supervisor em código e entrega um app de retenção.
 
 O domínio é uma empresa de assinatura genérica, então a trilha se adapta a qualquer cliente/indústria. Todo o conteúdo é reproduzível em qualquer workspace: os dados vêm de CSVs versionados neste repositório.
 
@@ -21,7 +21,7 @@ O domínio é uma empresa de assinatura genérica, então a trilha se adapta a q
 
 - **Base compartilhada** (schema `churn`, somente leitura): criada uma vez no Setup e usada por toda a turma.
 - **Schema pessoal por participante** (`<catálogo>.<seu_database>`): recebe o que cada um cria nos exercícios (metric views, modelo, funções, etc.).
-- Objetos de workspace (Genie, Supervisor, App) são criados por participante.
+- Objetos de workspace (Genies e App) são criados por participante.
 
 <details markdown="1">
 <summary>👉 Tabelas da base compartilhada churn</summary>
@@ -46,9 +46,9 @@ O domínio é uma empresa de assinatura genérica, então a trilha se adapta a q
 | **04 - IA Generativa no SQL** | IA Generativa no SQL sobre os tickets: sentimento, classificação, PII e resumo. |
 | **05 - Dashboards com IA** | Painel executivo de churn no AI/BI, com os gráficos montados pelo Assistente (✨) a partir de prompts. |
 | **06 - Previsão de Churn (ML)** | Treinar e registrar um modelo de probabilidade de churn e gerar a tabela de scores que alimenta os agentes e o app. |
-| **07 - Análise de Dados Multi-Agent** | Criar dois Genies (Faturamento e Suporte) e um agente Supervisor que orquestra os dois, roteando cada pergunta ao especialista certo. |
+| **07 - Análise de Dados Multi-Agent** | Criar dois Genies especialistas (Faturamento e Suporte), com instruções de negócio, que o Supervisor do app (Ex. 9) orquestra roteando cada pergunta ao especialista certo. |
 | **08 - Retenção com ML e GenAI** | Criar funções governadas (UC Functions) que transformam o score em ação: o perfil 360 do cliente e um e-mail de retenção personalizado, com as regras de oferta em SQL e a IA só na escrita. |
-| **09 - Criação de Apps** | Publicar a **Central de Retenção**: o app que amarra o treinamento inteiro. Reúne o Cockpit de churn (mapa + gráficos com leitura por IA), o Assistente (o Supervisor do Ex. 7) e a Retenção personalizada (as funções do Ex. 8), com um único notebook de deploy. A IA do app passa por um **model service do Unity Gateway**, governado e auditado. |
+| **09 - Criação de Apps** | Publicar a **Central de Retenção**: o app que amarra o treinamento inteiro. Reúne o Cockpit de churn (mapa + gráficos com leitura por IA), o Assistente (um Supervisor em código que orquestra os Genies do Ex. 7) e a Retenção personalizada (as funções do Ex. 8), com um único notebook de deploy. A IA do app passa por um **model service do Unity Gateway**, governado e auditado. |
 | **10 - Fechamento (Próximos Passos)** | Retrospectiva do desafio de churn concluído, resumo de tudo que foi construído e os próximos passos na Databricks Academy (Jornada Lakehouse). |
 
 ## Como começar
