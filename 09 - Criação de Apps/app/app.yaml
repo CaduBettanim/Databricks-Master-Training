@@ -1,0 +1,44 @@
+# Central de Retenção — config do Databricks App (autenticação ON-BEHALF-OF usuário).
+#
+# O App roda o FastAPI (uvicorn) na porta 8000, servindo API + build do React.
+#
+# AUTENTICAÇÃO ON-BEHALF-OF (OBO): o app usa o token OAuth do usuário logado
+# (header X-Forwarded-Access-Token) para as chamadas de SQL, Genie e IA, de modo que dados e IA
+# rodam com a identidade do USUÁRIO — o service principal do app NÃO precisa de GRANT.
+#
+# Os escopos OBO (`sql` para o SQL Warehouse, `dashboards.genie` para os Genies, `ai-gateway` para
+# o model service do Unity Gateway e `model-serving` para serving endpoints) NÃO ficam aqui no
+# app.yaml (esta chave é
+# ignorada e pode falhar o build). Eles são configurados no APP (campo user_api_scopes), o que o
+# notebook de deploy (deploy_app.py) faz via API.
+#
+# CR_GATEWAY_MODEL = model service do Unity Gateway (catalogo.schema.nome). Com ele definido, o
+# Supervisor do Assistente, o ✨ Explicar do Cockpit e o e-mail da aba Retenção passam pelo Gateway.
+# CR_GENIE_FATURAMENTO_ID / CR_GENIE_SUPORTE_ID = IDs dos Genies do Ex. 7 (os especialistas que o
+# Supervisor em código consulta). Este arquivo é só a referência: o deploy_app.py gera o app.yaml
+# final com os valores do aluno (e encontra os Genies pelo nome).
+command:
+  - "uvicorn"
+  - "app:app"
+  - "--host"
+  - "0.0.0.0"
+  - "--port"
+  - "8000"
+
+env:
+  - name: CR_WAREHOUSE_ID
+    value: "d788121d0edfbb7a"
+  - name: CR_GENIE_FATURAMENTO_ID
+    value: "<id do Genie 'Faturamento - <seu_schema>'>"
+  - name: CR_GENIE_SUPORTE_ID
+    value: "<id do Genie 'Suporte - <seu_schema>'>"
+  - name: CR_EXPLAIN_MODEL
+    value: "databricks-claude-sonnet-4-5"
+  - name: CR_GATEWAY_MODEL
+    value: "dbacademy.<seu_schema>.retencao-gateway"
+  - name: CR_CATALOG
+    value: "dbacademy"
+  - name: CR_SCHEMA_CHURN
+    value: "churn"
+  - name: CR_SCHEMA_PESSOAL
+    value: "cbettanim"
